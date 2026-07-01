@@ -1,0 +1,255 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
+const MAIN = 'https://intensivetrader.com';
+const DL_V137 = `${MAIN}/d/gdbasket`;
+const DL_V118 = `${MAIN}/d/gdbasket-v118`;
+
+const features = [
+  { title: 'Buy Grid ถัวเฉลี่ย (DCA)', desc: 'เปิด Buy เป็นชุด ราคาลงวางเพิ่มเรื่อยๆ ถัวต้นทุนให้ต่ำลง รอราคาเด้งกลับปิดทั้งตะกร้า' },
+  { title: 'ระยะกริดปรับตามตลาด (ATR)', desc: 'ระยะห่างระหว่างไม้ไม่ได้ fix — คำนวณจากความผันผวนจริง (ATR M15) ตลาดผันผวนมากกริดถ่างขึ้นอัตโนมัติ' },
+  { title: 'ปิดทั้งตะกร้าจุดเดียว (Common TP)', desc: 'ทุกไม้ใช้เป้ากำไรราคาเดียวกัน broker เป็นคนปิดให้ — ไม่ต้องเฝ้าจอ' },
+  { title: 'SL กันตายที่ broker', desc: 'วาง SL จริงร่วมทุกไม้เป็น backstop กันพอร์ตแตกหนักเมื่อ EA ดับ / ตลาดปิด / ราคากระโดด' },
+  { title: '2 โปรไฟล์ STRADA / SPORT', desc: 'เลือกสไตล์ได้: SPORT (default) สลับความถี่กริดตามโซนเส้นค่าเฉลี่ย / STRADA เปิดไม้เฉพาะฝั่งขาขึ้นความเสี่ยงต่ำ' },
+  { title: 'รองรับ GOLD# Std + GOLDm# Micro', desc: 'เลือก Auto / Standard / Micro — ปรับ lot ให้พอดีบัญชี XM ทั้งบัญชีใหญ่และไมโคร' },
+];
+
+const howSteps = [
+  'เปิดไม้แรกตามเวลา (ไม่ใช้ indicator จับสัญญาณ)',
+  'ราคาลงถึงระยะกริด (คิดจาก ATR) → วาง Buy เพิ่มถัวเฉลี่ย',
+  'ตั้งเป้ากำไรรวม (common TP) ราคาเดียวทุกไม้ — ราคาแตะ broker ปิดทั้งตะกร้า',
+  'มี SL จริงที่ broker เป็นตัวกันตาย (กรณี EA ดับ / ตลาดปิด / ราคา gap)',
+];
+
+const releases = [
+  { version: 'v1.37', date: '2026-06-24', latest: true, note: 'ปรับวิธีบันทึกผลตอนพอร์ตแตก (ขาดทุนสุทธิจริง) + ใช้ SL ที่ broker เป็นตัวปิดหลัก + แยกการปิดแบบ trail / TP / SO ชัดเจน', url: DL_V137 },
+  { version: 'v1.18', date: '2026-06-13', latest: false, note: 'แก้บั๊กตรวจพอร์ตแตกผิดพลาด (false SO) ตอนเจอ bad tick / ข่าว / สเปรดกระชาก', url: DL_V118 },
+];
+
+// file-list rows (github metaphor -> สารบัญ EA)
+const fileRows = [
+  { icon: 'doc', name: 'README — ภาพรวม EA', note: 'Buy Grid GOLD M15 · DCA + ATR grid + common TP', meta: 'อ่าน', href: '#readme', color: 'text-gray' },
+  { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · MQL5\\Experts\\ · ลากใส่กราฟ GOLD M15', meta: '5 ขั้น', href: '#install', color: 'text-secondary' },
+  { icon: 'star', name: 'จุดเด่น', note: '6 ข้อ · DCA / ATR / common TP / SL / STRADA+SPORT / Std+Micro', meta: '6', href: '#features', color: 'text-primary' },
+  { icon: 'clock', name: 'บันทึกเวอร์ชัน', note: 'v1.37 (2026-06-24) · v1.18 (2026-06-13)', meta: '2 rel', href: '#releases', color: 'text-gray' },
+  { icon: 'dl', name: 'gdBasket_v1.37.ex5', note: 'ไฟล์ EA พร้อมใช้ · MT5 · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_V137, color: 'text-green', download: true },
+];
+
+const installSteps = [
+  'โหลดไฟล์ <strong>gdBasket_v1.37.ex5</strong> จากปุ่มด้านบน',
+  'เปิด <strong>MetaTrader 5</strong> → เมนู <strong>File → Open Data Folder</strong>',
+  'วางไฟล์ใน <code class="install-path">MQL5\\Experts\\</code>',
+  '<strong>Restart MT5</strong> หรือกด <strong>Refresh</strong> ใน Navigator',
+  'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊ก <strong>Allow Algo Trading</strong> → OK',
+];
+---
+
+<Layout title="gdBasket — Buy Grid EA สำหรับ GOLD M15 | Room" description="gdBasket — MQL5 Buy Grid EA บน GOLD M15 ใช้จริงบนพอร์ตจริง. โหลดฟรี v1.37">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+  <!-- breadcrumb -->
+  <div class="text-sm text-gray-dark mb-4">
+    <a href="/" class="text-gray hover:text-primary transition-colors">Room</a><span class="mx-1">/</span>
+    <a href="/?filter=ea" class="text-gray hover:text-primary transition-colors">EA</a><span class="mx-1">/</span>
+    <span class="text-gray-light font-semibold">gdBasket</span>
+  </div>
+
+  <!-- (a) REPO HEADER ROW -->
+  <div class="flex justify-between items-start gap-4 flex-wrap pb-4">
+    <div class="flex items-center gap-3">
+      <img src={`${MAIN}/profile.jpg`} class="w-8 h-8 rounded-full bg-dark-border" alt="" />
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-lg text-gray">IntensiveTrader</span>
+        <span class="text-lg text-gray-dark">/</span>
+        <span class="pixel text-primary text-[15px]">gdBasket</span>
+        <span class="inline-flex items-center gap-1.5 bg-dark border border-green/40 text-green px-2.5 py-0.5 rounded-full text-xs font-semibold">LIVE จริง</span>
+      </div>
+    </div>
+    <div class="flex items-center rounded-lg border border-dark-border overflow-hidden text-sm">
+      <span class="px-3 py-1.5 text-gray">เวอร์ชัน</span>
+      <span class="px-3 py-1.5 bg-dark border-l border-dark-border text-gray-light font-semibold">v1.37</span>
+    </div>
+  </div>
+
+  <!-- (b) SUB-NAV TABS -->
+  <div class="border-b border-dark-border flex gap-1 text-sm overflow-x-auto">
+    <a href="#readme" class="px-3 py-2.5 border-b-2 border-primary text-gray-light font-semibold whitespace-nowrap">โค้ด/ไฟล์</a>
+    <a href="#readme" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">วิธีทำงาน</a>
+    <a href="#features" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">จุดเด่น</a>
+    <a href="#releases" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap flex items-center gap-1.5">Releases <span class="bg-dark-border text-gray-light text-[10px] px-1.5 rounded-full">2</span></a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 mt-5">
+
+    <!-- LEFT -->
+    <div>
+      <!-- (c) TOOLBAR -->
+      <div class="flex items-center gap-3 flex-wrap mb-3">
+        <span class="flex items-center gap-2 bg-dark-card border border-dark-border rounded-lg px-3 py-1.5 text-sm text-gray-light">
+          <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
+          <span class="font-semibold">v1.37</span>
+        </span>
+        <span class="text-sm text-gray flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
+          <span class="text-gray-light font-semibold">2</span> เวอร์ชัน
+        </span>
+        <div class="flex-1 min-w-[120px]"></div>
+        <a href={DL_V137} download class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors pixel-shadow">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด
+        </a>
+      </div>
+
+      <!-- (d) LATEST-COMMIT BAR -->
+      <div class="flex items-center gap-3 bg-dark-card border border-dark-border rounded-t-xl px-4 py-2.5 text-sm flex-wrap">
+        <img src={`${MAIN}/profile.jpg`} class="w-5 h-5 rounded-full bg-dark-border" alt="" />
+        <span class="text-gray-light font-semibold">IntensiveTrader</span>
+        <span class="text-gray truncate flex-1 min-w-[120px]">v1.37 — ปรับวิธีบันทึกผลตอนพอร์ตแตก + SL ที่ broker เป็นตัวปิดหลัก</span>
+        <span class="text-gray-dark whitespace-nowrap">อัปเดต 2026-06-24</span>
+      </div>
+
+      <!-- (e) FILE LIST -->
+      <div class="border border-t-0 border-dark-border rounded-b-xl overflow-hidden text-sm mb-8">
+        {fileRows.map((row, i) => (
+          <a
+            href={row.href}
+            {...(row.download ? { download: true } : {})}
+            class={`flex items-center gap-3 px-4 py-2.5 hover:bg-dark-card transition-colors cursor-pointer ${i < fileRows.length - 1 ? 'border-b border-dark-border' : ''}`}
+          >
+            <span class={`shrink-0 ${row.color}`}>
+              {row.icon === 'doc' && <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h11v2H4z"/></svg>}
+              {row.icon === 'gear' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>}
+              {row.icon === 'star' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>}
+              {row.icon === 'clock' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
+              {row.icon === 'dl' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>}
+            </span>
+            <span class="text-gray-light font-medium w-[190px] max-md:w-[130px] shrink-0">{row.name}</span>
+            <span class="text-gray truncate flex-1 max-md:hidden">{row.note}</span>
+            <span class={`whitespace-nowrap text-xs ${row.download ? 'text-primary font-semibold' : 'text-gray-dark'}`}>{row.meta}{row.download ? ' →' : ''}</span>
+          </a>
+        ))}
+      </div>
+
+      <!-- (f) README CARD -->
+      <div id="readme" class="border border-dark-border rounded-xl overflow-hidden mb-8 scroll-mt-20">
+        <div class="flex items-center gap-2 bg-dark-card border-b border-dark-border px-4 py-2.5 text-sm">
+          <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13"/></svg>
+          <span class="text-gray-light font-semibold">README</span>
+        </div>
+        <div class="p-6">
+          <h2 class="pixel text-primary text-[18px] mb-4">gdBasket</h2>
+          <p class="text-gray leading-relaxed mb-6">Buy Grid EA บน GOLD M15 — เปิด Buy เป็นชุดตามเวลา ถ้าราคาลงค่อยวางไม้เพิ่มถัวเฉลี่ย แล้วให้ broker ปิดทั้งตะกร้าด้วยเป้ากำไรรวมราคาเดียว มี SL จริงที่ broker เป็นตัวกันตาย</p>
+
+          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">ทำงานยังไง</h3>
+          <div class="flex flex-col mb-8">
+            {howSteps.map((step, i, arr) => (
+              <div class="grid grid-cols-[40px_1fr] gap-4 relative pb-5 last:pb-0">
+                {i < arr.length - 1 && <div class="absolute left-[19px] top-[40px] bottom-0 w-0.5 bg-dark-border"></div>}
+                <div class="pixel w-10 h-10 bg-primary/15 rounded-lg flex items-center justify-center text-primary relative z-10 text-[0.7rem]">{i + 1}</div>
+                <p class="text-gray text-sm leading-relaxed pt-2.5">{step}</p>
+              </div>
+            ))}
+          </div>
+
+          <h3 id="features" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">จุดเด่น</h3>
+          <div class="grid sm:grid-cols-2 gap-4 mb-8">
+            {features.map(f => (
+              <div class="bg-dark-card border border-dark-border rounded-lg p-4 hover:border-primary transition-colors">
+                <h4 class="font-bold text-gray-light text-[14px] mb-1.5">{f.title}</h4>
+                <p class="text-gray text-[13px] leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <h3 id="install" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">วิธีติดตั้ง</h3>
+          <div>
+            {installSteps.map((step, i) => (
+              <div class="flex gap-4 items-start py-3.5 border-b border-dark-border last:border-0">
+                <div class="pixel w-8 h-8 flex-shrink-0 bg-dark border border-dark-border rounded-lg flex items-center justify-center text-primary text-[0.6rem]">{i + 1}</div>
+                <p class="text-gray text-sm leading-relaxed pt-1.5" set:html={step} />
+              </div>
+            ))}
+          </div>
+          <p class="text-xs text-gray-dark mt-4">EA ล็อกให้รันเฉพาะ GOLD ที่ timeframe M15 บนโบรกเกอร์ XM</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="flex flex-col gap-6">
+      <!-- About -->
+      <div>
+        <h3 class="text-gray-light font-bold text-[15px] mb-2">About</h3>
+        <p class="text-gray text-sm mb-4 leading-relaxed">Buy Grid EA สำหรับ GOLD M15 — ใช้จริงบนพอร์ตจริง</p>
+        <div class="flex flex-col gap-2 text-sm border-t border-dark-border pt-3">
+          <div class="flex justify-between"><span class="text-gray-dark">ตลาด</span><span class="text-gray-light">GOLD (XAUUSD)</span></div>
+          <div class="flex justify-between"><span class="text-gray-dark">Timeframe</span><span class="text-gray-light">M15</span></div>
+          <div class="flex justify-between"><span class="text-gray-dark">ภาษา</span><span class="text-gray-light">MQL5</span></div>
+          <div class="flex justify-between"><span class="text-gray-dark">Broker</span><span class="text-gray-light">XM</span></div>
+          <div class="flex justify-between"><span class="text-gray-dark">ราคา</span><span class="text-green">ฟรี</span></div>
+          <div class="flex justify-between"><span class="text-gray-dark">สถานะ</span><span class="text-green">LIVE</span></div>
+        </div>
+      </div>
+
+      <!-- Releases -->
+      <div id="releases" class="border-t border-dark-border pt-5 scroll-mt-20">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-gray-light font-bold text-[15px]">Releases</h3>
+          <span class="text-xs text-gray-dark">2</span>
+        </div>
+        {releases.map(r => (
+          <div class="mb-4 last:mb-0">
+            <div class="flex items-center gap-2 mb-1">
+              <svg class={`w-4 h-4 ${r.latest ? 'text-green' : 'text-gray-dark'}`} fill="currentColor" viewBox="0 0 24 24"><path d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
+              <span class="text-gray-light font-semibold text-sm">{r.version}</span>
+              {r.latest && <span class="bg-green/10 text-green text-[10px] px-1.5 py-0.5 rounded-full font-semibold">ล่าสุด</span>}
+            </div>
+            <p class="text-xs text-gray-dark mb-1 ml-6">{r.date}</p>
+            <a href={r.url} download class="text-primary hover:underline text-sm ml-6 inline-block">โหลด {r.version} →</a>
+          </div>
+        ))}
+      </div>
+
+      <!-- Languages -->
+      <div class="border-t border-dark-border pt-5">
+        <h3 class="text-gray-light font-bold text-[15px] mb-3">Languages</h3>
+        <div class="flex h-2 rounded-full overflow-hidden mb-3">
+          <div class="bg-primary" style="width:92%"></div>
+          <div class="bg-secondary" style="width:8%"></div>
+        </div>
+        <div class="flex flex-col gap-1.5 text-xs">
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-primary"></span><span class="text-gray-light">MQL5</span><span class="text-gray-dark">92%</span></div>
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-secondary"></span><span class="text-gray-light">Docs</span><span class="text-gray-dark">8%</span></div>
+        </div>
+      </div>
+
+      <!-- Contributor + bug report -->
+      <div class="border-t border-dark-border pt-5">
+        <h3 class="text-gray-light font-bold text-[15px] mb-3">ผู้พัฒนา</h3>
+        <div class="flex items-center gap-2 mb-4">
+          <img src={`${MAIN}/profile.jpg`} class="w-8 h-8 rounded-full bg-dark-border" alt="" />
+          <div><div class="text-sm text-gray-light">IntensiveTrader</div><div class="text-xs text-gray-dark">Kittitat Wasati</div></div>
+        </div>
+        <a href="https://www.facebook.com/IntensiveTraderArt" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 border border-dark-border text-gray-light hover:border-primary px-4 py-2 rounded-lg text-sm transition-colors">
+          <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          แจ้ง Bug / ติดต่อ
+        </a>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<style>
+  .install-path {
+    display: inline-block;
+    background: var(--color-dark);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    color: var(--color-secondary);
+  }
+</style>
+</Layout>

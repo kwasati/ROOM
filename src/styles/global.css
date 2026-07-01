@@ -24,3 +24,10 @@
     @apply antialiased;
   }
 }
+
+@layer utilities {
+  /* brand signature — ported from intensivetrader.com DESIGN.md */
+  .pixel { font-family: 'Press Start 2P', monospace; }
+  .pixel-shadow { box-shadow: 4px 4px 0 var(--color-primary); }
+  .glass-dark { @apply bg-dark-card/90 backdrop-blur-md border-b border-dark-border; }
+}

@@ -12,6 +12,8 @@ const coursesCollection = defineCollection({
     toolDownload: z.string().optional(),
     tags: z.array(z.string()).default([]),
     order: z.number(),
+    pinned: z.boolean().default(false),
+    pinOrder: z.number().optional(),
     publishedAt: z.coerce.date(),
   })
 });
