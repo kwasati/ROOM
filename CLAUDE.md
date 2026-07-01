@@ -6,12 +6,14 @@ Unified hub (คอร์ส + EA) under IntensiveTrader brand — `room.intensi
 - **Stack:** Astro 6 + MDX + Tailwind CSS 4, static output
 - **Content:**
   - Courses = MDX Astro Content Collections (glob loader): `src/content/courses/*.mdx` (title, description, courseType, tags, order, **pinned, pinOrder**) + `src/content/lessons/{course-slug}/*.mdx` (title, course, order, videoId, duration). Course types: `learn` / `learn-tool`
-  - EA = **hardcoded array `eaItems` ใน `src/pages/index.astro`** (ไม่ใช่ collection — มี gdBasket ตัวเดียว). แต่ละ EA มีหน้า detail แยกเอง
+  - EA = **hardcoded array `eaItems` ใน `src/data/ea.ts`** (ไม่ใช่ collection — มี gdBasket ตัวเดียว; shared โดย index.astro + items.json.ts). แต่ละ EA มีหน้า detail แยกเอง
 - **Pages:**
   - `src/pages/index.astro` — home hub: รวม course + EA เป็น list เดียว, โซน **ปักหมุด** (pinned เรียง pinOrder) + โซนทั้งหมด, filter ทั้งหมด/คอร์สเรียน/EA, อ่าน `?filter=ea` auto-กดปุ่ม, inline lesson toggle สำหรับ course
   - `src/pages/ea/gdbasket.astro` — gdBasket detail สไตล์ **github-repo** (repo header + toolbar + file list + README + sidebar About/Releases/Languages). ปุ่มโหลด absolute -> `intensivetrader.com/d/gdbasket` (ตัวนับยอดเว็บหลัก)
   - `src/pages/[slug].astro` — course detail (multi-lesson; single-lesson redirect home)
   - `src/pages/[slug]/[lesson].astro` — lesson page
+  - `src/pages/items.json.ts` — list item (คอร์ส+EA) key={type}:{slug} + CORS (vercel.json) ให้ admin เว็บหลักดึงไปทำ pin manager
+- **ปักหมุด (จาก admin):** home ดึง `site_settings.content_pins` (Supabase REST, env PUBLIC_SUPABASE_URL/ANON_KEY) มาจัดโซนปักหมุด+ติดป้าย; fetch fail = คง frontmatter (pinned/pinOrder) เดิม. eaItems อยู่ `src/data/ea.ts` (shared index + items.json)
 - **Components:** `src/components/` — **Navbar** (โคลนเว็บหลัก glass-dark: หน้าแรก/Room/Trading Journal + login, cross-subdomain absolute URL), BrokerCTA, CourseCard, LessonNav. (`TopBar.astro` = legacy เลิกใช้ ยังไม่ลบ)
 - **Layouts:** `src/layouts/Layout.astro` — Navbar + slot
 - **Content config:** `src/content.config.ts` — courses (+ pinned/pinOrder) + lessons
