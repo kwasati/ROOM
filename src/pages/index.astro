@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import BrokerCTA from '../components/BrokerCTA.astro';
 import { getCollection, render } from 'astro:content';
+import { eaItems } from '../data/ea';
 
 const courses = (await getCollection('courses')).sort((a, b) => a.data.order - b.data.order);
 const allLessons = (await getCollection('lessons')).sort((a, b) => a.data.order - b.data.order);
@@ -27,22 +28,6 @@ for (const lesson of allLessons) {
     Content,
   });
 }
-
-// EA items — hardcoded (มี gdBasket ตัวเดียว); link ออกไปหน้า detail /ea/gdbasket
-const eaItems = [
-  {
-    kind: 'ea' as const,
-    id: 'gdbasket',
-    title: 'gdBasket',
-    description: 'Buy Grid EA บน GOLD M15 — เปิด Buy เป็นชุด ถัวเฉลี่ยด้วย ATR ปิดทั้งตะกร้าราคาเดียว',
-    version: 'v1.37',
-    live: true,
-    href: '/ea/gdbasket',
-    cardType: 'ea',
-    pinned: true,
-    pinOrder: 1,
-  },
-];
 
 // Normalize courses -> unified card shape
 const courseItems = courses.map(c => ({
@@ -104,15 +89,14 @@ const restItems = allItems.filter(i => !i.pinned);
       </div>
 
       <!-- PINNED -->
-      {pinnedItems.length > 0 && (
-        <div class="mt-7">
+      <div id="pinned-section" class={pinnedItems.length > 0 ? 'mt-7' : 'mt-7 hidden'}>
           <div class="flex items-center gap-2 mb-3">
             <svg class="w-4 h-4 text-secondary" fill="currentColor" viewBox="0 0 24 24"><path d="M16 3l5 5-1.5 1.5-1-.5-3.5 3.5.5 3.5-2 2-3.5-3.5L3 24l-1-1 6.5-8.5L5 11l2-2 3.5.5L14 6l-.5-1z"/></svg>
             <span class="text-[11px] text-gray-dark uppercase tracking-[1.5px] font-semibold">ปักหมุด</span>
           </div>
-          <div class="grid grid-cols-2 max-md:grid-cols-1 gap-3.5">
+          <div id="pinned-grid" class="grid grid-cols-2 max-md:grid-cols-1 gap-3.5">
             {pinnedItems.map(item => (
-              <div data-course-type={item.cardType}>
+              <div data-course-type={item.cardType} data-item-key={item.kind === 'ea' ? `ea:${item.id}` : `course:${item.id}`}>
                 {item.kind === 'ea' ? (
                   <a href={item.href} class="course-card group flex w-full text-left bg-dark-card rounded-[14px] border border-primary/40 hover:border-primary transition-all cursor-pointer overflow-hidden pixel-shadow">
                     <div class="w-[150px] max-md:w-[110px] shrink-0 flex items-center justify-center bg-gradient-to-br from-stone-900 to-stone-800 relative">
@@ -149,15 +133,13 @@ const restItems = allItems.filter(i => !i.pinned);
             ))}
           </div>
         </div>
-      )}
 
       <!-- ALL (non-pinned) -->
-      {restItems.length > 0 && (
-        <div class="mt-8">
+      <div id="rest-section" class={restItems.length > 0 ? 'mt-8' : 'mt-8 hidden'}>
           <div class="text-[11px] text-gray-dark uppercase tracking-[1.5px] font-semibold mb-3">ทั้งหมด</div>
-          <div class="grid grid-cols-2 max-md:grid-cols-1 gap-3.5">
+          <div id="rest-grid" class="grid grid-cols-2 max-md:grid-cols-1 gap-3.5">
             {restItems.map(item => (
-              <div data-course-type={item.cardType}>
+              <div data-course-type={item.cardType} data-item-key={item.kind === 'ea' ? `ea:${item.id}` : `course:${item.id}`}>
                 {item.kind === 'ea' ? (
                   <a href={item.href} class="course-card group flex w-full text-left bg-dark-card rounded-[14px] border border-dark-border hover:border-primary transition-all cursor-pointer overflow-hidden">
                     <div class="w-[150px] max-md:w-[110px] shrink-0 flex items-center justify-center bg-gradient-to-br from-stone-900 to-stone-800 relative">
@@ -194,7 +176,6 @@ const restItems = allItems.filter(i => !i.pinned);
             ))}
           </div>
         </div>
-      )}
 
       <!-- Inline course content (toggle on course-card click) -->
       {courses.map(course => {
@@ -335,4 +316,50 @@ const restItems = allItems.filter(i => !i.pinned);
   // ?filter=ea -> auto-activate EA filter (nav "EA" link)
   const urlFilter = new URLSearchParams(window.location.search).get('filter');
   if (urlFilter === 'ea' || urlFilter === 'learn') applyFilter(urlFilter);
+
+  // ── ปักหมุดจาก admin: ดึง content_pins (site_settings) มาจัดโซนใหม่ ──
+  // fetch fail / ไม่มี pins = คง frontmatter เดิม (SSR default)
+  function setPinnedStyle(wrapper: HTMLElement, on: boolean) {
+    const card = wrapper.querySelector('.course-card');
+    if (!card) return;
+    card.classList.toggle('border-primary/40', on);
+    card.classList.toggle('pixel-shadow', on);
+    card.classList.toggle('border-dark-border', !on);
+  }
+
+  function applyPins(pins: { key: string; order?: number }[]) {
+    const pinnedGrid = document.getElementById('pinned-grid');
+    const restGrid = document.getElementById('rest-grid');
+    const pinnedSection = document.getElementById('pinned-section');
+    const restSection = document.getElementById('rest-section');
+    if (!pinnedGrid || !restGrid || !pinnedSection || !restSection) return;
+
+    const orderMap = new Map(pins.map(p => [p.key, p.order ?? 999]));
+    const wrappers = [...document.querySelectorAll<HTMLElement>('[data-item-key]')];
+    const pinned = wrappers
+      .filter(w => orderMap.has(w.dataset.itemKey!))
+      .sort((a, b) => orderMap.get(a.dataset.itemKey!)! - orderMap.get(b.dataset.itemKey!)!);
+    const rest = wrappers.filter(w => !orderMap.has(w.dataset.itemKey!));
+
+    pinned.forEach(w => { setPinnedStyle(w, true); pinnedGrid.appendChild(w); });
+    rest.forEach(w => { setPinnedStyle(w, false); restGrid.appendChild(w); });
+    pinnedSection.classList.toggle('hidden', pinned.length === 0);
+    restSection.classList.toggle('hidden', rest.length === 0);
+  }
+
+  const SUPA_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPA_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  if (SUPA_URL && SUPA_KEY) {
+    (async () => {
+      try {
+        const res = await fetch(`${SUPA_URL}/rest/v1/site_settings?key=eq.content_pins&select=value`, {
+          headers: { apikey: SUPA_KEY },
+        });
+        if (!res.ok) return;
+        const rows = await res.json();
+        const pins = rows?.[0]?.value; // JSONB -> array [{key, order}]
+        if (Array.isArray(pins) && pins.length) applyPins(pins);
+      } catch (e) { /* keep SSR frontmatter default */ }
+    })();
+  }
 </script>
