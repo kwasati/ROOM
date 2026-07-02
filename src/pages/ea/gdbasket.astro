@@ -291,11 +291,11 @@ const installSteps = [
         <h3 class="text-gray-light font-bold text-[15px] mb-3">Myfxbook <span class="text-[10px] text-gray-dark font-normal">· ผลตรวจสอบจริง</span></h3>
         <div class="rounded-xl border border-dark-border bg-dark-card p-4">
           <div class="flex flex-col gap-1.5 text-sm">
-            <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span class="text-green font-bold">+{mfb.gain}%</span></div>
-            <div class="flex justify-between"><span class="text-gray-dark">Abs. Gain</span><span class="text-green font-semibold">+{mfb.absGain}%</span></div>
-            <div class="flex justify-between"><span class="text-gray-dark">Monthly</span><span class="text-gray-light">{mfb.monthly}%</span></div>
-            <div class="flex justify-between"><span class="text-gray-dark">Drawdown</span><span class="text-gray-light">{mfb.drawdown}%</span></div>
-            <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">Balance</span><span class="text-gray-light">${mfb.balance}</span></div>
+            <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span id="mfb-gain" class="text-green font-bold">+{mfb.gain}%</span></div>
+            <div class="flex justify-between"><span class="text-gray-dark">Abs. Gain</span><span id="mfb-absgain" class="text-green font-semibold">+{mfb.absGain}%</span></div>
+            <div class="flex justify-between"><span class="text-gray-dark">Monthly</span><span id="mfb-monthly" class="text-gray-light">{mfb.monthly}%</span></div>
+            <div class="flex justify-between"><span class="text-gray-dark">Drawdown</span><span id="mfb-dd" class="text-gray-light">{mfb.drawdown}%</span></div>
+            <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">Balance</span><span id="mfb-balance" class="text-gray-light">${mfb.balance}</span></div>
           </div>
           <a href={MFB_URL} target="_blank" rel="noopener noreferrer" class="block text-center mt-3 border border-dark-border hover:border-primary text-gray-light text-sm font-semibold py-2 rounded-lg transition-colors">ดูใน Myfxbook →</a>
         </div>
@@ -384,6 +384,18 @@ const installSteps = [
       })
       .catch(() => {});
   }
+  fetch('https://intensivetrader.com/api/myfxbook.json')
+    .then((r) => r.json())
+    .then((m) => {
+      if (!m) return;
+      const set = (id, v, pre, suf) => { const el = document.getElementById(id); if (el && v != null) el.textContent = (pre || '') + v + (suf || ''); };
+      set('mfb-gain', m.gain, '+', '%');
+      set('mfb-absgain', m.absGain, '+', '%');
+      set('mfb-monthly', m.monthly, '', '%');
+      set('mfb-dd', m.drawdown, '', '%');
+      set('mfb-balance', m.balance, '$', '');
+    })
+    .catch(() => {});
   document.querySelectorAll('.copy-code').forEach((btn) => {
     btn.addEventListener('click', () => {
       const code = btn.getAttribute('data-copy') || '';
