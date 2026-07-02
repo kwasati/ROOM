@@ -8,6 +8,25 @@ const DL_V118 = `${MAIN}/d/gdbasket-v118`;
 const XM_AFF = 'https://affs.click/jih0m';
 const XM_CODE = 'KWASATI';
 
+// Myfxbook — ดึงผลพอร์ต gdBasket XS ตอน build (auto) + fallback ค่าล่าสุดกันพัง
+const MFB_URL = 'https://www.myfxbook.com/members/kwasati/gdbasket-xs/12090186';
+let mfb = { gain: '53.40', absGain: '53.45', monthly: '53.40', drawdown: '18.16', balance: '460.36', profit: '160.36' };
+try {
+  const email = import.meta.env.MYFXBOOK_EMAIL;
+  const pass = import.meta.env.MYFXBOOK_PASSWORD;
+  if (email && pass) {
+    const lr = await fetch(`https://www.myfxbook.com/api/login.json?email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`).then((r) => r.json());
+    if (lr && lr.session) {
+      const ar = await fetch(`https://www.myfxbook.com/api/get-my-accounts.json?session=${encodeURIComponent(lr.session)}`).then((r) => r.json());
+      const acc = (ar.accounts || []).find((a) => String(a.id) === '12090186');
+      if (acc) {
+        const f = (n) => (n == null ? '-' : Number(n).toFixed(2));
+        mfb = { gain: f(acc.gain), absGain: f(acc.absGain), monthly: f(acc.monthly), drawdown: f(acc.drawdown), balance: f(acc.balance), profit: f(acc.profit) };
+      }
+    }
+  }
+} catch (e) { /* ใช้ fallback */ }
+
 const features = [
   { title: 'Buy Grid ถัวเฉลี่ย (DCA)', desc: 'เปิด Buy เป็นชุด ราคาลงวางเพิ่มเรื่อยๆ ถัวต้นทุนให้ต่ำลง รอราคาเด้งกลับปิดทั้งตะกร้า' },
   { title: 'ระยะกริดปรับตามตลาด (ATR)', desc: 'ระยะห่างระหว่างไม้ไม่ได้ fix — คำนวณจากความผันผวนจริง (ATR M15) ตลาดผันผวนมากกริดถ่างขึ้นอัตโนมัติ' },
@@ -264,6 +283,21 @@ const installSteps = [
             <div><div id="tj-ct" class="text-[17px] font-bold text-gray-light">—</div><div class="text-[10px] text-gray-dark mt-0.5">จำนวนรอบ</div></div>
           </div>
           <a href={`${MAIN}/journal`} class="block text-center bg-primary hover:bg-primary-dark text-white font-bold text-sm py-2 rounded-lg pixel-shadow">ดูประวัติเทรดทั้งหมด →</a>
+        </div>
+      </div>
+
+      <!-- Myfxbook -->
+      <div class="border-t border-dark-border pt-5">
+        <h3 class="text-gray-light font-bold text-[15px] mb-3">Myfxbook <span class="text-[10px] text-gray-dark font-normal">· ผลตรวจสอบจริง</span></h3>
+        <div class="rounded-xl border border-dark-border bg-dark-card p-4">
+          <div class="flex flex-col gap-1.5 text-sm">
+            <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span class="text-green font-bold">+{mfb.gain}%</span></div>
+            <div class="flex justify-between"><span class="text-gray-dark">Abs. Gain</span><span class="text-green font-semibold">+{mfb.absGain}%</span></div>
+            <div class="flex justify-between"><span class="text-gray-dark">Monthly</span><span class="text-gray-light">{mfb.monthly}%</span></div>
+            <div class="flex justify-between"><span class="text-gray-dark">Drawdown</span><span class="text-gray-light">{mfb.drawdown}%</span></div>
+            <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">Balance</span><span class="text-gray-light">${mfb.balance}</span></div>
+          </div>
+          <a href={MFB_URL} target="_blank" rel="noopener noreferrer" class="block text-center mt-3 border border-dark-border hover:border-primary text-gray-light text-sm font-semibold py-2 rounded-lg transition-colors">ดูใน Myfxbook →</a>
         </div>
       </div>
 
