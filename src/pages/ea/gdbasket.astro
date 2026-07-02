@@ -5,6 +5,8 @@ import Layout from '../../layouts/Layout.astro';
 const MAIN = 'https://intensivetrader.com';
 const DL_V137 = `${MAIN}/d/gdbasket`;
 const DL_V118 = `${MAIN}/d/gdbasket-v118`;
+const XM_AFF = 'https://affs.click/jih0m';
+const XM_CODE = 'KWASATI';
 
 const features = [
   { title: 'Buy Grid ถัวเฉลี่ย (DCA)', desc: 'เปิด Buy เป็นชุด ราคาลงวางเพิ่มเรื่อยๆ ถัวต้นทุนให้ต่ำลง รอราคาเด้งกลับปิดทั้งตะกร้า' },
@@ -135,6 +137,25 @@ const installSteps = [
         ))}
       </div>
 
+      <!-- (aff) XM AFFILIATE CARD -->
+      <div class="rounded-xl border border-secondary/40 p-5 mb-8" style="background:linear-gradient(160deg,rgba(245,158,11,.07),rgba(26,26,26,.5))">
+        <div class="text-xs text-secondary font-bold mb-1">โบรกที่ผมเทรดเอง</div>
+        <h3 class="text-lg font-bold text-gray-light mb-2">gdBasket ทำมาเพื่อ XM โดยเฉพาะ</h3>
+        <p class="text-sm text-gray mb-4">EA ตัวนี้ล็อกให้รันเฉพาะ GOLD บน XM — ใครจะเอาไปใช้ต้องมีบัญชี XM ก่อน ผมเทรดโบรกนี้เอง เปิดผ่านลิงก์ผมได้โบนัสเติมเงินด้วย</p>
+        <div class="flex gap-2 flex-wrap mb-4 text-xs font-semibold">
+          <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">Leverage <span class="text-secondary">1:1000</span></span>
+          <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">โบนัสเติมเงิน <span class="text-secondary">100%</span></span>
+          <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">เปิดบัญชี <span class="text-secondary">ฟรี</span></span>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap bg-dark border border-dashed border-secondary rounded-lg px-3 py-2.5 mb-3 text-sm">
+          <span class="text-gray-dark text-xs">รหัสผู้แนะนำ:</span>
+          <span class="font-mono font-bold text-white bg-primary px-2.5 py-0.5 rounded">{XM_CODE}</span>
+          <button type="button" data-copy={XM_CODE} class="copy-code text-xs font-semibold text-gray-light bg-dark-card border border-dark-border rounded px-2.5 py-1 cursor-pointer">คัดลอก</button>
+        </div>
+        <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="inline-block bg-primary hover:bg-primary-dark text-white font-bold text-sm px-5 py-2.5 rounded-lg pixel-shadow">เปิดบัญชี XM ผ่านลิงก์เพื่อน →</a>
+        <p class="text-[11px] text-gray-dark mt-3 leading-relaxed">ลิงก์แนะนำ (affiliate) — ผมได้ค่าตอบแทนถ้าสมัครผ่านลิงก์นี้ · ไม่ใช่คำแนะนำการลงทุน · การเทรดมีความเสี่ยง อาจขาดทุนได้ ตัดสินใจด้วยตัวเอง</p>
+      </div>
+
       <!-- (f) README CARD -->
       <div id="readme" class="border border-dark-border rounded-xl overflow-hidden mb-8 scroll-mt-20">
         <div class="flex items-center gap-2 bg-dark-card border-b border-dark-border px-4 py-2.5 text-sm">
@@ -187,6 +208,10 @@ const installSteps = [
           <p class="text-center text-secondary text-sm font-semibold mb-8">*** โปรดเลือก Profile ตามความเสี่ยงที่คุณรับไหว ***</p>
 
           <h3 id="install" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">วิธีติดตั้ง</h3>
+          <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-secondary/5 border border-secondary/30 rounded-lg p-3.5 mb-4 hover:border-secondary/60 transition-colors">
+            <span class="shrink-0 w-7 h-7 rounded-lg bg-secondary text-[#1a1205] font-black grid place-items-center text-sm">0</span>
+            <span class="text-sm text-gray-light pt-0.5">ยังไม่มีบัญชี XM? <span class="text-secondary font-semibold">เปิดที่นี่</span> (รหัสผู้แนะนำ <span class="text-secondary font-semibold">KWASATI</span>) — EA ใช้กับ XM เท่านั้น</span>
+          </a>
           <div>
             {installSteps.map((step, i) => (
               <div class="flex gap-4 items-start py-3.5 border-b border-dark-border last:border-0">
@@ -223,7 +248,7 @@ const installSteps = [
           <div class="flex justify-between"><span class="text-gray-dark">ตลาด</span><span class="text-gray-light">GOLD (XAUUSD)</span></div>
           <div class="flex justify-between"><span class="text-gray-dark">Timeframe</span><span class="text-gray-light">M15</span></div>
           <div class="flex justify-between"><span class="text-gray-dark">ภาษา</span><span class="text-gray-light">MQL5</span></div>
-          <div class="flex justify-between"><span class="text-gray-dark">Broker</span><span class="text-gray-light">XM</span></div>
+          <div class="flex justify-between"><span class="text-gray-dark">Broker</span><a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="text-secondary font-semibold hover:underline">XM · เปิดบัญชี →</a></div>
           <div class="flex justify-between"><span class="text-gray-dark">ราคา</span><span class="text-green">ฟรี</span></div>
           <div class="flex justify-between"><span class="text-gray-dark">สถานะ</span><span class="text-green">LIVE</span></div>
         </div>
@@ -325,5 +350,14 @@ const installSteps = [
       })
       .catch(() => {});
   }
+  document.querySelectorAll('.copy-code').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const code = btn.getAttribute('data-copy') || '';
+      if (navigator.clipboard) navigator.clipboard.writeText(code);
+      const prev = btn.textContent;
+      btn.textContent = 'คัดลอกแล้ว!';
+      setTimeout(() => { btn.textContent = prev; }, 1500);
+    });
+  });
 </script>
 </Layout>
