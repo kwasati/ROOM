@@ -30,7 +30,7 @@ const releases = [
 // file-list rows (github metaphor -> สารบัญ EA)
 const fileRows = [
   { icon: 'doc', name: 'README — ภาพรวม EA', note: 'Buy Grid GOLD M15 · DCA + ATR grid + common TP', meta: 'อ่าน', href: '#readme', color: 'text-gray' },
-  { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · MQL5\\Experts\\ · ลากใส่กราฟ GOLD M15', meta: '5 ขั้น', href: '#install', color: 'text-secondary' },
+  { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · MQL5\\Experts\\ · ลากใส่กราฟ GOLD M15', meta: '6 ขั้น', href: '#install', color: 'text-secondary' },
   { icon: 'star', name: 'จุดเด่น', note: '6 ข้อ · DCA / ATR / common TP / SL / STRADA+SPORT / Std+Micro', meta: '6', href: '#features', color: 'text-primary' },
   { icon: 'clock', name: 'บันทึกเวอร์ชัน', note: 'v1.37 (2026-06-24) · v1.18 (2026-06-13)', meta: '2 rel', href: '#releases', color: 'text-gray' },
   { icon: 'dl', name: 'gdBasket_v1.37.ex5', note: 'ไฟล์ EA พร้อมใช้ · MT5 · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_V137, color: 'text-green', download: true },
@@ -41,7 +41,8 @@ const installSteps = [
   'เปิด <strong>MetaTrader 5</strong> → เมนู <strong>File → Open Data Folder</strong>',
   'วางไฟล์ใน <code class="install-path">MQL5\\Experts\\</code>',
   '<strong>Restart MT5</strong> หรือกด <strong>Refresh</strong> ใน Navigator',
-  'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊ก <strong>Allow Algo Trading</strong> → OK',
+  'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊ก <strong>Allow Algo Trading</strong> → OK แล้วกดปุ่ม <strong>Algo Trading</strong> บนแถบเครื่องมือ MT5 ให้เป็น<strong class="text-green">สีเขียว</strong>',
+  'ตั้งค่า <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — บัญชี <strong>Standard</strong> ตั้งขั้นต่ำ <strong>$1,000</strong> · บัญชี <strong>Micro</strong> ตั้งขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์)',
 ];
 ---
 
@@ -138,6 +139,7 @@ const installSteps = [
           <span class="text-gray-light font-semibold">README</span>
         </div>
         <div class="p-6">
+          <img src="/gdbasket-chart.png" class="w-full rounded-lg border border-dark-border mb-6" alt="gdBasket รันจริงบนกราฟ GOLD M15 — panel แสดง Capital / Target / NetProfit และไม้ในตะกร้า" />
           <h2 class="pixel text-primary text-[18px] mb-4">gdBasket</h2>
           <p class="text-gray leading-relaxed mb-6">Buy Grid EA บน GOLD M15 — เปิด Buy เป็นชุดตามเวลา ถ้าราคาลงค่อยวางไม้เพิ่มถัวเฉลี่ย แล้วให้ broker ปิดทั้งตะกร้าด้วยเป้ากำไรรวมราคาเดียว มี SL จริงที่ broker เป็นตัวกันตาย</p>
 
@@ -152,6 +154,12 @@ const installSteps = [
             ))}
           </div>
 
+          <div class="bg-dark-card border border-dark-border rounded-lg p-5 mb-8 flex flex-col gap-3">
+            <p class="text-gray text-sm leading-relaxed">ระบบเปิดไม้แรกทุกต้นชั่วโมง แบบ <strong class="text-gray-light">Buy ทางเดียว</strong> ใช้การเก็บกำไรแบบ <strong class="text-secondary">PPTS</strong> (Peak Profit Trailing System) เมื่อราคาวิ่งถูกทาง และใช้ระบบ <strong class="text-secondary">Grid แบบ Dynamic</strong> เก็บกำไรเมื่อราคาวิ่งผิดทาง</p>
+            <p class="text-gray text-sm leading-relaxed">จุดเด่นคือ การคำนวณค่าต่างๆ มาเพื่อเป้าหมายเดียวคือ <strong class="text-green">“ปั้นกำไรเป็นรอบๆ”</strong> — ตั้งค่า <strong class="text-gray-light">Capital</strong> เอาไว้ ตัว EA จะคำนวณการทำกำไรเป็นรอบจาก Capital แล้วพยายามทำกำไรต่อรอบให้ได้ตามที่ตั้งไว้</p>
+            <p class="text-gray text-sm leading-relaxed">ตัวอย่างเช่น ตั้ง Capital ไว้ <strong class="text-gray-light">$1,000</strong> ตัว EA จะคำนวณทุกอย่างให้ ทั้ง Lot / Grid / Trail เพื่อคาดหวังทำกำไรให้ถึง <strong class="text-green">$1,000</strong> ให้สำเร็จ โดยจะยอมขาดทุนที่ <strong class="text-primary">$1,000</strong> เช่นกัน</p>
+          </div>
+
           <h3 id="features" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">จุดเด่น</h3>
           <div class="grid sm:grid-cols-2 gap-4 mb-8">
             {features.map(f => (
@@ -161,6 +169,19 @@ const installSteps = [
               </div>
             ))}
           </div>
+
+          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">สถิติน่าสนใจ</h3>
+          <div class="grid sm:grid-cols-2 gap-4 mb-4">
+            <div class="bg-dark-card border border-dark-border rounded-lg p-4">
+              <h4 class="font-bold text-gray-light text-[14px] mb-1.5">Profile <span class="text-secondary">STRADA</span></h4>
+              <p class="text-gray text-[13px] leading-relaxed">ความถี่การขาดทุนต่ำ แต่ปั้นสำเร็จนานหน่อย — เฉลี่ยปั้นสำเร็จที่ <strong class="text-green">30 วัน</strong></p>
+            </div>
+            <div class="bg-dark-card border border-dark-border rounded-lg p-4">
+              <h4 class="font-bold text-gray-light text-[14px] mb-1.5">Profile <span class="text-secondary">SPORT</span></h4>
+              <p class="text-gray text-[13px] leading-relaxed">ความถี่การขาดทุนสูงขึ้นมานิด แต่ปั้นสำเร็จเร็วขึ้น — เฉลี่ยปั้นสำเร็จที่ <strong class="text-green">19 วัน</strong></p>
+            </div>
+          </div>
+          <p class="text-center text-secondary text-sm font-semibold mb-8">*** โปรดเลือก Profile ตามความเสี่ยงที่คุณรับไหว ***</p>
 
           <h3 id="install" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">วิธีติดตั้ง</h3>
           <div>
@@ -172,6 +193,19 @@ const installSteps = [
             ))}
           </div>
           <p class="text-xs text-gray-dark mt-4">EA ล็อกให้รันเฉพาะ GOLD ที่ timeframe M15 บนโบรกเกอร์ XM</p>
+
+          <h3 class="text-gray-light font-bold text-[15px] mb-4 mt-8 pb-2 border-b border-dark-border">คำแนะนำ</h3>
+          <div class="bg-dark-card border border-dark-border rounded-lg p-4 mb-8">
+            <p class="text-gray text-sm leading-relaxed mb-2">มีทุนเท่าไหร่ ให้เอาไป <strong class="text-secondary">หาร 3</strong> แล้วเอาเลขนั้นไปตั้งค่า Capital</p>
+            <p class="text-gray text-sm leading-relaxed mb-2">ตัวอย่างเช่น ทุน <strong class="text-gray-light">$300</strong> หาร 3 ได้ <strong class="text-gray-light">$100</strong> → ตั้ง Capital <strong class="text-green">$100</strong></p>
+            <p class="text-gray-dark text-xs leading-relaxed">นี่คือหลักการบริหารความเสี่ยงของ gdBasket</p>
+          </div>
+
+          <div class="bg-secondary/10 border border-secondary/40 rounded-lg p-4">
+            <h4 class="font-bold text-secondary text-[14px] mb-2">⚠ ข้อควรจำ</h4>
+            <p class="text-gray text-sm leading-relaxed">บัญชี <strong class="text-gray-light">Standard</strong> ตั้ง Capital ขั้นต่ำได้ที่ <strong class="text-gray-light">$1,000</strong></p>
+            <p class="text-gray text-sm leading-relaxed">บัญชี <strong class="text-gray-light">Micro</strong> ตั้ง Capital ขั้นต่ำได้ที่ <strong class="text-gray-light">$100</strong></p>
+          </div>
         </div>
       </div>
     </div>
