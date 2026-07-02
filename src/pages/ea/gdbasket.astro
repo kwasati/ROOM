@@ -34,6 +34,7 @@ const fileRows = [
   { icon: 'star', name: 'จุดเด่น', note: '6 ข้อ · DCA / ATR / common TP / SL / STRADA+SPORT / Std+Micro', meta: '6', href: '#features', color: 'text-primary' },
   { icon: 'clock', name: 'บันทึกเวอร์ชัน', note: 'v1.37 (2026-06-24) · v1.18 (2026-06-13)', meta: '2 rel', href: '#releases', color: 'text-gray' },
   { icon: 'dl', name: 'gdBasket_v1.37.ex5', note: 'ไฟล์ EA พร้อมใช้ · MT5 · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_V137, color: 'text-green', download: true },
+  { icon: 'journal', name: 'Trading Journal', note: 'ประวัติการเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: `${MAIN}/journal`, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
@@ -79,6 +80,7 @@ const installSteps = [
     <a href="#readme" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">วิธีทำงาน</a>
     <a href="#features" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">จุดเด่น</a>
     <a href="#releases" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap flex items-center gap-1.5">Releases <span class="bg-dark-border text-gray-light text-[10px] px-1.5 rounded-full">2</span></a>
+    <a href={`${MAIN}/journal`} class="px-3 py-2.5 border-b-2 border-transparent text-primary hover:text-primary-dark font-semibold whitespace-nowrap">Trading Journal</a>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 mt-5">
@@ -124,10 +126,11 @@ const installSteps = [
               {row.icon === 'star' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>}
               {row.icon === 'clock' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               {row.icon === 'dl' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>}
+              {row.icon === 'journal' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>}
             </span>
             <span class="text-gray-light font-medium w-[190px] max-md:w-[130px] shrink-0">{row.name}</span>
             <span class="text-gray truncate flex-1 max-md:hidden">{row.note}</span>
-            <span class={`whitespace-nowrap text-xs ${row.download ? 'text-primary font-semibold' : 'text-gray-dark'}`}>{row.meta}{row.download ? ' →' : ''}</span>
+            <span class={`whitespace-nowrap text-xs ${(row.download || row.accent) ? 'text-primary font-semibold' : 'text-gray-dark'}`}>{row.meta}{(row.download || row.accent) ? ' →' : ''}</span>
           </a>
         ))}
       </div>
@@ -226,6 +229,19 @@ const installSteps = [
         </div>
       </div>
 
+      <!-- Trading Journal -->
+      <div class="border-t border-dark-border pt-5">
+        <h3 class="text-gray-light font-bold text-[15px] mb-3">Trading Journal</h3>
+        <div class="rounded-xl border border-primary/30 bg-dark-card p-4">
+          <div class="grid grid-cols-3 gap-2 text-center mb-3">
+            <div><div id="tj-pnl" class="text-[17px] font-bold text-green">—</div><div class="text-[10px] text-gray-dark mt-0.5">กำไรสะสม</div></div>
+            <div><div id="tj-wr" class="text-[17px] font-bold text-gray-light">—</div><div class="text-[10px] text-gray-dark mt-0.5">Win rate</div></div>
+            <div><div id="tj-ct" class="text-[17px] font-bold text-gray-light">—</div><div class="text-[10px] text-gray-dark mt-0.5">จำนวนรอบ</div></div>
+          </div>
+          <a href={`${MAIN}/journal`} class="block text-center bg-primary hover:bg-primary-dark text-white font-bold text-sm py-2 rounded-lg pixel-shadow">ดูประวัติเทรดทั้งหมด →</a>
+        </div>
+      </div>
+
       <!-- Releases -->
       <div id="releases" class="border-t border-dark-border pt-5 scroll-mt-20">
         <div class="flex items-center justify-between mb-3">
@@ -286,4 +302,28 @@ const installSteps = [
     color: var(--color-secondary);
   }
 </style>
+
+<script>
+  const SUPA = import.meta.env.PUBLIC_SUPABASE_URL;
+  const KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  if (SUPA && KEY) {
+    fetch(`${SUPA}/rest/v1/baskets?select=pnl_usd&limit=100000`, {
+      headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
+    })
+      .then((r) => r.json())
+      .then((rows) => {
+        if (!Array.isArray(rows) || rows.length === 0) return;
+        let sum = 0, win = 0;
+        for (const b of rows) { const p = Number(b.pnl_usd) || 0; sum += p; if (p >= 0) win++; }
+        const wr = Math.round((win / rows.length) * 100);
+        const money = (n) => (n >= 0 ? '+$' : '-$') + Math.abs(Math.round(n)).toLocaleString();
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        const pnlEl = document.getElementById('tj-pnl');
+        if (pnlEl) { pnlEl.textContent = money(sum); pnlEl.className = 'text-[17px] font-bold ' + (sum >= 0 ? 'text-green' : 'text-primary'); }
+        set('tj-wr', wr + '%');
+        set('tj-ct', String(rows.length));
+      })
+      .catch(() => {});
+  }
+</script>
 </Layout>
