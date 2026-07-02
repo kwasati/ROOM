@@ -384,7 +384,7 @@ const installSteps = [
       })
       .catch(() => {});
   }
-  fetch('https://intensivetrader.com/api/myfxbook.json')
+  fetch('https://www.intensivetrader.com/api/myfxbook.json')
     .then((r) => r.json())
     .then((m) => {
       if (!m) return;
