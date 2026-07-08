@@ -6,7 +6,7 @@ export const eaItems = [
     id: 'gdbasket',
     title: 'gdBasket',
     description: 'Buy Grid EA บน GOLD M15 — เปิด Buy เป็นชุด ถัวเฉลี่ยด้วย ATR ปิดทั้งตะกร้าราคาเดียว',
-    version: 'v1.37',
+    version: 'v2.00',
     live: true,
     href: '/ea/gdbasket',
     cardType: 'ea',
