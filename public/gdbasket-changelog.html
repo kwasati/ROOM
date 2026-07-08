@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gdBasket — การเดินทาง (Journey)</title>
+<style>
+  :root{
+    --bg:#0a0d12; --bg2:#0e131a; --panel:#121a24; --panel2:#161f2b;
+    --ink:#e8eef5; --dim:#8b97a6; --faint:#5c6675; --line:#1e2935;
+    --gold:#e3b341; --green:#3fb950; --cyan:#4cc4d6; --amber:#e0a82e;
+    --red:#f06a5b; --purple:#b07cf0; --blue:#58a6ff;
+    --pub:#4cc4d6; --dev:#c98bf0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:
+      radial-gradient(1200px 600px at 50% -200px,#16241c 0%,transparent 60%),
+      linear-gradient(180deg,#0c1118,#0a0d12 40%);
+    color:var(--ink);font-family:'Segoe UI',-apple-system,'Sarabun',system-ui,sans-serif;
+    min-height:100vh;font-size:15px;line-height:1.5}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 18px}
+
+  /* header */
+  header{padding:34px 0 14px;text-align:center}
+  header h1{font-size:30px;font-weight:800;letter-spacing:.3px}
+  header h1 .g{color:var(--gold)}
+  header .sub{color:var(--dim);font-size:14px;margin-top:6px}
+  .status{display:inline-flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+  .pill{font-size:12px;padding:4px 11px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--dim)}
+  .pill b{color:var(--ink)}
+  .pill.pub{border-color:rgba(76,196,214,.4)} .pill.pub b{color:var(--pub)}
+  .pill.dev{border-color:rgba(201,139,240,.4)} .pill.dev b{color:var(--dev)}
+
+  /* toolbar */
+  .toolbar{position:sticky;top:0;z-index:20;background:rgba(10,13,18,.82);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);padding:12px 0;margin-bottom:8px}
+  .toolbar .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
+  .tab{font-size:13.5px;padding:7px 16px;border-radius:9px;cursor:pointer;color:var(--dim);border:none;background:none;font-weight:600;transition:.15s}
+  .tab.on{background:var(--gold);color:#1a1205}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:12.5px;padding:5px 12px;border-radius:20px;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--dim);transition:.15s;user-select:none;display:inline-flex;align-items:center;gap:6px}
+  .chip:hover{border-color:var(--faint)}
+  .chip.on{color:var(--ink);border-color:currentColor}
+  .chip .d{width:9px;height:9px;border-radius:50%}
+  .chip[data-k="added"].on{color:var(--green)} .chip[data-k="fixed"].on{color:var(--blue)}
+  .chip[data-k="changed"].on{color:var(--amber)} .chip[data-k="removed"].on{color:var(--red)}
+  .chip[data-k="reverted"].on{color:var(--purple)}
+  .chip[data-trk].on{color:var(--gold)}
+  .search{flex:1;min-width:160px;max-width:280px;display:flex;align-items:center;gap:8px;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 12px}
+  .search input{flex:1;background:none;border:none;color:var(--ink);font-size:13.5px;outline:none;font-family:inherit}
+  .search input::placeholder{color:var(--faint)}
+  .seclabel{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+
+  /* TIMELINE */
+  #timeline{position:relative;padding:24px 0 60px}
+  #timeline::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;
+    background:linear-gradient(180deg,var(--gold),#2a7d3e 30%,var(--green) 60%,var(--cyan));border-radius:3px;opacity:.5}
+  .era{position:relative;text-align:center;margin:26px 0 18px}
+  .era .b{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:24px;
+    padding:8px 20px;font-weight:700;font-size:15px;position:relative;z-index:2}
+  .era .b span{color:var(--gold)} .era .b small{color:var(--dim);font-weight:400;font-size:12px;margin-left:8px}
+
+  .item{position:relative;width:50%;padding:9px 34px;display:flex}
+  .item.l{left:0;justify-content:flex-end}
+  .item.r{left:50%;justify-content:flex-start}
+  .item::after{content:"";position:absolute;top:50%;width:26px;height:2px;background:var(--line)}
+  .item.l::after{right:8px} .item.r::after{left:8px}
+  .dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;margin-top:-7px;
+    border:3px solid var(--bg);z-index:3;background:var(--green)}
+  .item.l .dot{right:-7px} .item.r .dot{left:-7px}
+  .dot.star{width:18px;height:18px;margin-top:-9px;box-shadow:0 0 0 4px rgba(227,179,65,.18)}
+  .item.l .dot.star{right:-9px} .item.r .dot.star{left:-9px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;
+    max-width:430px;cursor:pointer;transition:.15s;position:relative}
+  .card:hover{border-color:var(--faint);transform:translateY(-2px);box-shadow:0 8px 26px rgba(0,0,0,.4)}
+  .card .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .ver{font-weight:800;font-size:16px;color:var(--gold)}
+  .ver.star::after{content:" ★";color:var(--gold);font-size:13px}
+  .date{font-size:11.5px;color:var(--faint)}
+  .trk{font-size:10.5px;padding:2px 8px;border-radius:12px;font-weight:700;letter-spacing:.3px}
+  .trk.public{background:rgba(76,196,214,.14);color:var(--pub)}
+  .trk.dev{background:rgba(201,139,240,.14);color:var(--dev)}
+  .trk\.public\+dev,.trk.both{background:rgba(227,179,65,.14);color:var(--gold)}
+  .trk.pre-public{background:rgba(139,151,166,.14);color:var(--dim)}
+  .trk.tester{background:rgba(139,151,166,.14);color:var(--dim)}
+  .card .sum{font-size:13.5px;color:var(--ink);line-height:1.45}
+  .tchips{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
+  .tc{font-size:10.5px;padding:2px 8px;border-radius:10px;display:inline-flex;gap:4px;align-items:center;font-weight:600}
+  .tc .d{width:7px;height:7px;border-radius:50%}
+  .tc.added{background:rgba(63,185,80,.12);color:var(--green)}
+  .tc.fixed{background:rgba(88,166,255,.12);color:var(--blue)}
+  .tc.changed{background:rgba(224,168,46,.12);color:var(--amber)}
+  .tc.removed{background:rgba(240,106,91,.12);color:var(--red)}
+  .tc.reverted{background:rgba(176,124,240,.14);color:var(--purple)}
+
+  /* canopy / future */
+  .canopy{position:relative;margin-top:40px;padding-top:30px}
+  .canopy .ttl{text-align:center;color:var(--blue);font-weight:700;font-size:16px;margin-bottom:6px}
+  .canopy .sub{text-align:center;color:var(--dim);font-size:12.5px;margin-bottom:20px}
+  .buds{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;max-width:920px;margin:0 auto}
+  .bud{background:linear-gradient(180deg,rgba(88,166,255,.07),var(--panel));border:1px solid rgba(88,166,255,.25);
+    border-radius:14px;padding:13px 15px;cursor:pointer;transition:.15s}
+  .bud:hover{border-color:var(--blue);transform:translateY(-2px)}
+  .bud h4{font-size:14.5px;color:var(--blue);margin-bottom:4px}
+  .bud .st{font-size:11px;color:var(--faint);margin-bottom:6px}
+  .bud p{font-size:12.5px;color:var(--dim);line-height:1.45}
+
+  /* LIFECYCLE */
+  #lifecycle{padding:18px 0 60px;display:none}
+  #lifecycle.on{display:block}
+  #timeline.off{display:none}
+  .lcaxis{display:flex;justify-content:space-between;font-size:11px;color:var(--faint);
+    padding:0 4px 6px;position:sticky;top:62px;background:rgba(10,13,18,.7);backdrop-filter:blur(6px);z-index:5}
+  .lcrow{display:grid;grid-template-columns:230px 1fr;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s}
+  .lcrow:hover{background:rgba(255,255,255,.02)}
+  .lcname{font-size:13px;font-weight:600;line-height:1.3}
+  .lcname .st{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:0;display:inline-block;margin-top:3px}
+  .st.active{background:rgba(63,185,80,.15);color:var(--green)}
+  .st.removed{background:rgba(240,106,91,.15);color:var(--red)}
+  .st.reverted{background:rgba(176,124,240,.15);color:var(--purple)}
+  .st.replaced{background:rgba(224,168,46,.15);color:var(--amber)}
+  .lctrack{position:relative;height:26px;background:var(--panel);border-radius:7px;overflow:hidden}
+  .lcbar{position:absolute;top:4px;height:18px;border-radius:5px;display:flex;align-items:center;padding:0 8px;
+    font-size:10.5px;font-weight:700;white-space:nowrap;overflow:hidden}
+  .lcbar.active{background:linear-gradient(90deg,rgba(63,185,80,.5),rgba(63,185,80,.25));border:1px solid rgba(63,185,80,.6);color:#cdf5d4}
+  .lcbar.removed{background:linear-gradient(90deg,rgba(240,106,91,.18),rgba(240,106,91,.4));border:1px solid rgba(240,106,91,.6);color:#ffd9d3}
+  .lcbar.reverted{background:linear-gradient(90deg,rgba(176,124,240,.2),rgba(176,124,240,.4));border:1px solid rgba(176,124,240,.6);color:#ecdcff}
+  .lcbar.replaced{background:linear-gradient(90deg,rgba(224,168,46,.2),rgba(224,168,46,.4));border:1px solid rgba(224,168,46,.6);color:#ffeec2}
+  .lcend{position:absolute;top:1px;height:24px;width:2px;background:var(--red);opacity:.8}
+  .lcgrid{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+
+  /* DRAWER */
+  #scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.2s;z-index:40}
+  #scrim.on{opacity:1;pointer-events:auto}
+  #drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,92vw);background:var(--bg2);
+    border-left:1px solid var(--line);transform:translateX(100%);transition:.24s cubic-bezier(.4,0,.2,1);
+    z-index:41;overflow-y:auto;padding:22px 22px 50px}
+  #drawer.on{transform:translateX(0)}
+  #drawer .x{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel);color:var(--dim);cursor:pointer;font-size:18px;line-height:1}
+  #drawer .dv{font-size:24px;font-weight:800;color:var(--gold)}
+  #drawer .dmeta{display:flex;gap:8px;align-items:center;margin:8px 0 14px;flex-wrap:wrap}
+  #drawer .dsum{font-size:14px;color:var(--ink);background:var(--panel);border-radius:10px;padding:11px 13px;line-height:1.5;border:1px solid var(--line)}
+  #drawer h3{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);margin:20px 0 9px}
+  .chg{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .chg .tag{flex-shrink:0;font-size:10px;font-weight:800;padding:2px 7px;border-radius:8px;height:fit-content;text-transform:uppercase;letter-spacing:.3px}
+  .chg .tag.added{background:rgba(63,185,80,.15);color:var(--green)}
+  .chg .tag.fixed{background:rgba(88,166,255,.15);color:var(--blue)}
+  .chg .tag.changed{background:rgba(224,168,46,.15);color:var(--amber)}
+  .chg .tag.removed{background:rgba(240,106,91,.15);color:var(--red)}
+  .chg .tag.reverted{background:rgba(176,124,240,.15);color:var(--purple)}
+  .chg .txt{font-size:13px;color:var(--ink);line-height:1.5}
+  .lcbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:9px}
+  .lcbox .h{font-size:13.5px;font-weight:700;margin-bottom:5px}
+  .lcbox .meta{font-size:11.5px;color:var(--dim);margin-bottom:6px;display:flex;gap:6px;flex-wrap:wrap}
+  .lcbox .r{font-size:12.5px;color:var(--dim);line-height:1.45}
+  .lcbox .r b{color:var(--ink)}
+  .arrow{color:var(--faint);margin:0 4px}
+
+  .foot{text-align:center;color:var(--faint);font-size:12px;padding:30px 0 50px;line-height:1.8;border-top:1px solid var(--line);margin-top:20px}
+  .foot code{background:var(--panel);padding:2px 7px;border-radius:5px;color:var(--dim)}
+  .empty{text-align:center;color:var(--faint);padding:60px 0;font-size:14px}
+
+  @media(max-width:760px){
+    header h1{font-size:23px}
+    #timeline::before{left:20px}
+    .item{width:100%;left:0!important;padding:7px 0 7px 44px;justify-content:flex-start!important}
+    .item::after{left:20px;width:18px}
+    .item .dot{left:13px!important;right:auto!important}
+    .item .dot.star{left:11px!important}
+    .card{max-width:none;width:100%}
+    .lcrow{grid-template-columns:1fr;gap:6px}
+    .lctrack{height:22px}
+    .lcaxis{top:0}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🌳 <span class="g">gdBasket</span> — การเดินทาง</h1>
+    <div class="sub">buy-grid DCA บน GOLD M15 · ไม่ใช้สัญญาณ · ไม่มี SL · วัดผลด้วยยอดถอน<br>
+      จากแนวคิด → ทดลอง/วิจัย → ลงมือลงจริง → เข้า-ออก ทุก version</div>
+    <div class="status">
+      <span class="pill">เริ่ม <b>v0.14</b> (core)</span>
+      <span class="pill pub">public <b>v1.37</b></span>
+      <span class="pill dev">dev <b>v1.38</b></span>
+      <span class="pill" id="stat-v"></span>
+      <span class="pill" id="stat-f"></span>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="wrap">
+    <div class="row">
+      <div class="tabs">
+        <button class="tab on" data-view="timeline">📈 ไทม์ไลน์</button>
+        <button class="tab" data-view="lifecycle">🔄 ชีวิตฟีเจอร์ (เข้า-ออก)</button>
+      </div>
+      <div class="search">🔍<input id="q" placeholder="ค้นหา version / ฟีเจอร์..."></div>
+    </div>
+    <div class="row" id="filters" style="margin-top:10px">
+      <span class="seclabel">ประเภท</span>
+      <div class="chips" id="typechips">
+        <span class="chip on" data-k="added"><i class="d" style="background:var(--green)"></i>เพิ่ม</span>
+        <span class="chip on" data-k="fixed"><i class="d" style="background:var(--blue)"></i>แก้บั๊ก</span>
+        <span class="chip on" data-k="changed"><i class="d" style="background:var(--amber)"></i>เปลี่ยน</span>
+        <span class="chip on" data-k="removed"><i class="d" style="background:var(--red)"></i>เอาออก</span>
+        <span class="chip on" data-k="reverted"><i class="d" style="background:var(--purple)"></i>ถอยคืน</span>
+      </div>
+      <span class="seclabel" style="margin-left:10px">สาย</span>
+      <div class="chips" id="trkchips">
+        <span class="chip on" data-trk="public">public</span>
+        <span class="chip on" data-trk="dev">dev</span>
+        <span class="chip on" data-trk="pre-public">pre-public</span>
+      </div>
+    </div>
+    <div class="row" id="lcfilters" style="margin-top:10px;display:none">
+      <span class="seclabel">สถานะ</span>
+      <div class="chips" id="stchips">
+        <span class="chip on" data-st="active">ยังใช้อยู่</span>
+        <span class="chip on" data-st="removed">เอาออกแล้ว</span>
+        <span class="chip on" data-st="reverted">ถอยคืน</span>
+        <span class="chip on" data-st="replaced">ถูกแทนที่/rename</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="timeline"></div>
+  <div id="lifecycle"></div>
+  <div class="foot">
+    ข้อมูลทุก fact มาจาก CHANGELOG จริง (public + dev + pre-public) + roadmap idea ledger<br>
+    SSOT: <code>.claude\plans\2-EAfactory\gdbasket-roadmap.md</code> ·
+    North Star: เปิด buy/sell · AGB บริหาร position เบา/กลาง/หนัก · VSS เฝ้าระวังบัญชีแตก
+  </div>
+</div>
+
+<div id="scrim"></div>
+<div id="drawer"><button class="x" id="dx">✕</button><div id="dbody"></div></div>
+
+<script src="/gdbasket-data.js"></script>
+<script>
+const D = window.GDB_DATA;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+/* ---- helpers ---- */
+const vnum = v => { const m=String(v).match(/(\d+\.\d+)/); return m?parseFloat(m[1]):0; };
+const isStar = v => String(v).includes("★") || ["1.38","0.73","1.37 (public)"].includes(v);
+const ERAS=[
+ {n:"🌱 เมล็ด",d:"แก่นกำเนิด · v0.14–0.67",lo:0,hi:0.679},
+ {n:"🌿 ลงดิน",d:"public live + ฐานวัดผล · v0.68–0.78",lo:0.68,hi:0.789},
+ {n:"🪴 แตกกิ่ง",d:"เครื่องมือ + โปรไฟล์ · v0.79–0.99",lo:0.79,hi:0.999},
+ {n:"🌲 โตเต็มวัย",d:"AGB + trail saga · v1.00–1.22",lo:1.00,hi:1.229},
+ {n:"🌳 เรือนยอด",d:"opt-first + re-baseline · v1.23–1.38",lo:1.23,hi:9},
+];
+const eraIdx = n => ERAS.findIndex(e=>n>=e.lo && n<=e.hi);
+function dominant(changes){ // pick most "notable" type for the dot
+  const order=["reverted","removed","added","fixed","changed"];
+  for(const t of order) if(changes.some(c=>c.type===t)) return t;
+  return "changed";
+}
+const DOTC={added:"var(--green)",fixed:"var(--blue)",changed:"var(--amber)",removed:"var(--red)",reverted:"var(--purple)"};
+function trackClass(t){ return t.replace(/[^a-z+-]/gi,'').replace('+','\\+'); }
+function trackLabel(t){ return t; }
+function trackKeys(t){ // which filter tracks this version belongs to
+  if(t.includes("public")&&t.includes("dev")) return ["public","dev"];
+  if(t.includes("public")) return ["public"];
+  if(t.includes("dev")) return ["dev"];
+  if(t.includes("pre-public")) return ["pre-public"];
+  if(t.includes("tester")) return ["dev"];
+  return [t];
+}
+
+/* future ideas (canopy) — จาก roadmap idea ledger */
+const FUTURE=[
+ {n:"AGB full — สลับพฤติกรรม",st:"build เริ่ม v1.18 (UI revamp)",p:"ไม่ใช่แค่ตัวเลข: ถ่างกริดเมื่อวางแน่น / โซนล่าง 1 แท่ง 1 กริด. เป้าสุดท้าย 6-state S1-S6. Exp 22 per-bar guard หนุน (+18k→+37k, SO 3→1)"},
+ {n:"CORSA profile",st:"spec แล้ว รอ opt",p:"profile ที่ 3 มุมบุก: ปลดล็อก lot-step → add lot แท้ + คนทุนหนา buffer ×5 maximize ยอดถอน"},
+ {n:"gdPyramid",st:"plan จบ รอ build",p:"EA proto: grid ขาลง (gdBasket เดิม) + pyramid trail ขาขึ้น. buy only, no SL"},
+ {n:"xG quick-close",st:"paused",p:"rescue เชิงรุก: ตะกร้าลึกถึง arm + สัญญาณกลับตัว → ไม้พิเศษ lot 2.5-3× หด TP มาชั้นก่อน (ผูก AGB S3)"},
+ {n:"VSS — เฝ้าระวัง SO",st:"ยังโนไอเดีย",p:"จับวันดิ่งแรงไม่เด้ง กันบัญชีแตก (เชิงรับ). เป้า SO save 100% + false=0"},
+];
+
+/* sort versions old→new */
+const VERS = D.versions.slice().sort((a,b)=>{
+  const da=a.date||"", db=b.date||"";
+  if(da&&db&&da!==db) return da<db?-1:1;
+  return vnum(a.version)-vnum(b.version);
+});
+
+/* ---- state ---- */
+const state={view:"timeline",types:new Set(["added","fixed","changed","removed","reverted"]),
+  tracks:new Set(["public","dev","pre-public"]),sts:new Set(["active","removed","reverted","replaced"]),q:""};
+
+/* ---- stats ---- */
+$("#stat-v").innerHTML="<b>"+D.versions.length+"</b> version";
+$("#stat-f").innerHTML="<b>"+D.feature_lifecycle.length+"</b> ฟีเจอร์ track เข้า-ออก";
+
+/* ---- render timeline ---- */
+function lcAtVersion(verStr){
+  const vn=vnum(verStr);
+  const out=[];
+  D.feature_lifecycle.forEach(f=>{
+    if(f.added_version && vnum(f.added_version)===vn) out.push({f,kind:"added"});
+    if(f.removed_version && vnum(f.removed_version)===vn) out.push({f,kind:"removed"});
+  });
+  return out;
+}
+function matchVer(v){
+  const tks=trackKeys(v.track);
+  if(![...tks].some(t=>state.tracks.has(t))) return false;
+  const types=v.changes.map(c=>c.type);
+  if(!types.some(t=>state.types.has(t))) return false;
+  if(state.q){
+    const hay=(v.version+" "+v.summary+" "+v.changes.map(c=>c.text).join(" ")).toLowerCase();
+    if(!hay.includes(state.q)) return false;
+  }
+  return true;
+}
+function renderTimeline(){
+  const tl=$("#timeline"); let html=""; let side=0; let curEra=-1; let shown=0;
+  VERS.forEach(v=>{
+    if(!matchVer(v)) return;
+    shown++;
+    const n=vnum(v.version), e=eraIdx(n);
+    if(e!==curEra && e>=0){ curEra=e; html+=`<div class="era"><div class="b"><span>${ERAS[e].n}</span><small>${ERAS[e].d}</small></div></div>`; side=0; }
+    const cls=side%2?"r":"l"; side++;
+    const dt=dominant(v.changes), star=isStar(v.version);
+    const counts={};
+    v.changes.forEach(c=>counts[c.type]=(counts[c.type]||0)+1);
+    const tchips=Object.entries(counts).map(([t,c])=>`<span class="tc ${t}"><i class="d"></i>${TLABEL[t]} ${c}</span>`).join("");
+    html+=`<div class="item ${cls}" data-i="${D.versions.indexOf(v)}">
+      <span class="dot ${star?'star':''}" style="background:${DOTC[dt]}"></span>
+      <div class="card">
+        <div class="top">
+          <span class="ver ${star?'star':''}">v${v.version.replace(/\s*★/,'').replace(' (public)','').replace(' (dev)','')}</span>
+          <span class="trk ${trackCss(v.track)}">${v.track}</span>
+          <span class="date">${v.date||''}</span>
+        </div>
+        <div class="sum">${esc(v.summary)}</div>
+        <div class="tchips">${tchips}</div>
+      </div></div>`;
+  });
+  // canopy
+  html+=`<div class="canopy">
+    <div class="ttl">✦ เรือนยอด — กิ่งไอเดียที่รอเติบโต (ปลายทาง)</div>
+    <div class="sub">ยังไม่ลงมือเต็ม — แนวคิดที่จะพา gdBasket ไปต่อ</div>
+    <div class="buds">${FUTURE.map((f,i)=>`<div class="bud" data-fi="${i}"><h4>✦ ${esc(f.n)}</h4><div class="st">${esc(f.st)}</div><p>${esc(f.p)}</p></div>`).join("")}</div>
+  </div>`;
+  tl.innerHTML = shown? html : `<div class="empty">ไม่พบ version ที่ตรงกับตัวกรอง</div>`+html.slice(html.indexOf('<div class="canopy">'));
+  if(!shown){ tl.innerHTML=`<div class="empty">ไม่พบ version ที่ตรงกับตัวกรอง</div>`; }
+}
+const TLABEL={added:"เพิ่ม",fixed:"แก้",changed:"เปลี่ยน",removed:"ออก",reverted:"คืน"};
+function trackCss(t){ if(t.includes("public")&&t.includes("dev"))return "both"; if(t.includes("public"))return "public"; if(t.includes("dev"))return "dev"; if(t.includes("pre"))return "pre-public"; return "tester"; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* index versions for lookup */
+D.versions.forEach((v,i)=>v._idx=i);
+VERS.forEach(v=>{ /* already has _idx */ });
+
+/* ---- render lifecycle ---- */
+const VMIN=0.14, VMAX=1.45;
+const xPct=n=>Math.max(0,Math.min(100,(n-VMIN)/(VMAX-VMIN)*100));
+function lcStatus(f){
+  const s=(f.status_now||"").toLowerCase();
+  if(s.startsWith("active")) return "active";
+  if(s.startsWith("revert")) return "reverted";
+  if(s.includes("replaced")||s.includes("renamed")||s.includes("superseded")||s.includes("merged")) return "replaced";
+  return "removed";
+}
+const STLABEL={active:"ยังใช้อยู่",removed:"เอาออกแล้ว",reverted:"ถอยคืน",replaced:"แทนที่/rename"};
+function renderLifecycle(){
+  const root=$("#lifecycle");
+  // axis ticks
+  const ticks=[0.14,0.5,0.68,0.79,1.0,1.23,1.38];
+  let axis=`<div class="lcaxis">`+ticks.map(t=>`<span>v${t.toFixed(2)}</span>`).join("")+`</div>`;
+  let rows="";
+  const items=D.feature_lifecycle.map(f=>({f,st:lcStatus(f),a:vnum(f.added_version),r:f.removed_version?vnum(f.removed_version):null}))
+    .sort((x,y)=>x.a-y.a);
+  let shown=0;
+  items.forEach((it,idx)=>{
+    if(!state.sts.has(it.st)) return;
+    if(state.q){ const hay=(it.f.name+" "+(it.f.added_reason||"")+" "+(it.f.removed_reason||"")).toLowerCase(); if(!hay.includes(state.q))return; }
+    shown++;
+    const a=it.a, end=it.r||VMAX, left=xPct(a), w=Math.max(2,xPct(end)-left);
+    const grid=ticks.map(t=>`<span class="lcgrid" style="left:${xPct(t)}%"></span>`).join("");
+    const endMark=it.r?`<span class="lcend" style="left:${xPct(it.r)}%"></span>`:"";
+    const barLabel = it.r? `v${it.f.added_version.match(/(\d+\.\d+)/)?.[1]||''} → v${it.f.removed_version.match(/(\d+\.\d+)/)?.[1]||''}` : `v${it.f.added_version.match(/(\d+\.\d+)/)?.[1]||''} → ปัจจุบัน`;
+    rows+=`<div class="lcrow" data-lci="${idx0(it.f)}">
+      <div class="lcname">${esc(shortName(it.f.name))}<br><span class="st ${it.st}">${STLABEL[it.st]}</span></div>
+      <div class="lctrack">${grid}
+        <div class="lcbar ${it.st}" style="left:${left}%;width:${w}%">${barLabel}</div>${endMark}
+      </div></div>`;
+  });
+  root.innerHTML = axis + (shown?rows:`<div class="empty">ไม่พบฟีเจอร์ที่ตรงกับตัวกรอง</div>`);
+}
+function idx0(f){ return D.feature_lifecycle.indexOf(f); }
+function shortName(n){ return n.length>46? n.slice(0,44)+"…":n; }
+
+/* ---- drawer ---- */
+function openDrawer(html){ $("#dbody").innerHTML=html; $("#drawer").classList.add("on"); $("#scrim").classList.add("on"); }
+function closeDrawer(){ $("#drawer").classList.remove("on"); $("#scrim").classList.remove("on"); }
+$("#dx").onclick=closeDrawer; $("#scrim").onclick=closeDrawer;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();});
+
+function versionDrawer(v){
+  const chgs=v.changes.map(c=>`<div class="chg"><span class="tag ${c.type}">${c.type}</span><div class="txt">${esc(c.text)}</div></div>`).join("");
+  const lc=lcAtVersion(v.version);
+  let lcHtml="";
+  if(lc.length){
+    lcHtml=`<h3>🔄 ฟีเจอร์ที่เกี่ยวกับ version นี้</h3>`+lc.map(({f,kind})=>{
+      const st=lcStatus(f);
+      return `<div class="lcbox"><div class="h">${kind==="added"?"➕ เริ่มใส่":"➖ เอาออก"}: ${esc(f.name)}</div>
+        <div class="meta"><span class="st ${st}">${STLABEL[st]}</span></div>
+        <div class="r">${esc(kind==="added"?f.added_reason:f.removed_reason||"")}</div></div>`;
+    }).join("");
+  }
+  openDrawer(`<div class="dv">v${esc(v.version)}</div>
+    <div class="dmeta"><span class="trk ${trackCss(v.track)}">${v.track}</span><span class="date">${v.date||''}</span></div>
+    <div class="dsum">${esc(v.summary)}</div>
+    <h3>รายการเปลี่ยนแปลง (${v.changes.length})</h3>${chgs}${lcHtml}`);
+}
+function lifecycleDrawer(f){
+  const st=lcStatus(f);
+  openDrawer(`<div class="dv" style="font-size:19px;color:var(--ink)">${esc(f.name)}</div>
+    <div class="dmeta"><span class="st ${st}">${STLABEL[st]}</span><span class="trk ${trackCss(f.track||'')}">${esc(f.track||'')}</span></div>
+    <h3>➕ เข้า</h3>
+    <div class="lcbox"><div class="h">${esc(f.added_version||'—')}</div><div class="r">${esc(f.added_reason||'')}</div></div>
+    ${f.removed_version?`<h3>➖ เอาออก / เปลี่ยน</h3>
+    <div class="lcbox"><div class="h">${esc(f.removed_version)}</div><div class="r">${esc(f.removed_reason||'')}</div></div>`:''}
+    <h3>สถานะตอนนี้</h3><div class="dsum">${esc(f.status_now||'')}</div>`);
+}
+function futureDrawer(f){
+  openDrawer(`<div class="dv" style="font-size:19px;color:var(--blue)">✦ ${esc(f.n)}</div>
+    <div class="dmeta"><span class="st replaced" style="background:rgba(88,166,255,.15);color:var(--blue)">${esc(f.st)}</span></div>
+    <div class="dsum">${esc(f.p)}</div>
+    <h3>ปลายทาง</h3><div class="r" style="color:var(--dim);font-size:13px">กิ่งไอเดียที่รอเติบโต — ส่วนหนึ่งของ North Star (เปิด buy/sell · AGB · VSS)</div>`);
+}
+
+/* ---- events ---- */
+document.addEventListener("click",e=>{
+  const item=e.target.closest(".item"); if(item){ versionDrawer(D.versions[+item.dataset.i]); return; }
+  const row=e.target.closest(".lcrow"); if(row){ lifecycleDrawer(D.feature_lifecycle[+row.dataset.lci]); return; }
+  const bud=e.target.closest(".bud"); if(bud){ futureDrawer(FUTURE[+bud.dataset.fi]); return; }
+});
+$$(".tab").forEach(t=>t.onclick=()=>{
+  $$(".tab").forEach(x=>x.classList.remove("on")); t.classList.add("on");
+  state.view=t.dataset.view;
+  const tl=state.view==="timeline";
+  $("#timeline").classList.toggle("off",!tl);
+  $("#lifecycle").classList.toggle("on",!tl);
+  $("#filters").style.display=tl?"flex":"none";
+  $("#lcfilters").style.display=tl?"none":"flex";
+});
+$("#typechips").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;c.classList.toggle("on");
+  c.classList.contains("on")?state.types.add(c.dataset.k):state.types.delete(c.dataset.k);renderTimeline();};
+$("#trkchips").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;c.classList.toggle("on");
+  c.classList.contains("on")?state.tracks.add(c.dataset.trk):state.tracks.delete(c.dataset.trk);renderTimeline();};
+$("#stchips").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;c.classList.toggle("on");
+  c.classList.contains("on")?state.sts.add(c.dataset.st):state.sts.delete(c.dataset.st);renderLifecycle();};
+$("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();renderTimeline();renderLifecycle();});
+
+/* init */
+D.versions.forEach((v,i)=>v._idx=i);
+renderTimeline(); renderLifecycle();
+</script>
+</body>
+</html>
