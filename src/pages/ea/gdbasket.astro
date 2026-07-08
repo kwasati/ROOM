@@ -8,9 +8,14 @@ const DL_V118 = `${MAIN}/d/gdbasket-v118`;
 const XM_AFF = 'https://affs.click/jih0m';
 const XM_CODE = 'KWASATI';
 
-// Myfxbook — ดึงผลพอร์ต gdBasket XS ตอน build (auto) + fallback ค่าล่าสุดกันพัง
+// Myfxbook — ดึงผลพอร์ต gdBasket XS (id 12090186) ตอน build (auto) + fallback ค่าล่าสุดกันพัง
+// การ์ดนี้เป็น "ต้นแบบ" เดียวที่ SSR ไว้ก่อนเสมอ — พอร์ตอื่นที่ผูกเข้า myfxbook login เดียวกัน จะถูก client script
+// ด้านล่าง clone การ์ดนี้เพิ่มเองตอน runtime (ดึงจาก /api/myfxbook.json ที่คาย array ทุกพอร์ต live) ไม่ต้องแก้ไฟล์นี้อีก
+const MFB_ID_DEFAULT = '12090186';
 const MFB_URL = 'https://www.myfxbook.com/members/kwasati/gdbasket-xs/12090186';
 let mfb = { gain: '53.40', absGain: '53.45', monthly: '53.40', drawdown: '18.16', balance: '460.36', profit: '160.36' };
+let mfbId = MFB_ID_DEFAULT;
+let mfbName: string | null = null;
 try {
   const email = import.meta.env.MYFXBOOK_EMAIL;
   const pass = import.meta.env.MYFXBOOK_PASSWORD;
@@ -18,10 +23,12 @@ try {
     const lr = await fetch(`https://www.myfxbook.com/api/login.json?email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`).then((r) => r.json());
     if (lr && lr.session) {
       const ar = await fetch(`https://www.myfxbook.com/api/get-my-accounts.json?session=${encodeURIComponent(lr.session)}`).then((r) => r.json());
-      const acc = (ar.accounts || []).find((a) => String(a.id) === '12090186');
+      const acc = (ar.accounts || []).find((a) => String(a.id) === MFB_ID_DEFAULT);
       if (acc) {
         const f = (n) => (n == null ? '-' : Number(n).toFixed(2));
         mfb = { gain: f(acc.gain), absGain: f(acc.absGain), monthly: f(acc.monthly), drawdown: f(acc.drawdown), balance: f(acc.balance), profit: f(acc.profit) };
+        mfbId = String(acc.id);
+        mfbName = acc.name || null;
       }
     }
   }
@@ -286,18 +293,21 @@ const installSteps = [
         </div>
       </div>
 
-      <!-- Myfxbook -->
+      <!-- Myfxbook — id="mfb-list" = ที่ client script (ท้ายไฟล์) clone การ์ดเพิ่มเวลามีพอร์ตอื่นผูกเข้า myfxbook -->
       <div class="border-t border-dark-border pt-5">
         <h3 class="text-gray-light font-bold text-[15px] mb-3">Myfxbook <span class="text-[10px] text-gray-dark font-normal">· ผลตรวจสอบจริง</span></h3>
-        <div class="rounded-xl border border-dark-border bg-dark-card p-4">
-          <div class="flex flex-col gap-1.5 text-sm">
-            <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span id="mfb-gain" class="text-green font-bold">+{mfb.gain}%</span></div>
-            <div class="flex justify-between"><span class="text-gray-dark">Abs. Gain</span><span id="mfb-absgain" class="text-green font-semibold">+{mfb.absGain}%</span></div>
-            <div class="flex justify-between"><span class="text-gray-dark">Monthly</span><span id="mfb-monthly" class="text-gray-light">{mfb.monthly}%</span></div>
-            <div class="flex justify-between"><span class="text-gray-dark">Drawdown</span><span id="mfb-dd" class="text-gray-light">{mfb.drawdown}%</span></div>
-            <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">Balance</span><span id="mfb-balance" class="text-gray-light">${mfb.balance}</span></div>
+        <div id="mfb-list" class="flex flex-col gap-3">
+          <div class="rounded-xl border border-dark-border bg-dark-card p-4" data-mfb-id={mfbId}>
+            <div class="mfb-label hidden text-xs text-gray-dark font-semibold mb-2">{mfbName}</div>
+            <div class="flex flex-col gap-1.5 text-sm">
+              <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span class="mfb-gain text-green font-bold">+{mfb.gain}%</span></div>
+              <div class="flex justify-between"><span class="text-gray-dark">Abs. Gain</span><span class="mfb-absgain text-green font-semibold">+{mfb.absGain}%</span></div>
+              <div class="flex justify-between"><span class="text-gray-dark">Monthly</span><span class="mfb-monthly text-gray-light">{mfb.monthly}%</span></div>
+              <div class="flex justify-between"><span class="text-gray-dark">Drawdown</span><span class="mfb-dd text-gray-light">{mfb.drawdown}%</span></div>
+              <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">Balance</span><span class="mfb-balance text-gray-light">${mfb.balance}</span></div>
+            </div>
+            <a href={MFB_URL} target="_blank" rel="noopener noreferrer" class="mfb-link block text-center mt-3 border border-dark-border hover:border-primary text-gray-light text-sm font-semibold py-2 rounded-lg transition-colors">ดูใน Myfxbook →</a>
           </div>
-          <a href={MFB_URL} target="_blank" rel="noopener noreferrer" class="block text-center mt-3 border border-dark-border hover:border-primary text-gray-light text-sm font-semibold py-2 rounded-lg transition-colors">ดูใน Myfxbook →</a>
         </div>
       </div>
 
@@ -384,16 +394,46 @@ const installSteps = [
       })
       .catch(() => {});
   }
+  // Myfxbook — API คาย array ทุกพอร์ต live; การ์ดแรก (SSR ไว้แล้ว) reuse ตัวเดิม พอร์ตถัดไป clone เพิ่มเอง
   fetch('https://www.intensivetrader.com/api/myfxbook.json')
     .then((r) => r.json())
-    .then((m) => {
-      if (!m) return;
-      const set = (id, v, pre, suf) => { const el = document.getElementById(id); if (el && v != null) el.textContent = (pre || '') + v + (suf || ''); };
-      set('mfb-gain', m.gain, '+', '%');
-      set('mfb-absgain', m.absGain, '+', '%');
-      set('mfb-monthly', m.monthly, '', '%');
-      set('mfb-dd', m.drawdown, '', '%');
-      set('mfb-balance', m.balance, '$', '');
+    .then((accounts) => {
+      if (!Array.isArray(accounts) || accounts.length === 0) return;
+      const list = document.getElementById('mfb-list');
+      const template = list ? list.querySelector('[data-mfb-id]') : null;
+      if (!list || !template) return;
+      const slugify = (s) => (s || 'account').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      accounts.forEach((acc, i) => {
+        let card = list.querySelector(`[data-mfb-id="${acc.id}"]`);
+        let isNew = false;
+        if (!card) {
+          if (i === 0) {
+            card = template;
+            card.setAttribute('data-mfb-id', String(acc.id));
+          } else {
+            card = template.cloneNode(true);
+            card.setAttribute('data-mfb-id', String(acc.id));
+            list.appendChild(card);
+            isNew = true;
+          }
+        }
+        const set = (sel, v, pre, suf) => { const el = card.querySelector(sel); if (el && v != null) el.textContent = (pre || '') + v + (suf || ''); };
+        set('.mfb-gain', acc.gain, '+', '%');
+        set('.mfb-absgain', acc.absGain, '+', '%');
+        set('.mfb-monthly', acc.monthly, '', '%');
+        set('.mfb-dd', acc.drawdown, '', '%');
+        set('.mfb-balance', acc.balance, '$', '');
+        const label = card.querySelector('.mfb-label');
+        if (label) label.textContent = acc.name || '';
+        // การ์ดเดิม (SSR) คงลิงก์ myfxbook เดิมไว้ — การ์ดใหม่ที่ clone มาถึงคำนวณลิงก์เอง
+        if (isNew) {
+          const link = card.querySelector('.mfb-link');
+          if (link) link.href = `https://www.myfxbook.com/members/kwasati/${slugify(acc.name)}/${acc.id}`;
+        }
+      });
+      if (accounts.length > 1) {
+        list.querySelectorAll('.mfb-label').forEach((el) => el.classList.remove('hidden'));
+      }
     })
     .catch(() => {});
   document.querySelectorAll('.copy-code').forEach((btn) => {
