@@ -3,33 +3,48 @@ import Layout from '../../layouts/Layout.astro';
 
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
-const DL_V137 = `${MAIN}/d/gdbasket`;
+const DL_V200 = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์ v2.00 (publish/releases/v2.00/gdBasket_v2.00.ex5)
+const DL_V137 = `${MAIN}/d/gdbasket-v137`;
 const DL_V118 = `${MAIN}/d/gdbasket-v118`;
 const XM_AFF = 'https://affs.click/jih0m';
 const XM_CODE = 'KWASATI';
 
-// Myfxbook — ดึงผลพอร์ต gdBasket XS (id 12090186) ตอน build (auto) + fallback ค่าล่าสุดกันพัง
-// การ์ดนี้เป็น "ต้นแบบ" เดียวที่ SSR ไว้ก่อนเสมอ — พอร์ตอื่นที่ผูกเข้า myfxbook login เดียวกัน จะถูก client script
-// ด้านล่าง clone การ์ดนี้เพิ่มเองตอน runtime (ดึงจาก /api/myfxbook.json ที่คาย array ทุกพอร์ต live) ไม่ต้องแก้ไฟล์นี้อีก
-const MFB_ID_DEFAULT = '12090186';
-const MFB_URL = 'https://www.myfxbook.com/members/kwasati/gdbasket-xs/12090186';
-let mfb = { gain: '53.40', absGain: '53.45', monthly: '53.40', drawdown: '18.16', balance: '460.36', profit: '160.36' };
-let mfbId = MFB_ID_DEFAULT;
-let mfbName: string | null = null;
+// Myfxbook — ดึงทุกพอร์ต live จาก /api/myfxbook.json ตอน build + fallback ต่อบัญชีกันพัง
+// client script ท้ายไฟล์ refresh ค่าสดตอน runtime + clone การ์ดเพิ่มเองเมื่อ API คายพอร์ตใหม่ ไม่ต้องแก้ไฟล์นี้อีก
+type MfbCard = {
+  id: string; name: string; label: string; url: string | null; newNote: string | null;
+  gain: string | null; absGain: string | null; monthly: string | null; drawdown: string | null; balance: string | null;
+};
+const mfbSlug = (s: string) => (s || 'account').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+const mfbFallback: MfbCard[] = [
+  { id: '12090186', name: 'gdbasket-xs', label: 'พอร์ต 1', url: 'https://www.myfxbook.com/members/kwasati/gdbasket-xs/12090186', newNote: null, gain: '53.40', absGain: '53.45', monthly: '53.40', drawdown: '18.16', balance: '460.36' },
+  { id: '', name: 'gdbasket lx', label: 'พอร์ต 2', url: null, newNote: 'พอร์ตใหม่ เริ่ม 2026-07 — ตัวเลขจะขึ้นเมื่อระบบตรวจสอบผูกเสร็จ', gain: null, absGain: null, monthly: null, drawdown: null, balance: null },
+];
+let mfbCards: MfbCard[] = mfbFallback;
 try {
-  const email = import.meta.env.MYFXBOOK_EMAIL;
-  const pass = import.meta.env.MYFXBOOK_PASSWORD;
-  if (email && pass) {
-    const lr = await fetch(`https://www.myfxbook.com/api/login.json?email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`).then((r) => r.json());
-    if (lr && lr.session) {
-      const ar = await fetch(`https://www.myfxbook.com/api/get-my-accounts.json?session=${encodeURIComponent(lr.session)}`).then((r) => r.json());
-      const acc = (ar.accounts || []).find((a) => String(a.id) === MFB_ID_DEFAULT);
-      if (acc) {
-        const f = (n) => (n == null ? '-' : Number(n).toFixed(2));
-        mfb = { gain: f(acc.gain), absGain: f(acc.absGain), monthly: f(acc.monthly), drawdown: f(acc.drawdown), balance: f(acc.balance), profit: f(acc.profit) };
-        mfbId = String(acc.id);
-        mfbName = acc.name || null;
-      }
+  const raw = await fetch('https://www.intensivetrader.com/api/myfxbook.json').then((r) => r.json());
+  // API รุ่นเก่าคาย object พอร์ตเดียว (ไม่มี id/name) — แปลงเป็น array โดยถือเป็นพอร์ต 1; รุ่นใหม่คาย array ทุกพอร์ต live
+  const accounts = Array.isArray(raw) ? raw : (raw && raw.gain != null ? [{ id: mfbFallback[0].id, name: mfbFallback[0].name, ...raw }] : []);
+  if (accounts.length > 0) {
+    const f = (n: unknown) => (n == null ? null : Number(n).toFixed(2));
+    const toCard = (acc: any, base: MfbCard): MfbCard => ({
+      ...base,
+      id: String(acc.id),
+      name: acc.name || base.name,
+      url: `https://www.myfxbook.com/members/kwasati/${mfbSlug(acc.name || base.name)}/${acc.id}`,
+      newNote: null,
+      gain: f(acc.gain), absGain: f(acc.absGain), monthly: f(acc.monthly), drawdown: f(acc.drawdown), balance: f(acc.balance),
+    });
+    const used = new Set<string>();
+    mfbCards = mfbFallback.map((fb) => {
+      const acc = accounts.find((a: any) => String(a.id) === fb.id || (a.name || '').toLowerCase() === fb.name.toLowerCase());
+      if (!acc) return fb; // fallback ต่อบัญชี — API ยังไม่คืนพอร์ตนี้
+      used.add(String(acc.id));
+      return toCard(acc, fb);
+    });
+    // พอร์ตใหม่ที่ยังไม่รู้จัก — ต่อท้ายเป็นการ์ดเพิ่ม
+    for (const acc of accounts) {
+      if (!used.has(String(acc.id))) mfbCards.push(toCard(acc, { id: '', name: '', label: `พอร์ต ${mfbCards.length + 1}`, url: null, newNote: null, gain: null, absGain: null, monthly: null, drawdown: null, balance: null }));
     }
   }
 } catch (e) { /* ใช้ fallback */ }
@@ -39,7 +54,7 @@ const features = [
   { title: 'ระยะกริดปรับตามตลาด (ATR)', desc: 'ระยะห่างระหว่างไม้ไม่ได้ fix — คำนวณจากความผันผวนจริง (ATR M15) ตลาดผันผวนมากกริดถ่างขึ้นอัตโนมัติ' },
   { title: 'ปิดทั้งตะกร้าจุดเดียว (Common TP)', desc: 'ทุกไม้ใช้เป้ากำไรราคาเดียวกัน broker เป็นคนปิดให้ — ไม่ต้องเฝ้าจอ' },
   { title: 'SL กันตายที่ broker', desc: 'วาง SL จริงร่วมทุกไม้เป็น backstop กันพอร์ตแตกหนักเมื่อ EA ดับ / ตลาดปิด / ราคากระโดด' },
-  { title: '2 โปรไฟล์ STRADA / SPORT', desc: 'เลือกสไตล์ได้: SPORT (default) สลับความถี่กริดตามโซนเส้นค่าเฉลี่ย / STRADA เปิดไม้เฉพาะฝั่งขาขึ้นความเสี่ยงต่ำ' },
+  { title: '3 โหมด STRADA+ / SPORT+ / CORSA', desc: 'เลือกความแรงได้ 3 ระดับ: STRADA+ นิ่งสุด / SPORT+ (ค่าเริ่มต้น) สลับชุดค่าตามโซนราคา / CORSA แรงสุดสำหรับคนรับความเสี่ยงได้' },
   { title: 'รองรับ GOLD# Std + GOLDm# Micro', desc: 'เลือก Auto / Standard / Micro — ปรับ lot ให้พอดีบัญชี XM ทั้งบัญชีใหญ่และไมโคร' },
 ];
 
@@ -51,7 +66,8 @@ const howSteps = [
 ];
 
 const releases = [
-  { version: 'v1.37', date: '2026-06-24', latest: true, note: 'ปรับวิธีบันทึกผลตอนพอร์ตแตก (ขาดทุนสุทธิจริง) + ใช้ SL ที่ broker เป็นตัวปิดหลัก + แยกการปิดแบบ trail / TP / SO ชัดเจน', url: DL_V137 },
+  { version: 'v2.00', date: '2026-07-08', latest: true, note: 'ยกเครื่องยนต์ใหม่ทั้งชุด — โหมด STRADA+ / SPORT+ / CORSA', url: DL_V200 },
+  { version: 'v1.37', date: '2026-06-24', latest: false, note: 'ปรับวิธีบันทึกผลตอนพอร์ตแตก (ขาดทุนสุทธิจริง) + ใช้ SL ที่ broker เป็นตัวปิดหลัก', url: DL_V137 },
   { version: 'v1.18', date: '2026-06-13', latest: false, note: 'แก้บั๊กตรวจพอร์ตแตกผิดพลาด (false SO) ตอนเจอ bad tick / ข่าว / สเปรดกระชาก', url: DL_V118 },
 ];
 
@@ -59,23 +75,24 @@ const releases = [
 const fileRows = [
   { icon: 'doc', name: 'README — ภาพรวม EA', note: 'Buy Grid GOLD M15 · DCA + ATR grid + common TP', meta: 'อ่าน', href: '#readme', color: 'text-gray' },
   { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · MQL5\\Experts\\ · ลากใส่กราฟ GOLD M15', meta: '6 ขั้น', href: '#install', color: 'text-secondary' },
-  { icon: 'star', name: 'จุดเด่น', note: '6 ข้อ · DCA / ATR / common TP / SL / STRADA+SPORT / Std+Micro', meta: '6', href: '#features', color: 'text-primary' },
-  { icon: 'clock', name: 'บันทึกเวอร์ชัน', note: 'v1.37 (2026-06-24) · v1.18 (2026-06-13)', meta: '2 rel', href: '#releases', color: 'text-gray' },
-  { icon: 'dl', name: 'gdBasket_v1.37.ex5', note: 'ไฟล์ EA พร้อมใช้ · MT5 · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_V137, color: 'text-green', download: true },
+  { icon: 'modes', name: 'โหมดการทำงาน', note: '3 โหมด · STRADA+ (นิ่ง) / SPORT+ (ค่าเริ่มต้น) / CORSA (แรง)', meta: '3', href: '#modes', color: 'text-primary' },
+  { icon: 'star', name: 'จุดเด่น', note: '6 ข้อ · DCA / ATR / common TP / SL / 3 โหมด / Std+Micro', meta: '6', href: '#features', color: 'text-primary' },
+  { icon: 'clock', name: 'บันทึกเวอร์ชัน', note: 'v2.00 (2026-07-08) · v1.37 (2026-06-24) · v1.18 (2026-06-13)', meta: '3 rel', href: '#releases', color: 'text-gray' },
+  { icon: 'dl', name: 'gdBasket_v2.00.ex5', note: 'ไฟล์ EA พร้อมใช้ · MT5 · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_V200, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ประวัติการเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: `${MAIN}/journal`, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
-  'โหลดไฟล์ <strong>gdBasket_v1.37.ex5</strong> จากปุ่มด้านบน',
+  'โหลดไฟล์ <strong>gdBasket_v2.00.ex5</strong> จากปุ่มด้านบน',
   'เปิด <strong>MetaTrader 5</strong> → เมนู <strong>File → Open Data Folder</strong>',
   'วางไฟล์ใน <code class="install-path">MQL5\\Experts\\</code>',
   '<strong>Restart MT5</strong> หรือกด <strong>Refresh</strong> ใน Navigator',
   'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊ก <strong>Allow Algo Trading</strong> → OK แล้วกดปุ่ม <strong>Algo Trading</strong> บนแถบเครื่องมือ MT5 ให้เป็น<strong class="text-green">สีเขียว</strong>',
-  'ตั้งค่า <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — บัญชี <strong>Standard</strong> ตั้งขั้นต่ำ <strong>$1,000</strong> · บัญชี <strong>Micro</strong> ตั้งขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์)',
+  'ตั้งค่า <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — บัญชี <strong>Standard</strong> ตั้งขั้นต่ำ <strong>$1,000</strong> · บัญชี <strong>Micro</strong> ตั้งขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) แล้วเลือก <strong>Mode</strong> ตามความเสี่ยงที่รับไหว (ค่าเริ่มต้น = SPORT+)',
 ];
 ---
 
-<Layout title="gdBasket — Buy Grid EA สำหรับ GOLD M15 | Room" description="gdBasket — MQL5 Buy Grid EA บน GOLD M15 ใช้จริงบนพอร์ตจริง. โหลดฟรี v1.37" ogImage="https://room.intensivetrader.com/gdbasket-og.png">
+<Layout title="gdBasket — Buy Grid EA สำหรับ GOLD M15 | Room" description="gdBasket — MQL5 Buy Grid EA บน GOLD M15 ใช้จริงบนพอร์ตจริง. โหลดฟรี v2.00" ogImage="https://room.intensivetrader.com/gdbasket-og.png">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
   <!-- breadcrumb -->
@@ -98,7 +115,7 @@ const installSteps = [
     </div>
     <div class="flex items-center rounded-lg border border-dark-border overflow-hidden text-sm">
       <span class="px-3 py-1.5 text-gray">เวอร์ชัน</span>
-      <span class="px-3 py-1.5 bg-dark border-l border-dark-border text-gray-light font-semibold">v1.37</span>
+      <span class="px-3 py-1.5 bg-dark border-l border-dark-border text-gray-light font-semibold">v2.00</span>
     </div>
   </div>
 
@@ -107,7 +124,7 @@ const installSteps = [
     <a href="#readme" class="px-3 py-2.5 border-b-2 border-primary text-gray-light font-semibold whitespace-nowrap">โค้ด/ไฟล์</a>
     <a href="#readme" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">วิธีทำงาน</a>
     <a href="#features" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">จุดเด่น</a>
-    <a href="#releases" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap flex items-center gap-1.5">Releases <span class="bg-dark-border text-gray-light text-[10px] px-1.5 rounded-full">2</span></a>
+    <a href="#releases" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap flex items-center gap-1.5">Releases <span class="bg-dark-border text-gray-light text-[10px] px-1.5 rounded-full">3</span></a>
     <a href={`${MAIN}/journal`} class="px-3 py-2.5 border-b-2 border-transparent text-primary hover:text-primary-dark font-semibold whitespace-nowrap">Trading Journal</a>
   </div>
 
@@ -119,25 +136,26 @@ const installSteps = [
       <div class="flex items-center gap-3 flex-wrap mb-3">
         <span class="flex items-center gap-2 bg-dark-card border border-dark-border rounded-lg px-3 py-1.5 text-sm text-gray-light">
           <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
-          <span class="font-semibold">v1.37</span>
+          <span class="font-semibold">v2.00</span>
         </span>
         <span class="text-sm text-gray flex items-center gap-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-          <span class="text-gray-light font-semibold">2</span> เวอร์ชัน
+          <span class="text-gray-light font-semibold">3</span> เวอร์ชัน
         </span>
         <div class="flex-1 min-w-[120px]"></div>
-        <a href={DL_V137} download class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors pixel-shadow">
+        <a href={DL_V200} download class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors pixel-shadow">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด
         </a>
+        <p class="text-[11px] text-gray-dark text-right w-full leading-relaxed">ไฟล์เวอร์ชัน <strong class="text-secondary font-semibold">v2.00</strong> — ใช้ได้เฉพาะบัญชี <strong class="text-secondary font-semibold">XM</strong> (โบรก XM Global + GOLD + M15 เท่านั้น — ล็อกในตัว EA)</p>
       </div>
 
       <!-- (d) LATEST-COMMIT BAR -->
       <div class="flex items-center gap-3 bg-dark-card border border-dark-border rounded-t-xl px-4 py-2.5 text-sm flex-wrap">
         <img src={`${MAIN}/profile.jpg`} class="w-5 h-5 rounded-full bg-dark-border" alt="" />
         <span class="text-gray-light font-semibold">IntensiveTrader</span>
-        <span class="text-gray truncate flex-1 min-w-[120px]">v1.37 — ปรับวิธีบันทึกผลตอนพอร์ตแตก + SL ที่ broker เป็นตัวปิดหลัก</span>
-        <span class="text-gray-dark whitespace-nowrap">อัปเดต 2026-06-24</span>
+        <span class="text-gray truncate flex-1 min-w-[120px]">v2.00 — ยกเครื่องยนต์ใหม่ทั้งชุด: โหมด STRADA+ / SPORT+ / CORSA</span>
+        <span class="text-gray-dark whitespace-nowrap">อัปเดต 2026-07-08</span>
       </div>
 
       <!-- (e) FILE LIST -->
@@ -151,6 +169,7 @@ const installSteps = [
             <span class={`shrink-0 ${row.color}`}>
               {row.icon === 'doc' && <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h11v2H4z"/></svg>}
               {row.icon === 'gear' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>}
+              {row.icon === 'modes' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>}
               {row.icon === 'star' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>}
               {row.icon === 'clock' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               {row.icon === 'dl' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>}
@@ -220,18 +239,60 @@ const installSteps = [
             ))}
           </div>
 
-          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">สถิติน่าสนใจ</h3>
-          <div class="grid sm:grid-cols-2 gap-4 mb-4">
-            <div class="bg-dark-card border border-dark-border rounded-lg p-4">
-              <h4 class="font-bold text-gray-light text-[14px] mb-1.5">Profile <span class="text-secondary">STRADA</span></h4>
-              <p class="text-gray text-[13px] leading-relaxed">ความถี่การขาดทุนต่ำ แต่ปั้นสำเร็จนานหน่อย — เฉลี่ยปั้นสำเร็จที่ <strong class="text-green">30 วัน</strong></p>
+          <h3 id="modes" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">โหมดการทำงาน 3 แบบ</h3>
+          <div class="grid md:grid-cols-3 gap-4 mb-4">
+            <div class="bg-dark-card border border-dark-border rounded-lg px-4 py-5 flex flex-col gap-2">
+              <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit bg-green/10 text-green">สายนิ่ง — ความเสี่ยงต่ำสุด</span>
+              <h4 class="pixel text-gray-light text-[12px]">STRADA+</h4>
+              <p class="text-gray text-[13px] leading-relaxed">เปิดไม้แรกเฉพาะจังหวะราคายืนเหนือเส้นค่าเฉลี่ย (EMA75 ของราคา High) ใช้ชุดค่าคงที่ทั้งรอบ และวางไม้ไม่เกิน 1 ไม้ต่อแท่ง</p>
             </div>
-            <div class="bg-dark-card border border-dark-border rounded-lg p-4">
-              <h4 class="font-bold text-gray-light text-[14px] mb-1.5">Profile <span class="text-secondary">SPORT</span></h4>
-              <p class="text-gray text-[13px] leading-relaxed">ความถี่การขาดทุนสูงขึ้นมานิด แต่ปั้นสำเร็จเร็วขึ้น — เฉลี่ยปั้นสำเร็จที่ <strong class="text-green">19 วัน</strong></p>
+            <div class="bg-dark-card border border-primary/50 rounded-lg px-4 py-5 flex flex-col gap-2">
+              <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit bg-primary/10 text-primary-light">ค่าเริ่มต้น</span>
+              <h4 class="pixel text-gray-light text-[12px]">SPORT+</h4>
+              <p class="text-gray text-[13px] leading-relaxed">เครื่องยนต์ 2 บ้าน high/low — สลับชุดค่าตามโซนราคาอัตโนมัติ + ระบบกันวางไม้ถี่เกิน (Spawn Guard) + trail อัตโนมัติผูกตามบ้านที่เปิดรอบ</p>
+            </div>
+            <div class="bg-dark-card border border-dark-border rounded-lg px-4 py-5 flex flex-col gap-2">
+              <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit bg-secondary/10 text-secondary">แรงสุด</span>
+              <h4 class="pixel text-gray-light text-[12px]">CORSA</h4>
+              <p class="text-gray text-[13px] leading-relaxed">เหมือน SPORT+ ทุกอย่าง ต่างที่ไม้ฐานโซน high หนักกว่า — ปั้นเร็วขึ้นมากแต่รอบแตกก็ลึกกว่า</p>
+              <div class="bg-secondary/10 border border-secondary/40 rounded-md px-2.5 py-2 text-[12px] text-secondary font-semibold leading-normal">คำเตือน: ความแรงเทียบเท่าใช้ทุน x5 — ใช้อย่างระมัดระวัง</div>
             </div>
           </div>
-          <p class="text-center text-secondary text-sm font-semibold mb-8">*** โปรดเลือก Profile ตามความเสี่ยงที่คุณรับไหว ***</p>
+          <p class="text-center text-secondary text-sm font-semibold mb-8">*** โปรดเลือกโหมดตามความเสี่ยงที่คุณรับไหว ***</p>
+
+          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">ผลสอบย้อนหลัง 3 โหมด (2023-01 ถึง 2026-05)</h3>
+          <p class="text-gray text-sm leading-relaxed mb-4">รันสอบย้อนหลังบนข้อมูลราคาจริงต่อเนื่อง 3 ปีครึ่ง ตั้งทุนต่อรอบ 10,000 ดอลลาร์เท่ากันทุกโหมด — ตัวเลขนี้คือผลรวมทั้งช่วง ไม่ได้การันตีอนาคต</p>
+          <table class="w-full border-collapse text-sm mb-3">
+            <thead>
+              <tr>
+                <th class="text-left text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">โหมด</th>
+                <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">กำไรสุทธิรวม (USD)</th>
+                <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">รอบสำเร็จ</th>
+                <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">รอบแตก (SO)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="px-3 py-2.5 border-b border-dark-border text-gray-light"><span class="pixel text-[10px]">STRADA+</span></td>
+                <td class="px-3 py-2.5 border-b border-dark-border text-right text-green font-bold">+88,925</td>
+                <td class="px-3 py-2.5 border-b border-dark-border text-right text-gray-light">15</td>
+                <td class="px-3 py-2.5 border-b border-dark-border text-right text-gray-light">9</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2.5 border-b border-dark-border text-gray-light"><span class="pixel text-[10px]">SPORT+</span> <span class="text-gray-dark text-[11px]">(ค่าเริ่มต้น)</span></td>
+                <td class="px-3 py-2.5 border-b border-dark-border text-right text-green font-bold">+199,673</td>
+                <td class="px-3 py-2.5 border-b border-dark-border text-right text-gray-light">28</td>
+                <td class="px-3 py-2.5 border-b border-dark-border text-right text-gray-light">20</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2.5 text-gray-light"><span class="pixel text-[10px]">CORSA</span></td>
+                <td class="px-3 py-2.5 text-right text-green font-bold">+298,270</td>
+                <td class="px-3 py-2.5 text-right text-gray-light">44</td>
+                <td class="px-3 py-2.5 text-right text-gray-light">42</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="text-gray-dark text-xs leading-relaxed mb-8">"รอบแตก (SO)" = รอบที่ราคาไหลลงแรงจนระบบตัดขาดทุนตามกติกา — เสียเท่าทุนต่อรอบที่ตั้งไว้ (ในตารางคือ 10,000 ต่อรอบ) <strong class="text-gray-light">ไม่ใช่พอร์ตหมดทั้งพอร์ต</strong> แล้วเริ่มรอบใหม่ต่อ. กำไรสุทธิรวมข้างบนหักรอบแตกทั้งหมดแล้ว. โหมดยิ่งแรง รอบสำเร็จยิ่งถี่ แต่รอบแตกก็ถี่ตาม — นี่คือเหตุผลที่ต้องเลือกโหมดตามความเสี่ยงที่รับไหว</p>
 
           <h3 id="install" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">วิธีติดตั้ง</h3>
           <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-secondary/5 border border-secondary/30 rounded-lg p-3.5 mb-4 hover:border-secondary/60 transition-colors">
@@ -262,6 +323,23 @@ const installSteps = [
           </div>
         </div>
       </div>
+
+      <!-- (g) CHANGELOG CARD — มีอะไรใหม่ใน v2.00 -->
+      <div id="changelog" class="border border-dark-border rounded-xl overflow-hidden mb-8 scroll-mt-20">
+        <div class="flex items-center gap-2 bg-dark-card border-b border-dark-border px-4 py-2.5 text-sm">
+          <span class="text-gray-light font-semibold">มีอะไรใหม่ใน v2.00</span>
+        </div>
+        <div class="p-6">
+          <ul class="flex flex-col gap-3 mb-5">
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>โหมดใหม่ 3 ตัว <strong class="text-gray-light">STRADA+ / SPORT+ / CORSA</strong> (แทน STRADA / SPORT เดิม — ค่าเก่าที่เซฟไว้ต้องกด Reset แล้วเลือกโหมดใหม่)</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>ระบบเติมไม้ตามเทรนด์ (pyramid) + trail อัตโนมัติเลือกให้ตามบ้านที่เปิดรอบ</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>ระบบกันวางไม้ถี่เกินตอนตลาดดิ่งแรง (Spawn Guard) — ลดโอกาสตะกร้าบานเร็วในวันตลาดพัง</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>ฐานตัดขาดทุนต่อรอบ = ทุนต่อรอบล้วน ตายตัว (เลิกมีตัวเลือกเบาะกำไร — เพดานเสียต่อรอบชัดเจนขึ้น)</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>ส่งข้อมูลเข้า Trading Journal บนเว็บอัตโนมัติครบทุกจุด — ดูผลจริงได้ที่หน้า Journal</span></li>
+          </ul>
+          <a href="/gdbasket-changelog.html" class="text-primary text-sm font-semibold hover:underline">ดูประวัติทุกเวอร์ชัน →</a>
+        </div>
+      </div>
     </div>
 
     <!-- RIGHT SIDEBAR -->
@@ -284,6 +362,8 @@ const installSteps = [
       <div class="border-t border-dark-border pt-5">
         <h3 class="text-gray-light font-bold text-[15px] mb-3">Trading Journal</h3>
         <div class="rounded-xl border border-primary/30 bg-dark-card p-4">
+          <!-- toggle รวม/ต่อพอร์ต — ปุ่มสร้างจาก account_login จริงใน client script (label จาก accounts.display_name, fallback เลขบัญชี); ซ่อนไว้จนมีมากกว่า 1 พอร์ต -->
+          <div id="tj-toggle" class="hidden gap-1 mb-3 bg-dark border border-dark-border rounded-lg p-1 text-[11px] font-semibold"></div>
           <div class="grid grid-cols-3 gap-2 text-center mb-3">
             <div><div id="tj-pnl" class="text-[17px] font-bold text-green">—</div><div class="text-[10px] text-gray-dark mt-0.5">กำไรสะสม</div></div>
             <div><div id="tj-wr" class="text-[17px] font-bold text-gray-light">—</div><div class="text-[10px] text-gray-dark mt-0.5">Win rate</div></div>
@@ -297,17 +377,20 @@ const installSteps = [
       <div class="border-t border-dark-border pt-5">
         <h3 class="text-gray-light font-bold text-[15px] mb-3">Myfxbook <span class="text-[10px] text-gray-dark font-normal">· ผลตรวจสอบจริง</span></h3>
         <div id="mfb-list" class="flex flex-col gap-3">
-          <div class="rounded-xl border border-dark-border bg-dark-card p-4" data-mfb-id={mfbId}>
-            <div class="mfb-label hidden text-xs text-gray-dark font-semibold mb-2">{mfbName}</div>
-            <div class="flex flex-col gap-1.5 text-sm">
-              <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span class="mfb-gain text-green font-bold">+{mfb.gain}%</span></div>
-              <div class="flex justify-between"><span class="text-gray-dark">Abs. Gain</span><span class="mfb-absgain text-green font-semibold">+{mfb.absGain}%</span></div>
-              <div class="flex justify-between"><span class="text-gray-dark">Monthly</span><span class="mfb-monthly text-gray-light">{mfb.monthly}%</span></div>
-              <div class="flex justify-between"><span class="text-gray-dark">Drawdown</span><span class="mfb-dd text-gray-light">{mfb.drawdown}%</span></div>
-              <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">Balance</span><span class="mfb-balance text-gray-light">${mfb.balance}</span></div>
+          {mfbCards.map((c) => (
+            <div class="rounded-xl border border-dark-border bg-dark-card p-4" data-mfb-id={c.id}>
+              <div class="mfb-label text-xs text-gray-dark font-semibold mb-2">{c.name} · {c.label}</div>
+              <div class="flex flex-col gap-1.5 text-sm">
+                <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span class={`mfb-gain font-bold ${c.gain != null ? 'text-green' : 'text-gray-light'}`}>{c.gain != null ? `+${c.gain}%` : '—'}</span></div>
+                <div class="flex justify-between"><span class="text-gray-dark">Abs. Gain</span><span class={`mfb-absgain font-semibold ${c.absGain != null ? 'text-green' : 'text-gray-light'}`}>{c.absGain != null ? `+${c.absGain}%` : '—'}</span></div>
+                <div class="flex justify-between"><span class="text-gray-dark">Monthly</span><span class="mfb-monthly text-gray-light">{c.monthly != null ? `${c.monthly}%` : '—'}</span></div>
+                <div class="flex justify-between"><span class="text-gray-dark">Drawdown</span><span class="mfb-dd text-gray-light">{c.drawdown != null ? `${c.drawdown}%` : '—'}</span></div>
+                <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">Balance</span><span class="mfb-balance text-gray-light">{c.balance != null ? `$${c.balance}` : '—'}</span></div>
+              </div>
+              {c.newNote && <p class="mfb-new-note text-[11px] text-gray-dark mt-2 leading-relaxed">{c.newNote}</p>}
+              <a href={c.url ?? '#'} target="_blank" rel="noopener noreferrer" class="mfb-link block text-center mt-3 border border-dark-border hover:border-primary text-gray-light text-sm font-semibold py-2 rounded-lg transition-colors">ดูใน Myfxbook →</a>
             </div>
-            <a href={MFB_URL} target="_blank" rel="noopener noreferrer" class="mfb-link block text-center mt-3 border border-dark-border hover:border-primary text-gray-light text-sm font-semibold py-2 rounded-lg transition-colors">ดูใน Myfxbook →</a>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -315,7 +398,7 @@ const installSteps = [
       <div id="releases" class="border-t border-dark-border pt-5 scroll-mt-20">
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-gray-light font-bold text-[15px]">Releases</h3>
-          <span class="text-xs text-gray-dark">2</span>
+          <span class="text-xs text-gray-dark">3</span>
         </div>
         {releases.map(r => (
           <div class="mb-4 last:mb-0">
@@ -325,6 +408,7 @@ const installSteps = [
               {r.latest && <span class="bg-green/10 text-green text-[10px] px-1.5 py-0.5 rounded-full font-semibold">ล่าสุด</span>}
             </div>
             <p class="text-xs text-gray-dark mb-1 ml-6">{r.date}</p>
+            <p class="text-xs text-gray mb-1 ml-6 leading-relaxed">{r.note}</p>
             <a href={r.url} download class="text-primary hover:underline text-sm ml-6 inline-block">โหลด {r.version} →</a>
           </div>
         ))}
@@ -376,47 +460,82 @@ const installSteps = [
   const SUPA = import.meta.env.PUBLIC_SUPABASE_URL;
   const KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   if (SUPA && KEY) {
-    fetch(`${SUPA}/rest/v1/baskets?select=pnl_usd&limit=100000`, {
-      headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
-    })
-      .then((r) => r.json())
-      .then((rows) => {
+    const headers = { apikey: KEY, Authorization: `Bearer ${KEY}` };
+    Promise.all([
+      fetch(`${SUPA}/rest/v1/baskets?select=pnl_usd,account_login&limit=100000`, { headers }).then((r) => r.json()),
+      fetch(`${SUPA}/rest/v1/accounts?select=login,display_name`, { headers }).then((r) => r.json()).catch(() => []),
+    ])
+      .then(([rows, accs]) => {
         if (!Array.isArray(rows) || rows.length === 0) return;
-        let sum = 0, win = 0;
-        for (const b of rows) { const p = Number(b.pnl_usd) || 0; sum += p; if (p >= 0) win++; }
-        const wr = Math.round((win / rows.length) * 100);
+        const names = {};
+        if (Array.isArray(accs)) for (const a of accs) names[String(a.login)] = a.display_name || String(a.login);
         const money = (n) => (n >= 0 ? '+$' : '-$') + Math.abs(Math.round(n)).toLocaleString();
         const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-        const pnlEl = document.getElementById('tj-pnl');
-        if (pnlEl) { pnlEl.textContent = money(sum); pnlEl.className = 'text-[17px] font-bold ' + (sum >= 0 ? 'text-green' : 'text-primary'); }
-        set('tj-wr', wr + '%');
-        set('tj-ct', String(rows.length));
+        const render = (login) => {
+          const sel = login == null ? rows : rows.filter((b) => String(b.account_login) === login);
+          let sum = 0, win = 0;
+          for (const b of sel) { const p = Number(b.pnl_usd) || 0; sum += p; if (p >= 0) win++; }
+          const wr = sel.length ? Math.round((win / sel.length) * 100) : 0;
+          const pnlEl = document.getElementById('tj-pnl');
+          if (pnlEl) { pnlEl.textContent = money(sum); pnlEl.className = 'text-[17px] font-bold ' + (sum >= 0 ? 'text-green' : 'text-primary'); }
+          set('tj-wr', wr + '%');
+          set('tj-ct', String(sel.length));
+        };
+        // toggle รวม/ต่อพอร์ต — โชว์เมื่อมีมากกว่า 1 พอร์ตจริงในข้อมูล (label จาก accounts.display_name, fallback เลขบัญชี)
+        const logins = [...new Set(rows.map((b) => (b.account_login == null ? '' : String(b.account_login))).filter(Boolean))].sort();
+        const wrap = document.getElementById('tj-toggle');
+        if (wrap && logins.length > 1) {
+          const OFF = 'flex-1 rounded-md py-1 cursor-pointer bg-transparent text-gray-dark text-[11px] font-semibold border-0';
+          const ON = 'flex-1 rounded-md py-1 cursor-pointer bg-primary text-white text-[11px] font-semibold border-0';
+          const mk = (label, login) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = label;
+            btn.className = OFF;
+            btn.addEventListener('click', () => {
+              wrap.querySelectorAll('button').forEach((b) => { b.className = OFF; });
+              btn.className = ON;
+              render(login);
+            });
+            wrap.appendChild(btn);
+            return btn;
+          };
+          mk('รวม', null).className = ON;
+          logins.forEach((l) => mk(names[l] || l, l));
+          wrap.classList.remove('hidden');
+          wrap.classList.add('flex');
+        }
+        render(null);
       })
       .catch(() => {});
   }
-  // Myfxbook — API คาย array ทุกพอร์ต live; การ์ดแรก (SSR ไว้แล้ว) reuse ตัวเดิม พอร์ตถัดไป clone เพิ่มเอง
+  // Myfxbook — API คาย array ทุกพอร์ต live; การ์ด SSR (มี 2 ใบตอน build) reuse ตามลำดับ พอร์ตเกินจากนั้น clone เพิ่มเอง
   fetch('https://www.intensivetrader.com/api/myfxbook.json')
     .then((r) => r.json())
-    .then((accounts) => {
-      if (!Array.isArray(accounts) || accounts.length === 0) return;
+    .then((raw) => {
       const list = document.getElementById('mfb-list');
-      const template = list ? list.querySelector('[data-mfb-id]') : null;
+      const ssrCards = list ? Array.from(list.querySelectorAll('[data-mfb-id]')) : [];
+      const template = ssrCards[0];
       if (!list || !template) return;
+      // API รุ่นเก่าคาย object พอร์ตเดียว (ไม่มี id/name) — ถือเป็นพอร์ต 1 (การ์ด SSR ใบแรก)
+      let accounts = raw;
+      if (!Array.isArray(accounts)) {
+        if (!accounts || accounts.gain == null) return;
+        const lbl = template.querySelector('.mfb-label');
+        accounts = [{ id: template.getAttribute('data-mfb-id'), name: lbl ? (lbl.textContent || '').split(' · ')[0] : '', ...accounts }];
+      }
+      if (accounts.length === 0) return;
       const slugify = (s) => (s || 'account').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       accounts.forEach((acc, i) => {
-        let card = list.querySelector(`[data-mfb-id="${acc.id}"]`);
+        // หาการ์ดตาม id ก่อน — ไม่เจอ (พอร์ตใหม่ที่ fallback ตอน build) ใช้การ์ด SSR ตามลำดับ — เกินจำนวน SSR ค่อย clone
+        let card = list.querySelector(`[data-mfb-id="${acc.id}"]`) || ssrCards[i];
         let isNew = false;
         if (!card) {
-          if (i === 0) {
-            card = template;
-            card.setAttribute('data-mfb-id', String(acc.id));
-          } else {
-            card = template.cloneNode(true);
-            card.setAttribute('data-mfb-id', String(acc.id));
-            list.appendChild(card);
-            isNew = true;
-          }
+          card = template.cloneNode(true);
+          list.appendChild(card);
+          isNew = true;
         }
+        card.setAttribute('data-mfb-id', String(acc.id));
         const set = (sel, v, pre, suf) => { const el = card.querySelector(sel); if (el && v != null) el.textContent = (pre || '') + v + (suf || ''); };
         set('.mfb-gain', acc.gain, '+', '%');
         set('.mfb-absgain', acc.absGain, '+', '%');
@@ -424,16 +543,13 @@ const installSteps = [
         set('.mfb-dd', acc.drawdown, '', '%');
         set('.mfb-balance', acc.balance, '$', '');
         const label = card.querySelector('.mfb-label');
-        if (label) label.textContent = acc.name || '';
-        // การ์ดเดิม (SSR) คงลิงก์ myfxbook เดิมไว้ — การ์ดใหม่ที่ clone มาถึงคำนวณลิงก์เอง
-        if (isNew) {
-          const link = card.querySelector('.mfb-link');
-          if (link) link.href = `https://www.myfxbook.com/members/kwasati/${slugify(acc.name)}/${acc.id}`;
-        }
+        if (label && acc.name) label.textContent = `${acc.name} · พอร์ต ${i + 1}`;
+        // มีตัวเลขจริงแล้ว — เอา note "พอร์ตใหม่ รอผูก" ออก
+        if (acc.gain != null) { const note = card.querySelector('.mfb-new-note'); if (note) note.remove(); }
+        // การ์ด SSR ที่มีลิงก์จริงอยู่แล้วคงเดิม — การ์ด clone/การ์ด fallback (href="#") คำนวณลิงก์เอง
+        const link = card.querySelector('.mfb-link');
+        if (link && (isNew || link.getAttribute('href') === '#')) link.href = `https://www.myfxbook.com/members/kwasati/${slugify(acc.name)}/${acc.id}`;
       });
-      if (accounts.length > 1) {
-        list.querySelectorAll('.mfb-label').forEach((el) => el.classList.remove('hidden'));
-      }
     })
     .catch(() => {});
   document.querySelectorAll('.copy-code').forEach((btn) => {
