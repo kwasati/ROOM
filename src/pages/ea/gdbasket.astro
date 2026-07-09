@@ -18,7 +18,7 @@ type MfbCard = {
 const mfbSlug = (s: string) => (s || 'account').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const mfbFallback: MfbCard[] = [
   { id: '12090186', name: 'gdbasket-xs', label: 'พอร์ต 1', url: 'https://www.myfxbook.com/members/kwasati/gdbasket-xs/12090186', newNote: null, gain: '53.40', absGain: '53.45', monthly: '53.40', drawdown: '18.16', balance: '460.36' },
-  { id: '', name: 'gdbasket lx', label: 'พอร์ต 2', url: null, newNote: 'พอร์ตใหม่ เริ่ม 2026-07 — ตัวเลขจะขึ้นเมื่อระบบตรวจสอบผูกเสร็จ', gain: null, absGain: null, monthly: null, drawdown: null, balance: null },
+  { id: '12105756', name: 'gdbasket lx', label: 'พอร์ต 2', url: 'https://www.myfxbook.com/members/kwasati/gdbasket-lx/12105756', newNote: 'พอร์ตใหม่ เริ่ม 2026-07', gain: null, absGain: null, monthly: null, drawdown: null, balance: null },
 ];
 let mfbCards: MfbCard[] = mfbFallback;
 try {
