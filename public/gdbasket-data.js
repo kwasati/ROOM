@@ -21,6 +21,16 @@ window.GDB_DATA = {
   "versions": [
     {
       "version": "2.00 (public)",
+      "date": "2026-07-09",
+      "track": "public",
+      "summary": "ตัวแจก (publish rebuild) เหลือโหมด SPORT+ เดียว — STRADA+/CORSA ยังจูนไม่ถึงเป้า ถอดออกจากตัวแจกก่อน จะเปิดคืนในรุ่นถัดไปเมื่อจูนถึงเป้า. เครื่องยนต์เทรด v2.00 เดิมไม่เปลี่ยน",
+      "changes": [
+        {"type": "changed", "text": "ไฟล์แจก gdBasket_v2.00.ex5: ช่อง Mode เหลือ SPORT+ ตัวเดียว (เลือก STRADA+/CORSA ไม่ได้) — การทำงานส่วนอื่นเหมือนเดิมทุกอย่าง"},
+        {"type": "removed", "text": "STRADA+ / CORSA ออกจากตัวแจกชั่วคราว — รอจูนถึงเป้าแล้วเปิดคืนในรุ่นถัดไป"}
+      ]
+    },
+    {
+      "version": "2.00 (public)",
       "date": "2026-07-08",
       "track": "public",
       "summary": "major release — ยกเครื่องยนต์ dev v1.63 ขึ้น public ทั้งชุด: โหมดใหม่ STRADA+/SPORT+/CORSA + pyramid trail + TRAIL_AUTO + Spawn Guard + ZONE_HL. เทียบเงากับ dev ตรงทุกหลัก + CORSA สอบไขว้ปี 23-24 ผ่าน (net บวกทั้งสองปี). ชุดแจก publish/releases/v2.00/",
