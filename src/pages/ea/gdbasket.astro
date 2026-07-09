@@ -54,7 +54,7 @@ const features = [
   { title: 'ระยะกริดปรับตามตลาด (ATR)', desc: 'ระยะห่างระหว่างไม้ไม่ได้ fix — คำนวณจากความผันผวนจริง (ATR M15) ตลาดผันผวนมากกริดถ่างขึ้นอัตโนมัติ' },
   { title: 'ปิดทั้งตะกร้าจุดเดียว (Common TP)', desc: 'ทุกไม้ใช้เป้ากำไรราคาเดียวกัน broker เป็นคนปิดให้ — ไม่ต้องเฝ้าจอ' },
   { title: 'SL กันตายที่ broker', desc: 'วาง SL จริงร่วมทุกไม้เป็น backstop กันพอร์ตแตกหนักเมื่อ EA ดับ / ตลาดปิด / ราคากระโดด' },
-  { title: '3 โหมด STRADA+ / SPORT+ / CORSA', desc: 'เลือกความแรงได้ 3 ระดับ: STRADA+ นิ่งสุด / SPORT+ (ค่าเริ่มต้น) สลับชุดค่าตามโซนราคา / CORSA แรงสุดสำหรับคนรับความเสี่ยงได้' },
+  { title: 'โหมด SPORT+ (เครื่องยนต์ 2 บ้าน)', desc: 'สลับชุดค่าตามโซนราคาอัตโนมัติ (บ้าน high/low) + ระบบกันวางไม้ถี่เกิน (Spawn Guard) + trail อัตโนมัติผูกตามบ้านที่เปิดรอบ' },
   { title: 'รองรับ GOLD# Std + GOLDm# Micro', desc: 'เลือก Auto / Standard / Micro — ปรับ lot ให้พอดีบัญชี XM ทั้งบัญชีใหญ่และไมโคร' },
 ];
 
@@ -66,7 +66,7 @@ const howSteps = [
 ];
 
 const releases = [
-  { version: 'v2.00', date: '2026-07-08', latest: true, note: 'ยกเครื่องยนต์ใหม่ทั้งชุด — โหมด STRADA+ / SPORT+ / CORSA', url: DL_V200 },
+  { version: 'v2.00', date: '2026-07-08', latest: true, note: 'ยกเครื่องยนต์ใหม่ทั้งชุด — ตัวแจกโหมด SPORT+', url: DL_V200 },
   { version: 'v1.37', date: '2026-06-24', latest: false, note: 'ปรับวิธีบันทึกผลตอนพอร์ตแตก (ขาดทุนสุทธิจริง) + ใช้ SL ที่ broker เป็นตัวปิดหลัก', url: DL_V137 },
   { version: 'v1.18', date: '2026-06-13', latest: false, note: 'แก้บั๊กตรวจพอร์ตแตกผิดพลาด (false SO) ตอนเจอ bad tick / ข่าว / สเปรดกระชาก', url: DL_V118 },
 ];
@@ -75,8 +75,8 @@ const releases = [
 const fileRows = [
   { icon: 'doc', name: 'README — ภาพรวม EA', note: 'Buy Grid GOLD M15 · DCA + ATR grid + common TP', meta: 'อ่าน', href: '#readme', color: 'text-gray' },
   { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · MQL5\\Experts\\ · ลากใส่กราฟ GOLD M15', meta: '6 ขั้น', href: '#install', color: 'text-secondary' },
-  { icon: 'modes', name: 'โหมดการทำงาน', note: '3 โหมด · STRADA+ (นิ่ง) / SPORT+ (ค่าเริ่มต้น) / CORSA (แรง)', meta: '3', href: '#modes', color: 'text-primary' },
-  { icon: 'star', name: 'จุดเด่น', note: '6 ข้อ · DCA / ATR / common TP / SL / 3 โหมด / Std+Micro', meta: '6', href: '#features', color: 'text-primary' },
+  { icon: 'modes', name: 'โหมดการทำงาน', note: 'SPORT+ · เครื่องยนต์ 2 บ้าน high/low สลับชุดค่าตามโซนราคา', meta: '1', href: '#modes', color: 'text-primary' },
+  { icon: 'star', name: 'จุดเด่น', note: '6 ข้อ · DCA / ATR / common TP / SL / SPORT+ / Std+Micro', meta: '6', href: '#features', color: 'text-primary' },
   { icon: 'clock', name: 'บันทึกเวอร์ชัน', note: 'v2.00 (2026-07-08) · v1.37 (2026-06-24) · v1.18 (2026-06-13)', meta: '3 rel', href: '#releases', color: 'text-gray' },
   { icon: 'dl', name: 'gdBasket_v2.00.ex5', note: 'ไฟล์ EA พร้อมใช้ · MT5 · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_V200, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ประวัติการเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: `${MAIN}/journal`, color: 'text-primary', accent: true },
@@ -88,7 +88,7 @@ const installSteps = [
   'วางไฟล์ใน <code class="install-path">MQL5\\Experts\\</code>',
   '<strong>Restart MT5</strong> หรือกด <strong>Refresh</strong> ใน Navigator',
   'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊ก <strong>Allow Algo Trading</strong> → OK แล้วกดปุ่ม <strong>Algo Trading</strong> บนแถบเครื่องมือ MT5 ให้เป็น<strong class="text-green">สีเขียว</strong>',
-  'ตั้งค่า <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — บัญชี <strong>Standard</strong> ตั้งขั้นต่ำ <strong>$1,000</strong> · บัญชี <strong>Micro</strong> ตั้งขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) แล้วเลือก <strong>Mode</strong> ตามความเสี่ยงที่รับไหว (ค่าเริ่มต้น = SPORT+)',
+  'ตั้งค่า <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — บัญชี <strong>Standard</strong> ตั้งขั้นต่ำ <strong>$1,000</strong> · บัญชี <strong>Micro</strong> ตั้งขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) — ส่วนโหมด EA ตั้ง <strong>SPORT+</strong> มาให้แล้ว ไม่ต้องเลือก',
 ];
 ---
 
@@ -154,8 +154,8 @@ const installSteps = [
       <div class="flex items-center gap-3 bg-dark-card border border-dark-border rounded-t-xl px-4 py-2.5 text-sm flex-wrap">
         <img src={`${MAIN}/profile.jpg`} class="w-5 h-5 rounded-full bg-dark-border" alt="" />
         <span class="text-gray-light font-semibold">IntensiveTrader</span>
-        <span class="text-gray truncate flex-1 min-w-[120px]">v2.00 — ยกเครื่องยนต์ใหม่ทั้งชุด: โหมด STRADA+ / SPORT+ / CORSA</span>
-        <span class="text-gray-dark whitespace-nowrap">อัปเดต 2026-07-08</span>
+        <span class="text-gray truncate flex-1 min-w-[120px]">v2.00 — ยกเครื่องยนต์ใหม่ทั้งชุด: โหมด SPORT+</span>
+        <span class="text-gray-dark whitespace-nowrap">อัปเดต 2026-07-09</span>
       </div>
 
       <!-- (e) FILE LIST -->
@@ -239,29 +239,18 @@ const installSteps = [
             ))}
           </div>
 
-          <h3 id="modes" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">โหมดการทำงาน 3 แบบ</h3>
-          <div class="grid md:grid-cols-3 gap-4 mb-4">
-            <div class="bg-dark-card border border-dark-border rounded-lg px-4 py-5 flex flex-col gap-2">
-              <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit bg-green/10 text-green">สายนิ่ง — ความเสี่ยงต่ำสุด</span>
-              <h4 class="pixel text-gray-light text-[12px]">STRADA+</h4>
-              <p class="text-gray text-[13px] leading-relaxed">เปิดไม้แรกเฉพาะจังหวะราคายืนเหนือเส้นค่าเฉลี่ย (EMA75 ของราคา High) ใช้ชุดค่าคงที่ทั้งรอบ และวางไม้ไม่เกิน 1 ไม้ต่อแท่ง</p>
-            </div>
+          <h3 id="modes" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">โหมดการทำงาน</h3>
+          <div class="grid gap-4 mb-4">
             <div class="bg-dark-card border border-primary/50 rounded-lg px-4 py-5 flex flex-col gap-2">
-              <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit bg-primary/10 text-primary-light">ค่าเริ่มต้น</span>
+              <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit bg-primary/10 text-primary-light">โหมดที่ใช้ในตัวแจก — ตั้งมาให้แล้ว</span>
               <h4 class="pixel text-gray-light text-[12px]">SPORT+</h4>
               <p class="text-gray text-[13px] leading-relaxed">เครื่องยนต์ 2 บ้าน high/low — สลับชุดค่าตามโซนราคาอัตโนมัติ + ระบบกันวางไม้ถี่เกิน (Spawn Guard) + trail อัตโนมัติผูกตามบ้านที่เปิดรอบ</p>
             </div>
-            <div class="bg-dark-card border border-dark-border rounded-lg px-4 py-5 flex flex-col gap-2">
-              <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit bg-secondary/10 text-secondary">แรงสุด</span>
-              <h4 class="pixel text-gray-light text-[12px]">CORSA</h4>
-              <p class="text-gray text-[13px] leading-relaxed">เหมือน SPORT+ ทุกอย่าง ต่างที่ไม้ฐานโซน high หนักกว่า — ปั้นเร็วขึ้นมากแต่รอบแตกก็ลึกกว่า</p>
-              <div class="bg-secondary/10 border border-secondary/40 rounded-md px-2.5 py-2 text-[12px] text-secondary font-semibold leading-normal">คำเตือน: ความแรงเทียบเท่าใช้ทุน x5 — ใช้อย่างระมัดระวัง</div>
-            </div>
           </div>
-          <p class="text-center text-secondary text-sm font-semibold mb-8">*** โปรดเลือกโหมดตามความเสี่ยงที่คุณรับไหว ***</p>
+          <p class="text-center text-gray text-sm mb-8">หมายเหตุ: โหมด STRADA+ (เสี่ยงต่ำ) และ CORSA (สายดุ) จะเปิดให้ใช้ในรุ่นถัดไปเมื่อจูนถึงเป้า</p>
 
-          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">ผลสอบย้อนหลัง 3 โหมด (2023-01 ถึง 2026-05)</h3>
-          <p class="text-gray text-sm leading-relaxed mb-4">รันสอบย้อนหลังบนข้อมูลราคาจริงต่อเนื่อง 3 ปีครึ่ง ตั้งทุนต่อรอบ 10,000 ดอลลาร์เท่ากันทุกโหมด — ตัวเลขนี้คือผลรวมทั้งช่วง ไม่ได้การันตีอนาคต</p>
+          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">ผลสอบย้อนหลัง (2023-01 ถึง 2026-05)</h3>
+          <p class="text-gray text-sm leading-relaxed mb-4">รันสอบย้อนหลังบนข้อมูลราคาจริงต่อเนื่อง 3 ปีครึ่ง ตั้งทุนต่อรอบ 10,000 ดอลลาร์ — ตัวเลขนี้คือผลรวมทั้งช่วง ไม่ได้การันตีอนาคต</p>
           <table class="w-full border-collapse text-sm mb-3">
             <thead>
               <tr>
@@ -273,26 +262,14 @@ const installSteps = [
             </thead>
             <tbody>
               <tr>
-                <td class="px-3 py-2.5 border-b border-dark-border text-gray-light"><span class="pixel text-[10px]">STRADA+</span></td>
-                <td class="px-3 py-2.5 border-b border-dark-border text-right text-green font-bold">+88,925</td>
-                <td class="px-3 py-2.5 border-b border-dark-border text-right text-gray-light">15</td>
-                <td class="px-3 py-2.5 border-b border-dark-border text-right text-gray-light">9</td>
-              </tr>
-              <tr>
-                <td class="px-3 py-2.5 border-b border-dark-border text-gray-light"><span class="pixel text-[10px]">SPORT+</span> <span class="text-gray-dark text-[11px]">(ค่าเริ่มต้น)</span></td>
-                <td class="px-3 py-2.5 border-b border-dark-border text-right text-green font-bold">+199,673</td>
-                <td class="px-3 py-2.5 border-b border-dark-border text-right text-gray-light">28</td>
-                <td class="px-3 py-2.5 border-b border-dark-border text-right text-gray-light">20</td>
-              </tr>
-              <tr>
-                <td class="px-3 py-2.5 text-gray-light"><span class="pixel text-[10px]">CORSA</span></td>
-                <td class="px-3 py-2.5 text-right text-green font-bold">+298,270</td>
-                <td class="px-3 py-2.5 text-right text-gray-light">44</td>
-                <td class="px-3 py-2.5 text-right text-gray-light">42</td>
+                <td class="px-3 py-2.5 text-gray-light"><span class="pixel text-[10px]">SPORT+</span></td>
+                <td class="px-3 py-2.5 text-right text-green font-bold">+199,673</td>
+                <td class="px-3 py-2.5 text-right text-gray-light">28</td>
+                <td class="px-3 py-2.5 text-right text-gray-light">20</td>
               </tr>
             </tbody>
           </table>
-          <p class="text-gray-dark text-xs leading-relaxed mb-8">"รอบแตก (SO)" = รอบที่ราคาไหลลงแรงจนระบบตัดขาดทุนตามกติกา — เสียเท่าทุนต่อรอบที่ตั้งไว้ (ในตารางคือ 10,000 ต่อรอบ) <strong class="text-gray-light">ไม่ใช่พอร์ตหมดทั้งพอร์ต</strong> แล้วเริ่มรอบใหม่ต่อ. กำไรสุทธิรวมข้างบนหักรอบแตกทั้งหมดแล้ว. โหมดยิ่งแรง รอบสำเร็จยิ่งถี่ แต่รอบแตกก็ถี่ตาม — นี่คือเหตุผลที่ต้องเลือกโหมดตามความเสี่ยงที่รับไหว</p>
+          <p class="text-gray-dark text-xs leading-relaxed mb-8">"รอบแตก (SO)" = รอบที่ราคาไหลลงแรงจนระบบตัดขาดทุนตามกติกา — เสียเท่าทุนต่อรอบที่ตั้งไว้ (ในตารางคือ 10,000 ต่อรอบ) <strong class="text-gray-light">ไม่ใช่พอร์ตหมดทั้งพอร์ต</strong> แล้วเริ่มรอบใหม่ต่อ. กำไรสุทธิรวมข้างบนหักรอบแตกทั้งหมดแล้ว</p>
 
           <h3 id="install" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">วิธีติดตั้ง</h3>
           <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-secondary/5 border border-secondary/30 rounded-lg p-3.5 mb-4 hover:border-secondary/60 transition-colors">
@@ -331,7 +308,7 @@ const installSteps = [
         </div>
         <div class="p-6">
           <ul class="flex flex-col gap-3 mb-5">
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>โหมดใหม่ 3 ตัว <strong class="text-gray-light">STRADA+ / SPORT+ / CORSA</strong> (แทน STRADA / SPORT เดิม — ค่าเก่าที่เซฟไว้ต้องกด Reset แล้วเลือกโหมดใหม่)</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>เครื่องยนต์โหมดใหม่ <strong class="text-gray-light">SPORT+</strong> (แทน STRADA / SPORT เดิม — ค่าเก่าที่เซฟไว้ต้องกด Reset)</span></li>
             <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>ระบบเติมไม้ตามเทรนด์ (pyramid) + trail อัตโนมัติเลือกให้ตามบ้านที่เปิดรอบ</span></li>
             <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>ระบบกันวางไม้ถี่เกินตอนตลาดดิ่งแรง (Spawn Guard) — ลดโอกาสตะกร้าบานเร็วในวันตลาดพัง</span></li>
             <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span>ฐานตัดขาดทุนต่อรอบ = ทุนต่อรอบล้วน ตายตัว (เลิกมีตัวเลือกเบาะกำไร — เพดานเสียต่อรอบชัดเจนขึ้น)</span></li>
