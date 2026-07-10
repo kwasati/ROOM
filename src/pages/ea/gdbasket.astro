@@ -3,7 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
-const DL_V200 = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์ v2.00 (publish/releases/v2.00/gdBasket_v2.00.ex5)
+const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v2.01 (publish/releases/v2.01/gdBasket_v2.01.ex5)
+const DL_V200 = `${MAIN}/d/gdbasket-v200`;
 const DL_V137 = `${MAIN}/d/gdbasket-v137`;
 const DL_V118 = `${MAIN}/d/gdbasket-v118`;
 const XM_AFF = 'https://affs.click/jih0m';
@@ -66,7 +67,8 @@ const howSteps = [
 ];
 
 const releases = [
-  { version: 'v2.00', dateLabel: '8 ก.ค. 2026', latest: true, url: DL_V200 },
+  { version: 'v2.01', dateLabel: '10 ก.ค. 2026', latest: true, url: DL_LATEST },
+  { version: 'v2.00', dateLabel: '8 ก.ค. 2026', latest: false, url: DL_V200 },
   { version: 'v1.37', dateLabel: '24 มิ.ย. 2026', latest: false, url: DL_V137 },
   { version: 'v1.18', dateLabel: '13 มิ.ย. 2026', latest: false, url: DL_V118 },
 ];
@@ -77,22 +79,22 @@ const fileRows = [
   { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · ลากใส่กราฟ GOLD M15 · 6 ขั้นจบ', meta: '6 ขั้น', href: '#install', color: 'text-secondary' },
   { icon: 'modes', name: 'Engine Profile', note: 'STRADA+ / SPORT+ / CORSA — เลือกตามความกล้าเสี่ยง', meta: '3', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Common-TP / PPTS / Broker-side Stop', meta: '6', href: '#features', color: 'text-primary' },
-  { icon: 'clock', name: 'Releases', note: 'v2.00 · v1.37 · v1.18', meta: '3 rel', href: '/gdbasket-changelog.html', color: 'text-gray' },
-  { icon: 'dl', name: 'gdBasket v2.00', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_V200, color: 'text-green', download: true },
+  { icon: 'clock', name: 'Releases', note: 'v2.01 · v2.00 · v1.37 · v1.18', meta: '4 rel', href: '/gdbasket-changelog.html', color: 'text-gray' },
+  { icon: 'dl', name: 'gdBasket v2.01', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: `${MAIN}/journal`, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
-  'ดาวน์โหลดไฟล์ <strong>gdBasket v2.00</strong> จากปุ่มด้านบน',
+  'ดาวน์โหลดไฟล์ <strong>gdBasket v2.01</strong> จากปุ่มด้านบน',
   'เปิด <strong>MetaTrader 5</strong> → <strong>File → Open Data Folder</strong>',
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
   'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊กอนุญาตเทรดอัตโนมัติ → กดปุ่ม <strong>Algo Trading</strong> ให้ขึ้น<strong class="text-green">สีเขียว</strong>',
-  'ตั้ง <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — Standard ขั้นต่ำ <strong>$1,000</strong> · Micro ขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) ส่วน Engine Profile ตั้ง <strong>SPORT+</strong> มาให้แล้ว ไม่ต้องเลือก',
+  'ตั้ง <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — Standard ขั้นต่ำ <strong>$1,000</strong> · Micro ขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) ส่วน Engine Profile ตั้ง <strong>SPORT+</strong> มาให้แล้ว ไม่ต้องเลือก — สายนิ่งอยากได้ตัวกรองความร้อนตลาด ค่อยสลับเป็น <strong>STRADA+</strong>',
 ];
 ---
 
-<Layout title="gdBasket — Buy Grid EA สำหรับ GOLD M15 | Room" description="gdBasket — MQL5 Buy Grid EA บน GOLD M15 ใช้จริงบนพอร์ตจริง. โหลดฟรี v2.00" ogImage="https://room.intensivetrader.com/gdbasket-og.png">
+<Layout title="gdBasket — Buy Grid EA สำหรับ GOLD M15 | Room" description="gdBasket — MQL5 Buy Grid EA บน GOLD M15 ใช้จริงบนพอร์ตจริง. โหลดฟรี v2.01" ogImage="https://room.intensivetrader.com/gdbasket-og.png">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
   <!-- breadcrumb -->
@@ -118,7 +120,7 @@ const installSteps = [
     </div>
     <div class="flex items-center rounded-lg border border-dark-border overflow-hidden text-sm">
       <span class="px-3 py-1.5 text-gray">เวอร์ชัน</span>
-      <span class="px-3 py-1.5 bg-dark border-l border-dark-border text-gray-light font-semibold">v2.00</span>
+      <span class="px-3 py-1.5 bg-dark border-l border-dark-border text-gray-light font-semibold">v2.01</span>
     </div>
   </div>
 
@@ -127,7 +129,7 @@ const installSteps = [
     <a href="#readme" class="px-3 py-2.5 border-b-2 border-primary text-gray-light font-semibold whitespace-nowrap">โค้ด/ไฟล์</a>
     <a href="#readme" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">วิธีทำงาน</a>
     <a href="#features" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">จุดเด่น</a>
-    <a href="/gdbasket-changelog.html" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap flex items-center gap-1.5">Releases <span class="bg-dark-border text-gray-light text-[10px] px-1.5 rounded-full">3</span></a>
+    <a href="/gdbasket-changelog.html" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap flex items-center gap-1.5">Releases <span class="bg-dark-border text-gray-light text-[10px] px-1.5 rounded-full">4</span></a>
     <a href={`${MAIN}/journal`} class="px-3 py-2.5 border-b-2 border-transparent text-primary hover:text-primary-dark font-semibold whitespace-nowrap">Trading Journal</a>
   </div>
 
@@ -139,26 +141,26 @@ const installSteps = [
       <div class="flex items-center gap-3 flex-wrap mb-3">
         <span class="flex items-center gap-2 bg-dark-card border border-dark-border rounded-lg px-3 py-1.5 text-sm text-gray-light">
           <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
-          <span class="font-semibold">v2.00</span>
+          <span class="font-semibold">v2.01</span>
         </span>
         <span class="text-sm text-gray flex items-center gap-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-          <span class="text-gray-light font-semibold">3</span> เวอร์ชัน
+          <span class="text-gray-light font-semibold">4</span> เวอร์ชัน
         </span>
         <div class="flex-1 min-w-[120px]"></div>
-        <a href={DL_V200} download class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors pixel-shadow">
+        <a href={DL_LATEST} download class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors pixel-shadow">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลดฟรี
         </a>
-        <p class="text-[11px] text-gray-dark text-right w-full leading-relaxed">ไฟล์รุ่น <strong class="text-secondary font-semibold">v2.00</strong> — ใช้ได้เฉพาะบัญชี <strong class="text-secondary font-semibold">XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
+        <p class="text-[11px] text-gray-dark text-right w-full leading-relaxed">ไฟล์รุ่น <strong class="text-secondary font-semibold">v2.01</strong> — ใช้ได้เฉพาะบัญชี <strong class="text-secondary font-semibold">XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
       </div>
 
       <!-- (d) LATEST-COMMIT BAR -->
       <div class="flex items-center gap-3 bg-dark-card border border-dark-border rounded-t-xl px-4 py-2.5 text-sm flex-wrap">
         <img src={`${MAIN}/profile.jpg`} class="w-5 h-5 rounded-full bg-dark-border" alt="" />
         <span class="text-gray-light font-semibold">IntensiveTrader</span>
-        <span class="text-gray truncate flex-1 min-w-[120px]">v2.00 — ยกเครื่องยนต์ใหม่ทั้งตัว</span>
-        <span class="text-gray-dark whitespace-nowrap">อัปเดต 9 ก.ค. 2026</span>
+        <span class="text-gray truncate flex-1 min-w-[120px]">v2.01 — STRADA+ มาแล้ว พร้อมตัวกรองความร้อนตลาดในตัว</span>
+        <span class="text-gray-dark whitespace-nowrap">อัปเดต 10 ก.ค. 2026</span>
       </div>
 
       <!-- (e) FILE LIST -->
@@ -261,11 +263,13 @@ const installSteps = [
           <div class="grid gap-4 mb-8">
             <div class="bg-dark-card border border-dark-border rounded-lg px-4 py-5 flex flex-col gap-2">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-dark border border-dark-border text-gray">เร็วๆ นี้</span>
+                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green/10 text-green">พร้อมใช้</span>
+                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-secondary/10 text-secondary">ใหม่ใน v2.01</span>
                 <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-dark border border-dark-border text-gray-light">เน้นนิ่ง · ปลอดภัย</span>
               </div>
               <div class="flex items-baseline gap-2 flex-wrap"><h4 class="pixel text-gray-light text-[12px]">STRADA+</h4><span class="text-xs text-gray-dark">grand tourer</span></div>
               <p class="text-gray text-[13px] leading-relaxed">ขับทางไกลแบบนิ่งๆ เลือกจังหวะเข้าที่มั่นใจ เก็บกำไรเรื่อยๆ ไม่หวือหวา เหมาะกับคนอยากนอนหลับสบาย</p>
+              <p class="text-gray text-[13px] leading-relaxed">มี<strong class="text-gray-light">ตัวกรองความร้อนตลาด</strong>ติดมาในตัว — วันไหนตลาดผันผวนแรงกว่าค่าเฉลี่ย 5 วันของตัวเอง มันงดเปิดกองใหม่ให้อัตโนมัติ รอตลาดเย็นลงค่อยเริ่มกองถัดไป เลือก STRADA+ ก็ได้เลย ไม่ต้องตั้งอะไรเพิ่ม</p>
             </div>
             <div class="bg-dark-card border border-primary/60 rounded-lg px-4 py-5 flex flex-col gap-2">
               <div class="flex items-center gap-2 flex-wrap">
@@ -368,20 +372,19 @@ const installSteps = [
         </div>
       </div>
 
-      <!-- (g) CHANGELOG CARD — มีอะไรใหม่ใน v2.00 -->
+      <!-- (g) CHANGELOG CARD — มีอะไรใหม่ใน v2.01 -->
       <div id="changelog" class="border border-dark-border rounded-xl overflow-hidden mb-8 scroll-mt-20">
         <div class="flex items-center gap-2 bg-dark-card border-b border-dark-border px-4 py-2.5 text-sm">
-          <span class="text-gray-light font-semibold">มีอะไรใหม่ใน v2.00</span>
+          <span class="text-gray-light font-semibold">มีอะไรใหม่ใน v2.01</span>
         </div>
         <div class="p-6">
-          <p class="text-gray text-sm leading-relaxed mb-4">รุ่นใหญ่สุดตั้งแต่ทำมา — เปลี่ยนเครื่องยนต์เทรดใหม่หมด ฉลาดขึ้นและปลอดภัยขึ้น</p>
+          <p class="text-gray text-sm leading-relaxed mb-4">ตัวแจกเปิดโหมดที่สอง — STRADA+ สายนิ่ง มาพร้อมตัวกรองความร้อนตลาดในตัว</p>
           <ul class="flex flex-col gap-3 mb-5">
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">ใหม่: Engine Profile 3 สไตล์ — STRADA+ / SPORT+ / CORSA</strong> เลือกวิธีเล่นตามความกล้าเสี่ยง (ตัวแจกรุ่นนี้เปิด SPORT+ ก่อน อีก 2 ตัวตามมาเมื่อจูนถึงเป้า)</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">ฉลาดขึ้น</strong> — รู้จักดูว่าทองอยู่โซนราคาแพงหรือถูก แล้วปรับสไตล์เล่นให้เหมาะกับจังหวะนั้นเอง</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">PPTS เก็บกำไรเก่งขึ้น</strong> — เพิ่มโหมด <strong class="text-gray-light">pyramid</strong> เติมไม้ตามเทรนด์แล้วไล่ล็อกกำไรทั้งกอง เก็บกำไรก้อนใหญ่ขึ้นเมื่อราคาวิ่งแรง</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">ปลอดภัยขึ้น</strong> — เพิ่มระบบเบรกกันไล่ซื้อรัวเกินในวันตลาดดิ่งแรง ลดโอกาสพอร์ตบานเร็ว</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">เพดานขาดทุนชัดขึ้น</strong> — ตัดตัวเลือกที่ทำให้งง เหลือเพดานเสียต่อรอบ = เท่า Capital ที่ตั้งไว้เป๊ะ</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">เชื่อม Trading Journal บนเว็บอัตโนมัติ</strong> — ผลเทรดจริงขึ้นเว็บให้ดูเองทุกวัน</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">ใหม่: ตัวกรองความร้อนตลาดใน STRADA+</strong> — วันไหนตลาดผันผวนแรงกว่าค่าเฉลี่ย 5 วันของตัวเอง EA งดเปิดกองใหม่ให้อัตโนมัติ รอตลาดเย็นลงค่อยเริ่มกองถัดไป ติดมากับโหมด STRADA+ เลย ไม่ต้องตั้งอะไรเพิ่ม</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">เสี่ยงหายไปเกินครึ่ง แลกกำไรนิดเดียว</strong> — ผลทดสอบย้อนหลัง ม.ค. 2023 → มิ.ย. 2026: ครั้งที่โดนตัดขาดทุนหนักลดจาก <strong class="text-gray-light">13 → 5 ครั้ง</strong> (กระจายทุกปี ไม่ใช่ฟลุคปีเดียว) แลกกำไรรวมลดเพียง ~7%</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">กองที่เปิดอยู่ไม่โดนแตะ</strong> — ตัวกรองคุมแค่จังหวะเริ่มกองใหม่ ส่วนกองที่วิ่งอยู่ ซื้อเพิ่ม / เป้ากำไร / ล็อกกำไร / ตัดขาดทุน ทำงานเหมือนเดิมทุกอย่าง</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">ตัวแจกเลือกได้ 2 โหมดแล้ว</strong> — SPORT+ (ค่าเริ่มต้น เหมือนเดิม) + STRADA+ (ใหม่ — สายเสี่ยงต่ำ มีตัวกรองความร้อน) · CORSA ยังไม่ปล่อย</span></li>
+            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">SPORT+ พฤติกรรมเดิม 100%</strong> — โหมดอื่นไม่ผ่านตัวกรองนี้ ใครใช้ SPORT+ อยู่ ทุกอย่างเหมือน v2.00 เป๊ะ</span></li>
           </ul>
           <a href="/gdbasket-changelog.html" class="text-primary text-sm font-semibold hover:underline">ดูประวัติทุกเวอร์ชัน →</a>
         </div>
