@@ -285,27 +285,59 @@ const installSteps = [
             </div>
           </div>
 
-          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">ผลสอบย้อนหลัง (2023-01 ถึง 2026-05)</h3>
-          <p class="text-gray text-sm leading-relaxed mb-4">รันสอบย้อนหลังบนข้อมูลราคาจริงต่อเนื่อง 3 ปีครึ่ง ตั้งทุนต่อรอบ 10,000 ดอลลาร์ — ตัวเลขนี้คือผลรวมทั้งช่วง ไม่ได้การันตีอนาคต</p>
-          <table class="w-full border-collapse text-sm mb-3">
-            <thead>
-              <tr>
-                <th class="text-left text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">โหมด</th>
-                <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">กำไรสุทธิรวม (USD)</th>
-                <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">รอบสำเร็จ</th>
-                <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">รอบแตก (SO)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="px-3 py-2.5 text-gray-light"><span class="pixel text-[10px]">SPORT+</span></td>
-                <td class="px-3 py-2.5 text-right text-green font-bold">+199,673</td>
-                <td class="px-3 py-2.5 text-right text-gray-light">28</td>
-                <td class="px-3 py-2.5 text-right text-gray-light">20</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="text-gray-dark text-xs leading-relaxed mb-8">"รอบแตก (SO)" = รอบที่ราคาไหลลงแรงจนระบบตัดขาดทุนตามกติกา — เสียเท่าทุนต่อรอบที่ตั้งไว้ (ในตารางคือ 10,000 ต่อรอบ) <strong class="text-gray-light">ไม่ใช่พอร์ตหมดทั้งพอร์ต</strong> แล้วเริ่มรอบใหม่ต่อ. กำไรสุทธิรวมข้างบนหักรอบแตกทั้งหมดแล้ว</p>
+          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">ผลทดสอบย้อนหลัง (ม.ค. 2023 – พ.ค. 2026)</h3>
+          <p class="text-gray text-sm leading-relaxed mb-4">ผมเอาเครื่องยนต์ไปรันย้อนหลังบนข้อมูลราคาทองจริงต่อเนื่อง 3 ปีครึ่ง ตั้ง Capital ไว้ $10,000 — ตัวเลขข้างล่างคือผลรวมทั้งช่วง <strong class="text-gray-light">ไม่ใช่การรับประกันอนาคต</strong></p>
+          <div class="flex items-baseline gap-3 flex-wrap mb-4">
+            <span class="pixel text-gray-light text-[11px]">SPORT+</span>
+            <span class="text-green font-bold text-2xl">+199,673</span>
+            <span class="text-gray-dark text-xs">กำไรสุทธิ (USD)</span>
+          </div>
+          <div class="overflow-x-auto mb-4">
+            <table class="w-full border-collapse text-sm">
+              <thead>
+                <tr>
+                  <th class="text-left text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">กำไรที่ระบบแบงก์ได้</th>
+                  <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border whitespace-nowrap">จำนวน</th>
+                  <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border whitespace-nowrap">ยอด (USD)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="px-3 py-2.5 text-gray-light">รอบสำเร็จ (ปั้นครบเป้า)</td>
+                  <td class="px-3 py-2.5 text-right text-gray-light whitespace-nowrap">28 รอบ</td>
+                  <td class="px-3 py-2.5 text-right text-green whitespace-nowrap">+288,459.40</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2.5 text-gray-light">กำไรที่แบงก์ไว้ก่อนชนเพดาน</td>
+                  <td class="px-3 py-2.5 text-right text-gray whitespace-nowrap">(ใน 20 รอบที่ชน)</td>
+                  <td class="px-3 py-2.5 text-right text-green whitespace-nowrap">+99,329.10</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2.5 text-gray-light">รอบกำลังปั้น (ยังไม่ครบเป้า ตอนจบเทส)</td>
+                  <td class="px-3 py-2.5 text-right text-gray-light whitespace-nowrap">1 รอบ</td>
+                  <td class="px-3 py-2.5 text-right text-green whitespace-nowrap">+7,123.20</td>
+                </tr>
+                <tr class="border-t border-dark-border">
+                  <td class="px-3 py-2.5 text-gray-light font-bold">รวมกำไรที่ทำได้จริง</td>
+                  <td class="px-3 py-2.5"></td>
+                  <td class="px-3 py-2.5 text-right text-green font-bold whitespace-nowrap">+394,911.70</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2.5 text-gray-light">หักส่วนที่เสียตอนชนเพดาน</td>
+                  <td class="px-3 py-2.5 text-right text-gray whitespace-nowrap">20 รอบ (รอบละ ~9–10k)</td>
+                  <td class="px-3 py-2.5 text-right text-primary whitespace-nowrap">−195,239.00</td>
+                </tr>
+                <tr class="border-t border-dark-border">
+                  <td class="px-3 py-2.5 text-gray-light font-bold">กำไรสุทธิ</td>
+                  <td class="px-3 py-2.5"></td>
+                  <td class="px-3 py-2.5 text-right text-green font-bold whitespace-nowrap">+199,672.70</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-gray-dark text-xs leading-relaxed mb-2"><strong class="text-gray-light">"รอบสำเร็จ"</strong> = รอบที่ปั้นครบเป้า (ในตารางคือ $10,000) โดยไม่ชนเพดานก่อน</p>
+          <p class="text-gray-dark text-xs leading-relaxed mb-2"><strong class="text-gray-light">"ชนเพดาน" ไม่ได้แปลว่ารอบนั้นขาดทุนล้วน</strong> — ก่อนจะชนเพดาน หลายรอบแบงก์กำไรไปแล้ว $3k–$9k (รวม 20 รอบ = +99,329) กำไรส่วนนี้อยู่ในพอร์ตจริง การชนเพดานแค่ตัดตะกร้าไม้สุดท้ายที่ราคาไหลลงแรง เสียเท่า Capital ที่ตั้งไว้ (~$9–10k) <strong class="text-gray-light">ไม่ใช่ล้างพอร์ต</strong> แล้วขึ้นรอบใหม่ต่อ</p>
+          <p class="text-gray-dark text-xs leading-relaxed mb-8">ตัวเลขกำไรสุทธิหักส่วนที่เสียตอนชนเพดานทั้งหมดแล้ว</p>
 
           <h3 id="install" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">วิธีติดตั้ง</h3>
           <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-secondary/5 border border-secondary/30 rounded-lg p-3.5 mb-4 hover:border-secondary/60 transition-colors">
@@ -361,20 +393,19 @@ const installSteps = [
       <!-- About -->
       <div>
         <h3 class="text-gray-light font-bold text-[15px] mb-2">About</h3>
-        <p class="text-gray text-sm mb-4 leading-relaxed">Buy Grid EA สำหรับ GOLD M15 — ใช้จริงบนพอร์ตจริง</p>
+        <p class="text-gray text-sm mb-4 leading-relaxed">Adaptive Buy Grid Behavior EA — ทยอยซื้อเป็นชุด ปิดรับกำไรทั้งชุด ใช้จริงบนพอร์ตจริง</p>
         <div class="flex flex-col gap-2 text-sm border-t border-dark-border pt-3">
           <div class="flex justify-between"><span class="text-gray-dark">ตลาด</span><span class="text-gray-light">GOLD (XAUUSD)</span></div>
           <div class="flex justify-between"><span class="text-gray-dark">Timeframe</span><span class="text-gray-light">M15</span></div>
-          <div class="flex justify-between"><span class="text-gray-dark">ภาษา</span><span class="text-gray-light">MQL5</span></div>
           <div class="flex justify-between"><span class="text-gray-dark">Broker</span><a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="text-secondary font-semibold hover:underline">XM · เปิดบัญชี →</a></div>
           <div class="flex justify-between"><span class="text-gray-dark">ราคา</span><span class="text-green">ฟรี</span></div>
-          <div class="flex justify-between"><span class="text-gray-dark">สถานะ</span><span class="text-green">LIVE</span></div>
+          <div class="flex justify-between"><span class="text-gray-dark">สถานะ</span><span class="text-green">ใช้งานจริง</span></div>
         </div>
       </div>
 
       <!-- Trading Journal -->
       <div class="border-t border-dark-border pt-5">
-        <h3 class="text-gray-light font-bold text-[15px] mb-3">Trading Journal</h3>
+        <h3 class="text-gray-light font-bold text-[15px] mb-3">Trading Journal <span class="text-[10px] text-gray-dark font-normal">· ผลเทรดจริง</span></h3>
         <div class="rounded-xl border border-primary/30 bg-dark-card p-4">
           <!-- toggle รวม/ต่อพอร์ต — ปุ่มสร้างจาก account_login จริงใน client script (label จาก accounts.display_name, fallback เลขบัญชี); ซ่อนไว้จนมีมากกว่า 1 พอร์ต -->
           <div id="tj-toggle" class="hidden gap-1 mb-3 bg-dark border border-dark-border rounded-lg p-1 text-[11px] font-semibold"></div>
@@ -396,10 +427,10 @@ const installSteps = [
               <div class="mfb-label text-xs text-gray-dark font-semibold mb-2">{c.name} · {c.label}</div>
               <div class="flex flex-col gap-1.5 text-sm">
                 <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span class={`mfb-gain font-bold ${c.gain != null ? 'text-green' : 'text-gray-light'}`}>{c.gain != null ? `+${c.gain}%` : '—'}</span></div>
-                <div class="flex justify-between"><span class="text-gray-dark">Abs. Gain</span><span class={`mfb-absgain font-semibold ${c.absGain != null ? 'text-green' : 'text-gray-light'}`}>{c.absGain != null ? `+${c.absGain}%` : '—'}</span></div>
-                <div class="flex justify-between"><span class="text-gray-dark">Monthly</span><span class="mfb-monthly text-gray-light">{c.monthly != null ? `${c.monthly}%` : '—'}</span></div>
-                <div class="flex justify-between"><span class="text-gray-dark">Drawdown</span><span class="mfb-dd text-gray-light">{c.drawdown != null ? `${c.drawdown}%` : '—'}</span></div>
-                <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">Balance</span><span class="mfb-balance text-gray-light">{c.balance != null ? `$${c.balance}` : '—'}</span></div>
+                <div class="flex justify-between"><span class="text-gray-dark">กำไรรวม</span><span class={`mfb-absgain font-semibold ${c.absGain != null ? 'text-green' : 'text-gray-light'}`}>{c.absGain != null ? `+${c.absGain}%` : '—'}</span></div>
+                <div class="flex justify-between"><span class="text-gray-dark">ต่อเดือน</span><span class="mfb-monthly text-gray-light">{c.monthly != null ? `${c.monthly}%` : '—'}</span></div>
+                <div class="flex justify-between"><span class="text-gray-dark">ติดลบสูงสุด</span><span class="mfb-dd text-gray-light">{c.drawdown != null ? `${c.drawdown}%` : '—'}</span></div>
+                <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">ยอดเงิน</span><span class="mfb-balance text-gray-light">{c.balance != null ? `$${c.balance}` : '—'}</span></div>
               </div>
               {c.newNote && <p class="mfb-new-note text-[11px] text-gray-dark mt-2 leading-relaxed">{c.newNote}</p>}
               <a href={c.url ?? '#'} target="_blank" rel="noopener noreferrer" class="mfb-link block text-center mt-3 border border-dark-border hover:border-primary text-gray-light text-sm font-semibold py-2 rounded-lg transition-colors">ดูใน Myfxbook →</a>
@@ -423,19 +454,6 @@ const installSteps = [
           <p class="text-xs text-gray-dark mt-1.5 ml-6">{releases[0].dateLabel}</p>
         </a>
         <a href="/gdbasket-changelog.html" class="inline-block text-primary hover:underline text-sm mt-3">+ {releases.length - 1} releases ทั้งหมด →</a>
-      </div>
-
-      <!-- Languages -->
-      <div class="border-t border-dark-border pt-5">
-        <h3 class="text-gray-light font-bold text-[15px] mb-3">Languages</h3>
-        <div class="flex h-2 rounded-full overflow-hidden mb-3">
-          <div class="bg-primary" style="width:92%"></div>
-          <div class="bg-secondary" style="width:8%"></div>
-        </div>
-        <div class="flex flex-col gap-1.5 text-xs">
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-primary"></span><span class="text-gray-light">MQL5</span><span class="text-gray-dark">92%</span></div>
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-secondary"></span><span class="text-gray-light">Docs</span><span class="text-gray-dark">8%</span></div>
-        </div>
       </div>
 
       <!-- Contributor + bug report -->
