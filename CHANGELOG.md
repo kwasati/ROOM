@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-07-10
+
+- [x] **หน้า gdBasket รื้อใหญ่ 3 ก้อน** - copy ทั้งหน้าเป็นภาษาผู้ใช้ตามเด็ค (tagline "Adaptive Buy Grid Behavior EA" / ชื่อฟีเจอร์ทับศัพท์ / ไม่มี logic ภายในหลุด) + Engine Profile กลับมา 3 การ์ด (SPORT+ พร้อมใช้·แนะนำ / STRADA+·CORSA เร็วๆ นี้) + ตารางผลสอบใหม่แยกกำไร-ชนเพดาน 6 แถว + PPTS legacy/pyramid + Myfxbook label ไทย + ตัดบล็อก Languages
+- [x] **Releases สไตล์ GitHub** - แถบข้างเป็น widget รุ่นล่าสุด (+2 releases →) + `/gdbasket-changelog.html` เขียนใหม่เป็น github-releases-style 3 รุ่น publish (v2.00/v1.37/v1.18) standalone ไม่พึ่ง data script
+- [x] **มือถือ 375px** - ตารางเลื่อนในกรอบ ไม่มีส่วนล้นขอบทั้ง 2 หน้า
+
 ## 2026-07-09
 
 - [x] **หน้า gdBasket เหลือโหมด SPORT+ เดียว** - ตามตัวแจก v2.00 rebuild (STRADA+/CORSA ยังจูนไม่ถึงเป้า ถอดออกจากตัวแจก) — การ์ดโหมด/ตารางผล/ขั้นติดตั้งเล่าเฉพาะ SPORT+ + note จุดเดียวว่าอีก 2 โหมดเปิดรุ่นถัดไปเมื่อจูนถึงเป้า + entry ประวัติเวอร์ชันใหม่
