@@ -6,7 +6,7 @@ export const eaItems = [
     id: 'gdbasket',
     title: 'gdBasket',
     description: 'Adaptive Buy Grid Behavior EA บน GOLD M15 — ราคาย่อยิ่งถัวเป็นชุด เด้งแล้วปิดยกชุดรับกำไรพร้อมกัน ปรับจังหวะตามตลาดเอง',
-    version: 'v2.01',
+    version: 'v2.02',
     live: true,
     href: '/ea/gdbasket',
     cardType: 'ea',
