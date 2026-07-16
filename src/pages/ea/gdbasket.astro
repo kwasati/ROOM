@@ -95,460 +95,457 @@ const installSteps = [
   'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊กอนุญาตเทรดอัตโนมัติ → กดปุ่ม <strong>Algo Trading</strong> ให้ขึ้น<strong class="text-green">สีเขียว</strong>',
   'ตั้ง <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — Standard ขั้นต่ำ <strong>$1,000</strong> · Micro ขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) ส่วน Engine Profile ตั้ง <strong>SPORT+</strong> มาให้แล้ว ไม่ต้องเลือก — สายนิ่งอยากได้ตัวกรองความร้อนตลาด ค่อยสลับเป็น <strong>STRADA+</strong>',
 ];
+
+// Engine Profile — 3 เครื่องยนต์ (markup-only render data สำหรับ engine-tabs ใหม่ ไม่กระทบ const/array เดิมด้านบน)
+const engines = [
+  {
+    key: 'strada', name: 'STRADA+', subtitle: 'grand tourer',
+    badge: 'พร้อมใช้ · ใหม่ใน v2.01 · เน้นนิ่ง · ปลอดภัย',
+    copy: [
+      'ขับทางไกลแบบนิ่งๆ เลือกจังหวะเข้าที่มั่นใจ เก็บกำไรเรื่อยๆ ไม่หวือหวา เหมาะกับคนอยากนอนหลับสบาย',
+      'มี<strong>ตัวกรองความร้อนตลาด</strong>ติดมาในตัว — วันไหนตลาดผันผวนแรงกว่าค่าเฉลี่ย 5 วันของตัวเอง มันงดเปิดกองใหม่ให้อัตโนมัติ รอตลาดเย็นลงค่อยเริ่มกองถัดไป เลือก STRADA+ ก็ได้เลย ไม่ต้องตั้งอะไรเพิ่ม',
+    ],
+    profit: '+90,184', wins: '10', stops: '3',
+  },
+  {
+    key: 'sport', name: 'SPORT+', subtitle: 'สปอร์ตสมดุล',
+    badge: 'พร้อมใช้ · แนะนำ · ตั้งมาให้แล้ว',
+    copy: [
+      'สมดุลระหว่างบุกกับเซฟ รู้จักดูว่าทองอยู่โซนแพงหรือถูกแล้วปรับสไตล์เล่นให้เหมาะกับจังหวะนั้น มีระบบเบรกกันเร่งเกินตอนตลาดดิ่งแรง — เป็นตัวที่ตั้งมาให้ในไฟล์แจก ลงแล้วใช้ได้เลย',
+    ],
+    profit: '+199,673', wins: '28', stops: '20',
+  },
+  {
+    key: 'corsa', name: 'CORSA', subtitle: 'track-bred',
+    badge: 'เร็วๆ นี้ · คันเร่งจัด · เสี่ยงสูง',
+    copy: [
+      'สายซิ่งเต็มคันเร่ง ไม้หนักกว่า กำไรต่อรอบแรงกว่า แลกกับความเสี่ยงที่สูงขึ้น เหมาะกับคนรับความเหวี่ยงได้และเข้าใจความเสี่ยงดี',
+    ],
+    profit: '—', wins: '—', stops: '—',
+  },
+];
 ---
 
 <Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — โหลดฟรี v2.02" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<div id="main-content" class="repo-page">
+  <div class="repo-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-  <!-- breadcrumb -->
-  <div class="text-sm text-gray-dark mb-4">
-    <a href="/" class="text-gray hover:text-primary transition-colors">Room</a><span class="mx-1">/</span>
-    <a href="/?filter=ea" class="text-gray hover:text-primary transition-colors">EA</a><span class="mx-1">/</span>
-    <span class="text-gray-light font-semibold">gdBasket</span>
-  </div>
+    <!-- (a) BREADCRUMB -->
+    <nav class="repo-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Room</a><span class="mx-1">/</span>
+      <a href="/?filter=ea">EA</a><span class="mx-1">/</span>
+      <span>gdBasket</span>
+    </nav>
 
-  <!-- (a) REPO HEADER ROW -->
-  <div class="flex justify-between items-start gap-4 flex-wrap pb-4">
-    <div class="flex items-start gap-3">
-      <img src="/gdbasket-mark.png" class="w-8 h-8 rounded-lg bg-dark-border" alt="gdBasket" />
-      <div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-lg text-gray">IntensiveTrader</span>
-          <span class="text-lg text-gray-dark">/</span>
-          <span class="pixel text-primary text-[15px]">gdBasket</span>
-          <span class="inline-flex items-center gap-1.5 bg-dark border border-green/40 text-green px-2.5 py-0.5 rounded-full text-xs font-semibold">ใช้งานจริง</span>
+    <!-- (b) REPO HEADER -->
+    <header class="repo-header">
+      <div class="repo-identity">
+        <div class="repo-mark"><img src="/gdbasket-mark.png" alt="gdBasket" /></div>
+        <div>
+          <div class="repo-name">
+            <span>IntensiveTrader</span><i>/</i><strong class="pixel">gdBasket</strong><b>ใช้งานจริง</b>
+          </div>
+          <p>Adaptive Buy Grid Behavior EA · GOLD M15</p>
         </div>
-        <p class="text-sm text-gray mt-1">Adaptive Buy Grid Behavior EA · GOLD M15</p>
       </div>
-    </div>
-    <div class="flex items-center rounded-lg border border-dark-border overflow-hidden text-sm">
-      <span class="px-3 py-1.5 text-gray">เวอร์ชัน</span>
-      <span class="px-3 py-1.5 bg-dark border-l border-dark-border text-gray-light font-semibold">v2.02</span>
-    </div>
-  </div>
+      <div class="repo-version"><span>เวอร์ชัน</span><strong>v2.02</strong></div>
+    </header>
 
-  <!-- (b) SUB-NAV TABS -->
-  <div class="border-b border-dark-border flex gap-1 text-sm overflow-x-auto">
-    <a href="#readme" class="px-3 py-2.5 border-b-2 border-primary text-gray-light font-semibold whitespace-nowrap">โค้ด/ไฟล์</a>
-    <a href="#readme" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">วิธีทำงาน</a>
-    <a href="#features" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap">จุดเด่น</a>
-    <a href="/gdbasket-changelog.html" class="px-3 py-2.5 border-b-2 border-transparent text-gray hover:text-gray-light whitespace-nowrap flex items-center gap-1.5">Releases <span class="bg-dark-border text-gray-light text-[10px] px-1.5 rounded-full">5</span></a>
-    <a href={`${MAIN}/journal`} class="px-3 py-2.5 border-b-2 border-transparent text-primary hover:text-primary-dark font-semibold whitespace-nowrap">Trading Journal</a>
-  </div>
+    <!-- (c) SUB-NAV TABS -->
+    <nav class="repo-tabs" aria-label="เมนู gdBasket">
+      <a href="#readme" class="active">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h11v2H4z"/></svg>
+        โค้ด/ไฟล์
+      </a>
+      <a href="#how">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13"/></svg>
+        วิธีทำงาน
+      </a>
+      <a href="#features">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        จุดเด่น
+      </a>
+      <a href="/gdbasket-changelog.html">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Releases <span>5</span>
+      </a>
+      <a href={`${MAIN}/journal`}>Trading Journal</a>
+    </nav>
 
-  <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 mt-5">
+    <div class="repo-columns">
 
-    <!-- LEFT -->
-    <div>
-      <!-- (c) TOOLBAR -->
-      <div class="flex items-center gap-3 flex-wrap mb-3">
-        <span class="flex items-center gap-2 bg-dark-card border border-dark-border rounded-lg px-3 py-1.5 text-sm text-gray-light">
-          <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
-          <span class="font-semibold">v2.02</span>
-        </span>
-        <span class="text-sm text-gray flex items-center gap-1.5">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-          <span class="text-gray-light font-semibold">5</span> เวอร์ชัน
-        </span>
-        <div class="flex-1 min-w-[120px]"></div>
-        <a href={DL_LATEST} download class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors pixel-shadow">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลดฟรี
-        </a>
-        <p class="text-[11px] text-gray-dark text-right w-full leading-relaxed">ไฟล์รุ่น <strong class="text-secondary font-semibold">v2.02</strong> — ใช้ได้เฉพาะบัญชี <strong class="text-secondary font-semibold">XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
-      </div>
-
-      <!-- (d) LATEST-COMMIT BAR -->
-      <div class="flex items-center gap-3 bg-dark-card border border-dark-border rounded-t-xl px-4 py-2.5 text-sm flex-wrap">
-        <img src={`${MAIN}/profile.jpg`} class="w-5 h-5 rounded-full bg-dark-border" alt="" />
-        <span class="text-gray-light font-semibold">IntensiveTrader</span>
-        <span class="text-gray truncate flex-1 min-w-[120px]">v2.02 — บัญชีที่โบรกแถมเครดิตเปิด EA ได้แล้ว</span>
-        <span class="text-gray-dark whitespace-nowrap">อัปเดต 13 ก.ค. 2026</span>
-      </div>
-
-      <!-- (e) FILE LIST -->
-      <div class="border border-t-0 border-dark-border rounded-b-xl overflow-hidden text-sm mb-8">
-        {fileRows.map((row, i) => (
-          <a
-            href={row.href}
-            {...(row.download ? { download: true } : {})}
-            class={`flex items-center gap-3 px-4 py-2.5 hover:bg-dark-card transition-colors cursor-pointer ${i < fileRows.length - 1 ? 'border-b border-dark-border' : ''}`}
-          >
-            <span class={`shrink-0 ${row.color}`}>
-              {row.icon === 'doc' && <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h11v2H4z"/></svg>}
-              {row.icon === 'gear' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>}
-              {row.icon === 'modes' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>}
-              {row.icon === 'star' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>}
-              {row.icon === 'clock' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
-              {row.icon === 'dl' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>}
-              {row.icon === 'journal' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>}
-            </span>
-            <span class="text-gray-light font-medium w-[190px] max-md:w-[130px] shrink-0">{row.name}</span>
-            <span class="text-gray truncate flex-1 max-md:hidden">{row.note}</span>
-            <span class={`whitespace-nowrap text-xs ${(row.download || row.accent) ? 'text-primary font-semibold' : 'text-gray-dark'}`}>{row.meta}{(row.download || row.accent) ? ' →' : ''}</span>
+      <!-- LEFT -->
+      <div class="repo-main">
+        <!-- (d) TOOLBAR -->
+        <div class="repo-toolbar">
+          <div class="branch-pill">
+            <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
+            <strong>v2.02</strong>
+          </div>
+          <span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
+            <strong>5</strong> เวอร์ชัน
+          </span>
+          <a href={DL_LATEST} download class="repo-download compact">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            ดาวน์โหลดฟรี <span>v2.02</span>
           </a>
-        ))}
-      </div>
-
-      <!-- (aff) XM AFFILIATE CARD -->
-      <div class="rounded-xl border border-secondary/40 p-5 mb-8" style="background:linear-gradient(160deg,rgba(245,158,11,.07),rgba(26,26,26,.5))">
-        <div class="text-xs text-secondary font-bold mb-1">โบรกที่ผมเทรดเอง</div>
-        <h3 class="text-lg font-bold text-gray-light mb-2">gdBasket ทำมาเพื่อ XM โดยเฉพาะ</h3>
-        <p class="text-sm text-gray mb-4">EA ตัวนี้ล็อกให้รันเฉพาะ GOLD บน XM — ใครจะเอาไปใช้ต้องมีบัญชี XM ก่อน ผมเทรดโบรกนี้เอง เปิดผ่านลิงก์ผมได้โบนัสเติมเงินด้วย</p>
-        <div class="flex gap-2 flex-wrap mb-4 text-xs font-semibold">
-          <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">Leverage <span class="text-secondary">1:1000</span></span>
-          <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">โบนัสเติมเงิน <span class="text-secondary">100%</span></span>
-          <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">เปิดบัญชี <span class="text-secondary">ฟรี</span></span>
+          <p>ไฟล์รุ่น <strong>v2.02</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
         </div>
-        <div class="flex items-center gap-2 flex-wrap bg-dark border border-dashed border-secondary rounded-lg px-3 py-2.5 mb-3 text-sm">
-          <span class="text-gray-dark text-xs">รหัสผู้แนะนำ:</span>
-          <span class="font-mono font-bold text-white bg-primary px-2.5 py-0.5 rounded">{XM_CODE}</span>
-          <button type="button" data-copy={XM_CODE} class="copy-code text-xs font-semibold text-gray-light bg-dark-card border border-dark-border rounded px-2.5 py-1 cursor-pointer">คัดลอก</button>
-        </div>
-        <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="inline-block bg-primary hover:bg-primary-dark text-white font-bold text-sm px-5 py-2.5 rounded-lg pixel-shadow">เปิดบัญชี XM ผ่านลิงก์เพื่อน →</a>
-        <p class="text-[11px] text-gray-dark mt-3 leading-relaxed">ลิงก์แนะนำ (affiliate) — ผมได้ค่าตอบแทนถ้าสมัครผ่านลิงก์นี้ · ไม่ใช่คำแนะนำการลงทุน · การเทรดมีความเสี่ยง อาจขาดทุนได้ ตัดสินใจด้วยตัวเอง</p>
-      </div>
 
-      <!-- (f) README CARD -->
-      <div id="readme" class="border border-dark-border rounded-xl overflow-hidden mb-8 scroll-mt-20">
-        <div class="flex items-center gap-2 bg-dark-card border-b border-dark-border px-4 py-2.5 text-sm">
-          <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13"/></svg>
-          <span class="text-gray-light font-semibold">README</span>
-        </div>
-        <div class="p-6">
-          <img src="/gdbasket-chart.png" class="w-full rounded-lg border border-dark-border mb-6" alt="gdBasket รันจริงบนกราฟ GOLD M15 — panel แสดง Capital / Target / NetProfit และไม้ในตะกร้า" />
-          <h2 class="pixel text-primary text-[18px] mb-2">gdBasket</h2>
-          <p class="text-gray-light font-bold mb-4">Adaptive Buy Grid Behavior EA</p>
-          <p class="text-gray leading-relaxed mb-6">EA เทรดทองคำด้วยระบบ <strong class="text-gray-light">Adaptive Grid Behavior</strong> ปรับพฤติกรรมการวาง Grid ตามสภาวะความผันผวนของตลาดแบบอัตโนมัติ และเสริมความแกร่งในการทำกำไรด้วยระบบ <strong class="text-gray-light">Peak Profit Trail System</strong> เก็บกำไรเก่ง เติมไม้ทำกำไรในช่วงตลาดพุ่ง — ใช้ระบบ Safety แบบ <strong class="text-gray-light">Common-TP/SL</strong> ที่วางจริงไว้ที่โบรก — ถึงเป้าปิดให้เองแม้คุณไม่ได้เปิดเครื่อง</p>
-
-          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">ทำงานยังไง</h3>
-          <div class="flex flex-col mb-8">
-            {howSteps.map((step, i, arr) => (
-              <div class="grid grid-cols-[40px_1fr] gap-4 relative pb-5 last:pb-0">
-                {i < arr.length - 1 && <div class="absolute left-[19px] top-[40px] bottom-0 w-0.5 bg-dark-border"></div>}
-                <div class="pixel w-10 h-10 bg-primary/15 rounded-lg flex items-center justify-center text-primary relative z-10 text-[0.7rem]">{i + 1}</div>
-                <p class="text-gray text-sm leading-relaxed pt-2.5" set:html={step} />
-              </div>
+        <!-- (e) FILE BROWSER -->
+        <section class="file-browser" aria-label="สารบัญ gdBasket">
+          <div class="commit-row">
+            <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
+            <strong>IntensiveTrader</strong>
+            <p>v2.02 — บัญชีที่โบรกแถมเครดิตเปิด EA ได้แล้ว</p>
+            <time>อัปเดต 13 ก.ค. 2026</time>
+          </div>
+          <div class="file-list">
+            {fileRows.map((row) => (
+              <a
+                href={row.href}
+                {...(row.download ? { download: true } : {})}
+                class={(row.download || row.accent) ? 'accent' : ''}
+              >
+                {row.icon === 'doc' && <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h11v2H4z"/></svg>}
+                {row.icon === 'gear' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>}
+                {row.icon === 'modes' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>}
+                {row.icon === 'star' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>}
+                {row.icon === 'clock' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
+                {row.icon === 'dl' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>}
+                {row.icon === 'journal' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>}
+                <strong>{row.name}</strong>
+                <span>{row.note}</span>
+                <b>{row.meta}{(row.download || row.accent) ? ' →' : ''}</b>
+              </a>
             ))}
           </div>
+        </section>
 
-          <div class="bg-dark-card border border-dark-border rounded-lg p-5 mb-8 flex flex-col gap-3">
-            <p class="text-gray text-sm leading-relaxed">gdBasket ทำงานเป็น<strong class="text-gray-light">รอบๆ</strong> — แต่ละรอบมันตั้งเป้าทำกำไรจาก <strong class="text-gray-light">Capital</strong> (ทุนต่อรอบ) ที่คุณกรอกไว้ แล้วบริหารทุกอย่างเองเพื่อไปให้ถึงเป้านั้น</p>
-            <p class="text-gray text-sm leading-relaxed">คุณบอกมันแค่ตัวเลขเดียว — <strong class="text-gray-light">Capital</strong> ที่เหลือมันคิดให้หมด ทั้งขนาดไม้ ระยะซื้อ และจังหวะเก็บกำไรด้วย <strong class="text-secondary">PPTS</strong></p>
-            <p class="text-gray text-sm leading-relaxed">เช่นตั้ง Capital <strong class="text-gray-light">$1,000</strong> → มันจะพยายามปั้นให้ได้กำไร <strong class="text-green">$1,000</strong> ต่อรอบ และถ้าพลาดจริงๆ ก็ยอมเสียไม่เกิน <strong class="text-primary">$1,000</strong> ต่อรอบเช่นกัน — เพดานได้/เสียชัดตั้งแต่ต้น</p>
-          </div>
-
-          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">PPTS — Peak Profit Trail System</h3>
-          <p class="text-gray text-sm leading-relaxed mb-4">หัวใจการเก็บกำไรของ gdBasket — พอราคาวิ่งเข้าทาง มันไม่รีบปิด แต่ไล่ล็อกกำไรตามขึ้นไป ให้กำไรวิ่งต่อได้เต็มที่โดยไม่เสี่ยงคืนกำไรที่ได้มาแล้ว</p>
-          <div class="grid sm:grid-cols-2 gap-4 mb-8">
-            <div class="bg-dark-card border border-dark-border rounded-lg p-4">
-              <h4 class="font-bold text-[14px] mb-1.5"><span class="pixel text-[11px] text-secondary">legacy</span> <span class="text-gray-light">· ไม้เดี่ยว</span></h4>
-              <p class="text-gray text-[13px] leading-relaxed">ถือไม้เดียวไล่ล็อกกำไรตามยอดแบบนิ่งๆ ราคาวิ่งไปเท่าไรก็เก็บตาม</p>
-            </div>
-            <div class="bg-dark-card border border-dark-border rounded-lg p-4">
-              <h4 class="font-bold text-[14px] mb-1.5"><span class="pixel text-[11px] text-secondary">pyramid</span> <span class="text-gray-light">· ไม้เติม</span></h4>
-              <p class="text-gray text-[13px] leading-relaxed">จังหวะราคาวิ่งแรง เติมไม้ทบเข้าไปแล้วไล่ล็อกกำไรทั้งกองพร้อมกัน เก็บกำไรก้อนใหญ่ขึ้น</p>
-            </div>
-          </div>
-
-          <h3 id="features" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">จุดเด่น</h3>
-          <div class="grid sm:grid-cols-2 gap-4 mb-8">
-            {features.map(f => (
-              <div class="bg-dark-card border border-dark-border rounded-lg p-4 hover:border-primary transition-colors">
-                <h4 class="font-bold text-gray-light text-[14px] mb-1.5">{f.title}</h4>
-                <p class="text-gray text-[13px] leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <h3 id="modes" class="text-gray-light font-bold text-[15px] mb-2 pb-2 border-b border-dark-border scroll-mt-20">Engine Profile — เลือกเครื่องยนต์ให้เข้ากับใจคุณ</h3>
-          <p class="text-gray text-sm leading-relaxed mb-4">gdBasket มี 3 เครื่องยนต์ให้เลือก — แต่ละตัวปรับสไตล์การเล่นตามจังหวะตลาดเอง ต่างกันที่ "คันเร่ง" ว่าจะบุกแค่ไหน</p>
-          <div class="grid gap-4 mb-8">
-            <div class="bg-dark-card border border-dark-border rounded-lg px-4 py-5 flex flex-col gap-2">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green/10 text-green">พร้อมใช้</span>
-                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-secondary/10 text-secondary">ใหม่ใน v2.01</span>
-                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-dark border border-dark-border text-gray-light">เน้นนิ่ง · ปลอดภัย</span>
-              </div>
-              <div class="flex items-baseline gap-2 flex-wrap"><h4 class="pixel text-gray-light text-[12px]">STRADA+</h4><span class="text-xs text-gray-dark">grand tourer</span></div>
-              <p class="text-gray text-[13px] leading-relaxed">ขับทางไกลแบบนิ่งๆ เลือกจังหวะเข้าที่มั่นใจ เก็บกำไรเรื่อยๆ ไม่หวือหวา เหมาะกับคนอยากนอนหลับสบาย</p>
-              <p class="text-gray text-[13px] leading-relaxed">มี<strong class="text-gray-light">ตัวกรองความร้อนตลาด</strong>ติดมาในตัว — วันไหนตลาดผันผวนแรงกว่าค่าเฉลี่ย 5 วันของตัวเอง มันงดเปิดกองใหม่ให้อัตโนมัติ รอตลาดเย็นลงค่อยเริ่มกองถัดไป เลือก STRADA+ ก็ได้เลย ไม่ต้องตั้งอะไรเพิ่ม</p>
-            </div>
-            <div class="bg-dark-card border border-primary/60 rounded-lg px-4 py-5 flex flex-col gap-2">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green/10 text-green">พร้อมใช้</span>
-                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary-light">แนะนำ · ตั้งมาให้แล้ว</span>
-              </div>
-              <div class="flex items-baseline gap-2 flex-wrap"><h4 class="pixel text-gray-light text-[12px]">SPORT+</h4><span class="text-xs text-gray-dark">สปอร์ตสมดุล</span></div>
-              <p class="text-gray text-[13px] leading-relaxed">สมดุลระหว่างบุกกับเซฟ รู้จักดูว่าทองอยู่โซนแพงหรือถูกแล้วปรับสไตล์เล่นให้เหมาะกับจังหวะนั้น มีระบบเบรกกันเร่งเกินตอนตลาดดิ่งแรง — เป็นตัวที่ตั้งมาให้ในไฟล์แจก ลงแล้วใช้ได้เลย</p>
-            </div>
-            <div class="bg-dark-card border border-dark-border rounded-lg px-4 py-5 flex flex-col gap-2">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-dark border border-dark-border text-gray">เร็วๆ นี้</span>
-                <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-dark border border-dark-border text-gray-light">คันเร่งจัด · เสี่ยงสูง</span>
-              </div>
-              <div class="flex items-baseline gap-2 flex-wrap"><h4 class="pixel text-gray-light text-[12px]">CORSA</h4><span class="text-xs text-gray-dark">track-bred</span></div>
-              <p class="text-gray text-[13px] leading-relaxed">สายซิ่งเต็มคันเร่ง ไม้หนักกว่า กำไรต่อรอบแรงกว่า แลกกับความเสี่ยงที่สูงขึ้น เหมาะกับคนรับความเหวี่ยงได้และเข้าใจความเสี่ยงดี</p>
-            </div>
-          </div>
-
-          <h3 class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border">ผลทดสอบย้อนหลัง (ม.ค. 2023 – พ.ค. 2026)</h3>
-          <p class="text-gray text-sm leading-relaxed mb-4">ผมเอาเครื่องยนต์ไปรันย้อนหลังบนข้อมูลราคาทองจริงต่อเนื่อง 3 ปีครึ่ง ตั้ง Capital ไว้ $10,000 — ตัวเลขข้างล่างคือผลรวมทั้งช่วง <strong class="text-gray-light">ไม่ใช่การรับประกันอนาคต</strong></p>
-          <!-- แถวบน: 2 การ์ดสรุปสมมาตร -->
-          <div class="grid sm:grid-cols-2 gap-4 mb-8">
-
-            <!-- การ์ด SPORT+ -->
-            <div class="bg-dark-card border border-primary/50 rounded-xl p-5 flex flex-col gap-3">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="pixel text-gray-light text-[11px]">SPORT+</span>
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary-light">ตั้งมาให้แล้ว</span>
-              </div>
-              <div>
-                <div class="text-green font-extrabold text-3xl leading-none">+199,673</div>
-                <div class="text-gray-dark text-xs mt-1">กำไรสุทธิ (USD)</div>
-              </div>
-              <div class="grid grid-cols-2 gap-2 mt-1">
-                <div class="bg-dark border border-dark-border rounded-lg px-2 py-2 text-center">
-                  <div class="text-gray-light font-bold text-lg leading-none">28</div>
-                  <div class="text-gray-dark text-[10px] mt-1">รอบสำเร็จ</div>
-                </div>
-                <div class="bg-dark border border-dark-border rounded-lg px-2 py-2 text-center">
-                  <div class="text-primary-light font-bold text-lg leading-none">20</div>
-                  <div class="text-gray-dark text-[10px] mt-1">รอบชนเพดาน</div>
-                </div>
-              </div>
-              <p class="text-gray-dark text-xs leading-relaxed mt-1">สมดุลบุก-เซฟ · เก็บกำไรถี่ ลุยได้ทุกจังหวะตลาด</p>
-            </div>
-
-            <!-- การ์ด STRADA+ -->
-            <div class="bg-dark-card border border-dark-border rounded-xl p-5 flex flex-col gap-3">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="pixel text-gray-light text-[11px]">STRADA+</span>
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green/10 text-green">ใหม่ v2.01</span>
-              </div>
-              <div>
-                <div class="text-green font-extrabold text-3xl leading-none">+90,184</div>
-                <div class="text-gray-dark text-xs mt-1">กำไรสุทธิ (USD)</div>
-              </div>
-              <div class="grid grid-cols-2 gap-2 mt-1">
-                <div class="bg-dark border border-dark-border rounded-lg px-2 py-2 text-center">
-                  <div class="text-gray-light font-bold text-lg leading-none">10</div>
-                  <div class="text-gray-dark text-[10px] mt-1">รอบสำเร็จ</div>
-                </div>
-                <div class="bg-dark border border-dark-border rounded-lg px-2 py-2 text-center">
-                  <div class="text-primary-light font-bold text-lg leading-none">3</div>
-                  <div class="text-gray-dark text-[10px] mt-1">รอบชนเพดาน</div>
-                </div>
-              </div>
-              <p class="text-gray-dark text-xs leading-relaxed mt-1">มีตัวกรองความร้อนตลาด — คัดจังหวะเข้า รอบที่ Capital แตกเหลือแค่ 3 รอบใน 3 ปีครึ่ง</p>
-            </div>
-
-          </div>
-
-          <!-- toggle ตารางละเอียด -->
-          <div class="flex items-center gap-2 mb-3 flex-wrap">
-            <h4 class="text-gray-light font-bold text-[13px] mr-1">แยกละเอียด</h4>
-            <button type="button" onclick="showTbl('sport')" id="btn-sport" class="tbl-btn text-xs font-semibold px-3 py-1 rounded-full border transition-colors">SPORT+</button>
-            <button type="button" onclick="showTbl('strada')" id="btn-strada" class="tbl-btn text-xs font-semibold px-3 py-1 rounded-full border transition-colors">STRADA+</button>
-          </div>
-
-          <!-- ตาราง SPORT+ -->
-          <div id="tbl-sport" class="tbl-wrap overflow-x-auto mb-4">
-            <table class="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th class="text-left text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">กำไรที่ระบบแบงก์ได้ — SPORT+</th>
-                  <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border whitespace-nowrap">จำนวน</th>
-                  <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border whitespace-nowrap">ยอด (USD)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td class="px-3 py-2.5 text-gray-light">รอบสำเร็จ (ปั้นครบเป้า)</td><td class="px-3 py-2.5 text-right text-gray-light whitespace-nowrap">28 รอบ</td><td class="px-3 py-2.5 text-right text-green whitespace-nowrap">+288,459.40</td></tr>
-                <tr><td class="px-3 py-2.5 text-gray-light">กำไรที่แบงก์ไว้ก่อนชนเพดาน</td><td class="px-3 py-2.5 text-right text-gray whitespace-nowrap">(ใน 20 รอบที่ชน)</td><td class="px-3 py-2.5 text-right text-green whitespace-nowrap">+99,329.10</td></tr>
-                <tr><td class="px-3 py-2.5 text-gray-light">รอบกำลังปั้น (ยังไม่ครบเป้า ตอนจบเทส)</td><td class="px-3 py-2.5 text-right text-gray-light whitespace-nowrap">1 รอบ</td><td class="px-3 py-2.5 text-right text-green whitespace-nowrap">+7,123.20</td></tr>
-                <tr class="border-t border-dark-border"><td class="px-3 py-2.5 text-gray-light font-bold">รวมกำไรที่ทำได้จริง</td><td class="px-3 py-2.5"></td><td class="px-3 py-2.5 text-right text-green font-bold whitespace-nowrap">+394,911.70</td></tr>
-                <tr><td class="px-3 py-2.5 text-gray-light">หักส่วนที่เสียตอนชนเพดาน</td><td class="px-3 py-2.5 text-right text-gray whitespace-nowrap">20 รอบ (รอบละ ~9–10k)</td><td class="px-3 py-2.5 text-right text-primary whitespace-nowrap">−195,239.00</td></tr>
-                <tr class="border-t border-dark-border"><td class="px-3 py-2.5 text-gray-light font-bold">กำไรสุทธิ</td><td class="px-3 py-2.5"></td><td class="px-3 py-2.5 text-right text-green font-bold whitespace-nowrap">+199,672.70</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- ตาราง STRADA+ -->
-          <div id="tbl-strada" class="tbl-wrap overflow-x-auto mb-4 hidden">
-            <table class="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th class="text-left text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border">กำไรที่ระบบแบงก์ได้ — STRADA+</th>
-                  <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border whitespace-nowrap">จำนวน</th>
-                  <th class="text-right text-gray-dark font-semibold text-xs px-3 py-2 border-b border-dark-border whitespace-nowrap">ยอด (USD)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td class="px-3 py-2.5 text-gray-light">รอบสำเร็จ (ปั้นครบเป้า)</td><td class="px-3 py-2.5 text-right text-gray-light whitespace-nowrap">10 รอบ</td><td class="px-3 py-2.5 text-right text-green whitespace-nowrap">+100,690.40</td></tr>
-                <tr><td class="px-3 py-2.5 text-gray-light">กำไรที่แบงก์ไว้ก่อนชนเพดาน</td><td class="px-3 py-2.5 text-right text-gray whitespace-nowrap">(ใน 3 รอบที่ชน)</td><td class="px-3 py-2.5 text-right text-green whitespace-nowrap">+19,426.70</td></tr>
-                <tr><td class="px-3 py-2.5 text-gray-light">รอบกำลังปั้น (ยังไม่ครบเป้า ตอนจบเทส)</td><td class="px-3 py-2.5 text-right text-gray-light whitespace-nowrap">1 รอบ</td><td class="px-3 py-2.5 text-right text-primary whitespace-nowrap">−280.20</td></tr>
-                <tr class="border-t border-dark-border"><td class="px-3 py-2.5 text-gray-light font-bold">รวมกำไรที่ทำได้จริง</td><td class="px-3 py-2.5"></td><td class="px-3 py-2.5 text-right text-green font-bold whitespace-nowrap">+119,836.90</td></tr>
-                <tr><td class="px-3 py-2.5 text-gray-light">หักส่วนที่เสียตอนชนเพดาน</td><td class="px-3 py-2.5 text-right text-gray whitespace-nowrap">3 รอบ</td><td class="px-3 py-2.5 text-right text-primary whitespace-nowrap">−29,652.50</td></tr>
-                <tr class="border-t border-dark-border"><td class="px-3 py-2.5 text-gray-light font-bold">กำไรสุทธิ</td><td class="px-3 py-2.5"></td><td class="px-3 py-2.5 text-right text-green font-bold whitespace-nowrap">+90,184.40</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p class="text-gray-dark text-xs leading-relaxed mb-2"><strong class="text-gray-light">"รอบสำเร็จ"</strong> = รอบที่ปั้นครบเป้า (ในตารางคือ $10,000) โดยไม่ชนเพดานก่อน</p>
-          <p class="text-gray-dark text-xs leading-relaxed mb-8"><strong class="text-gray-light">"ชนเพดาน" ไม่ได้แปลว่ารอบนั้นขาดทุนล้วน</strong> — ก่อนจะชนเพดาน หลายรอบแบงก์กำไรไปแล้ว กำไรส่วนนี้อยู่ในพอร์ตจริง การชนเพดานแค่ตัดตะกร้าไม้สุดท้ายที่ราคาไหลลงแรง เสียเท่า Capital ที่ตั้งไว้ (~$9–10k) <strong class="text-gray-light">ไม่ใช่ล้างพอร์ต</strong> แล้วขึ้นรอบใหม่ต่อ · ตัวเลขกำไรสุทธิหักส่วนที่เสียตอนชนเพดานทั้งหมดแล้ว</p>
-
-          <script is:inline>
-            function showTbl(which){
-              document.getElementById('tbl-sport').classList.toggle('hidden', which!=='sport');
-              document.getElementById('tbl-strada').classList.toggle('hidden', which!=='strada');
-              (function setActive(w){
-                var s=document.getElementById('btn-sport'), t=document.getElementById('btn-strada');
-                var base='tbl-btn text-xs font-semibold px-3 py-1 rounded-full border transition-colors ';
-                var on='bg-primary/15 border-primary/50 text-primary-light';
-                var off='bg-dark border-dark-border text-gray';
-                s.className=base+(w==='sport'?on:off);
-                t.className=base+(w==='strada'?on:off);
-              })(which);
-            }
-            showTbl('sport');
-          </script>
-
-          <h3 id="install" class="text-gray-light font-bold text-[15px] mb-4 pb-2 border-b border-dark-border scroll-mt-20">วิธีติดตั้ง</h3>
-          <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-secondary/5 border border-secondary/30 rounded-lg p-3.5 mb-4 hover:border-secondary/60 transition-colors">
-            <span class="shrink-0 w-7 h-7 rounded-lg bg-secondary text-[#1a1205] font-black grid place-items-center text-sm">0</span>
-            <span class="text-sm text-gray-light pt-0.5">ยังไม่มีบัญชี XM? <span class="text-secondary font-semibold">เปิดที่นี่</span> (รหัสผู้แนะนำ <span class="text-secondary font-semibold">KWASATI</span>) — gdBasket ใช้กับ XM เท่านั้น</span>
-          </a>
+        <!-- (f) AFFILIATE NOTE -->
+        <section class="affiliate-note" aria-label="ข้อมูลโบรก">
           <div>
-            {installSteps.map((step, i) => (
-              <div class="flex gap-4 items-start py-3.5 border-b border-dark-border last:border-0">
-                <div class="pixel w-8 h-8 flex-shrink-0 bg-dark border border-dark-border rounded-lg flex items-center justify-center text-primary text-[0.6rem]">{i + 1}</div>
-                <p class="text-gray text-sm leading-relaxed pt-1.5" set:html={step} />
+            <small>โบรกที่ผมเทรดเอง</small>
+            <h2>gdBasket ทำมาเพื่อ XM โดยเฉพาะ</h2>
+            <p>EA ตัวนี้ล็อกให้รันเฉพาะ GOLD บน XM — ใครจะเอาไปใช้ต้องมีบัญชี XM ก่อน ผมเทรดโบรกนี้เอง เปิดผ่านลิงก์ผมได้โบนัสเติมเงินด้วย</p>
+            <div class="flex gap-2 flex-wrap mt-3 text-xs font-semibold">
+              <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">Leverage <span class="text-secondary">1:1000</span></span>
+              <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">โบนัสเติมเงิน <span class="text-secondary">100%</span></span>
+              <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">เปิดบัญชี <span class="text-secondary">ฟรี</span></span>
+            </div>
+          </div>
+          <div class="ref-code">
+            <span>รหัสผู้แนะนำ:</span>
+            <strong>{XM_CODE}</strong>
+            <button type="button" data-copy={XM_CODE} class="copy-code">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              คัดลอก
+            </button>
+          </div>
+          <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="repo-download mt-3" style="display:inline-flex;">เปิดบัญชี XM ผ่านลิงก์เพื่อน →</a>
+          <p class="disclosure">ลิงก์แนะนำ (affiliate) — ผมได้ค่าตอบแทนถ้าสมัครผ่านลิงก์นี้ · ไม่ใช่คำแนะนำการลงทุน · การเทรดมีความเสี่ยง อาจขาดทุนได้ ตัดสินใจด้วยตัวเอง</p>
+        </section>
+
+        <!-- (g) README -->
+        <article id="readme" class="readme-card scroll-mt-20">
+          <div class="readme-title">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13"/></svg>
+            <strong>README</strong>
+          </div>
+          <div class="readme-body">
+            <img class="readme-chart" src="/gdbasket-chart.png" alt="gdBasket รันจริงบนกราฟ GOLD M15 — panel แสดง Capital / Target / NetProfit และไม้ในตะกร้า" />
+            <h1 class="pixel">gdBasket</h1>
+            <p class="readme-subtitle">Adaptive Buy Grid Behavior EA</p>
+            <p>EA เทรดทองคำด้วยระบบ <strong>Adaptive Grid Behavior</strong> ปรับพฤติกรรมการวาง Grid ตามสภาวะความผันผวนของตลาดแบบอัตโนมัติ และเสริมความแกร่งในการทำกำไรด้วยระบบ <strong>Peak Profit Trail System</strong> เก็บกำไรเก่ง เติมไม้ทำกำไรในช่วงตลาดพุ่ง — ใช้ระบบ Safety แบบ <strong>Common-TP/SL</strong> ที่วางจริงไว้ที่โบรก — ถึงเป้าปิดให้เองแม้คุณไม่ได้เปิดเครื่อง</p>
+
+            <h2 id="how">ทำงานยังไง</h2>
+            <ol class="readme-steps">
+              {howSteps.map((step, i) => (
+                <li><span>{i + 1}</span><p set:html={step} /></li>
+              ))}
+            </ol>
+
+            <div class="readme-callout">
+              <p>gdBasket ทำงานเป็น<strong>รอบๆ</strong> — แต่ละรอบมันตั้งเป้าทำกำไรจาก <strong>Capital</strong> (ทุนต่อรอบ) ที่คุณกรอกไว้ แล้วบริหารทุกอย่างเองเพื่อไปให้ถึงเป้านั้น</p>
+              <p>คุณบอกมันแค่ตัวเลขเดียว — <strong>Capital</strong> ที่เหลือมันคิดให้หมด ทั้งขนาดไม้ ระยะซื้อ และจังหวะเก็บกำไรด้วย <strong>PPTS</strong></p>
+              <p>เช่นตั้ง Capital <strong>$1,000</strong> → มันจะพยายามปั้นให้ได้กำไร <strong>$1,000</strong> ต่อรอบ และถ้าพลาดจริงๆ ก็ยอมเสียไม่เกิน <strong>$1,000</strong> ต่อรอบเช่นกัน — เพดานได้/เสียชัดตั้งแต่ต้น</p>
+            </div>
+
+            <h2>PPTS — Peak Profit Trail System</h2>
+            <p>หัวใจการเก็บกำไรของ gdBasket — พอราคาวิ่งเข้าทาง มันไม่รีบปิด แต่ไล่ล็อกกำไรตามขึ้นไป ให้กำไรวิ่งต่อได้เต็มที่โดยไม่เสี่ยงคืนกำไรที่ได้มาแล้ว</p>
+            <div class="readme-two-col">
+              <div>
+                <small class="pixel">legacy</small>
+                <h3>ไม้เดี่ยว</h3>
+                <p>ถือไม้เดียวไล่ล็อกกำไรตามยอดแบบนิ่งๆ ราคาวิ่งไปเท่าไรก็เก็บตาม</p>
+              </div>
+              <div>
+                <small class="pixel">pyramid</small>
+                <h3>ไม้เติม</h3>
+                <p>จังหวะราคาวิ่งแรง เติมไม้ทบเข้าไปแล้วไล่ล็อกกำไรทั้งกองพร้อมกัน เก็บกำไรก้อนใหญ่ขึ้น</p>
+              </div>
+            </div>
+
+            <h2 id="features">จุดเด่น</h2>
+            <div class="feature-list">
+              {features.map(f => (
+                <div>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <p><strong>{f.title}</strong><span>{f.desc}</span></p>
+                </div>
+              ))}
+            </div>
+
+            <h2 id="modes">Engine Profile — เลือกเครื่องยนต์ให้เข้ากับใจคุณ</h2>
+            <p>gdBasket มี 3 เครื่องยนต์ให้เลือก — แต่ละตัวปรับสไตล์การเล่นตามจังหวะตลาดเอง ต่างกันที่ "คันเร่ง" ว่าจะบุกแค่ไหน</p>
+            <div class="engine-tabs" role="tablist" aria-label="Engine Profile">
+              {engines.map((e) => (
+                <button type="button" id={`etab-${e.key}`} role="tab" aria-selected={e.key === 'sport'} class={e.key === 'sport' ? 'active' : ''} onclick={`showEngine('${e.key}')`}>
+                  <strong class="pixel">{e.name}</strong><span>{e.subtitle}</span>
+                </button>
+              ))}
+            </div>
+            {engines.map((e) => (
+              <div id={`engine-${e.key}`} class={`engine-readout${e.key === 'sport' ? '' : ' hidden'}`}>
+                <div>
+                  <span class="status-dot"></span><small>{e.badge}</small>
+                  <h3 class="pixel">{e.name}</h3>
+                  {e.copy.map((p) => <p set:html={p} />)}
+                </div>
+                <dl>
+                  <div><dt>กำไรสุทธิย้อนหลัง</dt><dd>{e.profit}</dd></div>
+                  <div><dt>รอบสำเร็จ</dt><dd>{e.wins}</dd></div>
+                  <div><dt>รอบชนเพดาน</dt><dd class="danger">{e.stops}</dd></div>
+                </dl>
               </div>
             ))}
+            <script is:inline>
+              function showEngine(which){
+                ['strada','sport','corsa'].forEach(function(k){
+                  var panel = document.getElementById('engine-'+k);
+                  var tab = document.getElementById('etab-'+k);
+                  if (panel) panel.classList.toggle('hidden', k !== which);
+                  if (tab) { tab.classList.toggle('active', k === which); tab.setAttribute('aria-selected', k === which ? 'true' : 'false'); }
+                });
+              }
+            </script>
+
+            <h2>ผลทดสอบย้อนหลัง <small>ม.ค. 2023 – พ.ค. 2026</small></h2>
+            <p>ผมเอาเครื่องยนต์ไปรันย้อนหลังบนข้อมูลราคาทองจริงต่อเนื่อง 3 ปีครึ่ง ตั้ง Capital ไว้ $10,000 — ตัวเลขข้างล่างคือผลรวมทั้งช่วง <strong>ไม่ใช่การรับประกันอนาคต</strong></p>
+            <div class="proof-switch" role="tablist" aria-label="ผลทดสอบ">
+              <button type="button" id="btn-sport" class="active" onclick="showTbl('sport')">SPORT+</button>
+              <button type="button" id="btn-strada" onclick="showTbl('strada')">STRADA+</button>
+            </div>
+
+            <div id="tbl-sport" class="proof-table-wrap mb-4">
+              <table class="proof-table">
+                <thead>
+                  <tr><th>สรุปผล — SPORT+</th><th>จำนวน</th><th>ยอด USD</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>รอบสำเร็จ (ปั้นครบเป้า)</td><td>28 รอบ</td><td class="positive">+288,459.40</td></tr>
+                  <tr><td>กำไรที่แบงก์ไว้ก่อนชนเพดาน</td><td>(ใน 20 รอบที่ชน)</td><td class="positive">+99,329.10</td></tr>
+                  <tr><td>รอบกำลังปั้น (ยังไม่ครบเป้า ตอนจบเทส)</td><td>1 รอบ</td><td class="positive">+7,123.20</td></tr>
+                  <tr class="total"><td>รวมกำไรที่ทำได้จริง</td><td></td><td class="positive">+394,911.70</td></tr>
+                  <tr><td>หักส่วนที่เสียตอนชนเพดาน</td><td>20 รอบ (รอบละ ~9–10k)</td><td class="negative">−195,239.00</td></tr>
+                  <tr class="total"><td>กำไรสุทธิ</td><td></td><td class="positive">+199,672.70</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="tbl-strada" class="proof-table-wrap mb-4 hidden">
+              <table class="proof-table">
+                <thead>
+                  <tr><th>สรุปผล — STRADA+</th><th>จำนวน</th><th>ยอด USD</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>รอบสำเร็จ (ปั้นครบเป้า)</td><td>10 รอบ</td><td class="positive">+100,690.40</td></tr>
+                  <tr><td>กำไรที่แบงก์ไว้ก่อนชนเพดาน</td><td>(ใน 3 รอบที่ชน)</td><td class="positive">+19,426.70</td></tr>
+                  <tr><td>รอบกำลังปั้น (ยังไม่ครบเป้า ตอนจบเทส)</td><td>1 รอบ</td><td class="negative">−280.20</td></tr>
+                  <tr class="total"><td>รวมกำไรที่ทำได้จริง</td><td></td><td class="positive">+119,836.90</td></tr>
+                  <tr><td>หักส่วนที่เสียตอนชนเพดาน</td><td>3 รอบ</td><td class="negative">−29,652.50</td></tr>
+                  <tr class="total"><td>กำไรสุทธิ</td><td></td><td class="positive">+90,184.40</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="fine-print"><strong>"รอบสำเร็จ"</strong> = รอบที่ปั้นครบเป้า (ในตารางคือ $10,000) โดยไม่ชนเพดานก่อน</p>
+            <p class="fine-print mb-6"><strong>"ชนเพดาน" ไม่ได้แปลว่ารอบนั้นขาดทุนล้วน</strong> — ก่อนจะชนเพดาน หลายรอบแบงก์กำไรไปแล้ว กำไรส่วนนี้อยู่ในพอร์ตจริง การชนเพดานแค่ตัดตะกร้าไม้สุดท้ายที่ราคาไหลลงแรง เสียเท่า Capital ที่ตั้งไว้ (~$9–10k) <strong>ไม่ใช่ล้างพอร์ต</strong> แล้วขึ้นรอบใหม่ต่อ · ตัวเลขกำไรสุทธิหักส่วนที่เสียตอนชนเพดานทั้งหมดแล้ว</p>
+
+            <script is:inline>
+              function showTbl(which){
+                document.getElementById('tbl-sport').classList.toggle('hidden', which !== 'sport');
+                document.getElementById('tbl-strada').classList.toggle('hidden', which !== 'strada');
+                document.getElementById('btn-sport').classList.toggle('active', which === 'sport');
+                document.getElementById('btn-strada').classList.toggle('active', which === 'strada');
+              }
+            </script>
+
+            <h2 id="install">วิธีติดตั้ง</h2>
+            <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-secondary/5 border border-secondary/30 rounded-lg p-3.5 mb-4 hover:border-secondary/60 transition-colors">
+              <span class="shrink-0 w-7 h-7 rounded-lg bg-secondary text-[#1a1205] font-black grid place-items-center text-sm">0</span>
+              <span class="text-sm text-gray-light pt-0.5">ยังไม่มีบัญชี XM? <span class="text-secondary font-semibold">เปิดที่นี่</span> (รหัสผู้แนะนำ <span class="text-secondary font-semibold">KWASATI</span>) — gdBasket ใช้กับ XM เท่านั้น</span>
+            </a>
+            <div class="install-list">
+              {installSteps.map((step, i) => (
+                <div><span>{i + 1}</span><p set:html={step} /></div>
+              ))}
+            </div>
+            <p class="text-xs text-gray-dark mt-4">gdBasket ล็อกให้รันเฉพาะ GOLD M15 บนโบรก XM เท่านั้น</p>
+
+            <a href={VPS_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-primary/5 border border-primary/30 rounded-lg p-3.5 mt-4 hover:border-primary/60 transition-colors">
+              <span class="shrink-0 w-7 h-7 rounded-lg bg-primary text-white font-black grid place-items-center text-sm">+</span>
+              <span class="text-sm text-gray-light pt-0.5">แนะนำรัน EA บน VPS จะได้ทำงาน 24/7 ไม่ต้องเปิดคอมฯทิ้งไว้ — <span class="text-primary font-semibold">VPS ที่ผมใช้</span></span>
+            </a>
+
+            <h2>คำแนะนำ</h2>
+            <div class="readme-callout">
+              <p>มีทุนเท่าไหร่ เอามา <strong>หาร 3</strong> แล้วเอาเลขนั้นไปตั้ง Capital</p>
+              <p>เช่นมีทุน <strong>$300</strong> → หาร 3 = <strong>$100</strong> → ตั้ง Capital <strong>$100</strong></p>
+              <p>นี่คือหลักบริหารความเสี่ยงที่ผมใช้กับ gdBasket — กันไม่ให้รอบเดียวกินพอร์ตหมด</p>
+            </div>
+
+            <div class="risk-note">
+              <span aria-hidden="true">⚠</span>
+              <p><strong>ข้อควรจำ</strong> บัญชี Standard ตั้ง Capital ขั้นต่ำ <strong>$1,000</strong> · บัญชี Micro ตั้ง Capital ขั้นต่ำ <strong>$100</strong></p>
+            </div>
           </div>
-          <p class="text-xs text-gray-dark mt-4">gdBasket ล็อกให้รันเฉพาะ GOLD M15 บนโบรก XM เท่านั้น</p>
+        </article>
 
-          <a href={VPS_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-primary/5 border border-primary/30 rounded-lg p-3.5 mt-4 hover:border-primary/60 transition-colors">
-            <span class="shrink-0 w-7 h-7 rounded-lg bg-primary text-white font-black grid place-items-center text-sm">+</span>
-            <span class="text-sm text-gray-light pt-0.5">แนะนำรัน EA บน VPS จะได้ทำงาน 24/7 ไม่ต้องเปิดคอมฯทิ้งไว้ — <span class="text-primary font-semibold">VPS ที่ผมใช้</span></span>
-          </a>
-
-          <h3 class="text-gray-light font-bold text-[15px] mb-4 mt-8 pb-2 border-b border-dark-border">คำแนะนำ</h3>
-          <div class="bg-dark-card border border-dark-border rounded-lg p-4 mb-8">
-            <p class="text-gray text-sm leading-relaxed mb-2">มีทุนเท่าไหร่ เอามา <strong class="text-secondary">หาร 3</strong> แล้วเอาเลขนั้นไปตั้ง Capital</p>
-            <p class="text-gray text-sm leading-relaxed mb-2">เช่นมีทุน <strong class="text-gray-light">$300</strong> → หาร 3 = <strong class="text-gray-light">$100</strong> → ตั้ง Capital <strong class="text-green">$100</strong></p>
-            <p class="text-gray-dark text-xs leading-relaxed">นี่คือหลักบริหารความเสี่ยงที่ผมใช้กับ gdBasket — กันไม่ให้รอบเดียวกินพอร์ตหมด</p>
+        <!-- (h) CHANGELOG — id="changelog" (ไม่ใช่ #release) -->
+        <section id="changelog" class="release-card scroll-mt-20">
+          <div>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <strong>อัปเดตล่าสุด — v2.02</strong>
           </div>
-
-          <div class="bg-secondary/10 border border-secondary/40 rounded-lg p-4">
-            <h4 class="font-bold text-secondary text-[14px] mb-2">⚠ ข้อควรจำ</h4>
-            <p class="text-gray text-sm leading-relaxed">บัญชี <strong class="text-gray-light">Standard</strong> ตั้ง Capital ขั้นต่ำ <strong class="text-gray-light">$1,000</strong> · บัญชี <strong class="text-gray-light">Micro</strong> ตั้ง Capital ขั้นต่ำ <strong class="text-gray-light">$100</strong></p>
-          </div>
-        </div>
-      </div>
-
-      <!-- (g) CHANGELOG CARD — อัปเดตล่าสุด v2.02 (+ ไฮไลต์ฟีเจอร์ STRADA+ จาก v2.01) -->
-      <div id="changelog" class="border border-dark-border rounded-xl overflow-hidden mb-8 scroll-mt-20">
-        <div class="flex items-center gap-2 bg-dark-card border-b border-dark-border px-4 py-2.5 text-sm">
-          <span class="text-gray-light font-semibold">อัปเดตล่าสุด — v2.02</span>
-        </div>
-        <div class="p-6">
-          <p class="text-gray text-sm leading-relaxed mb-4">v2.02 — บัญชีที่โบรกแถมเครดิตเปิด EA ได้แล้ว · ต่อจาก v2.01 ที่เปิดโหมด STRADA+ สายนิ่ง พร้อมตัวกรองความร้อนตลาดในตัว</p>
-          <ul class="flex flex-col gap-3 mb-5">
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">v2.02 · รองรับบัญชีเครดิตโบรกเกอร์</strong> — บัญชีที่ฝากเงินแล้วได้เครดิตแถม (เทรดได้จริงเท่ายอดฝาก+เครดิต) เปิด EA ได้แล้ว เดิมนับแค่ยอดฝากเลยไม่ให้เปิดถ้าทุนไม่ถึง</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">ใหม่: ตัวกรองความร้อนตลาดใน STRADA+</strong> — วันไหนตลาดผันผวนแรงกว่าค่าเฉลี่ย 5 วันของตัวเอง EA งดเปิดกองใหม่ให้อัตโนมัติ รอตลาดเย็นลงค่อยเริ่มกองถัดไป ติดมากับโหมด STRADA+ เลย ไม่ต้องตั้งอะไรเพิ่ม</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">รอบที่ Capital แตกน้อยลงเกินครึ่ง แลกกำไรนิดเดียว</strong> — ผลทดสอบย้อนหลัง 3 ปีครึ่ง: รอบที่ Capital ทั้งก้อนแตก (ต้องเริ่มปั้นใหม่) เหลือแค่ <strong class="text-gray-light">3 รอบ</strong> กระจายทุกปี ไม่ใช่ฟลุคปีเดียว แลกกำไรรวมลดเพียง ~7%</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">กองที่เปิดอยู่ไม่โดนแตะ</strong> — ตัวกรองคุมแค่จังหวะเริ่มกองใหม่ ส่วนกองที่วิ่งอยู่ ซื้อเพิ่ม / เป้ากำไร / ล็อกกำไร / ตัดขาดทุน ทำงานเหมือนเดิมทุกอย่าง</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">ตัวแจกเลือกได้ 2 โหมดแล้ว</strong> — SPORT+ (ค่าเริ่มต้น เหมือนเดิม) + STRADA+ (ใหม่ — สายเสี่ยงต่ำ มีตัวกรองความร้อน) · CORSA ยังไม่ปล่อย</span></li>
-            <li class="flex gap-3 text-gray text-sm leading-relaxed"><span class="text-green font-bold shrink-0">+</span><span><strong class="text-gray-light">SPORT+ พฤติกรรมเดิม 100%</strong> — โหมดอื่นไม่ผ่านตัวกรองนี้ ใครใช้ SPORT+ อยู่ ทุกอย่างเหมือน v2.00 เป๊ะ</span></li>
+          <p>v2.02 — บัญชีที่โบรกแถมเครดิตเปิด EA ได้แล้ว · ต่อจาก v2.01 ที่เปิดโหมด STRADA+ สายนิ่ง พร้อมตัวกรองความร้อนตลาดในตัว</p>
+          <ul>
+            <li><span>+</span><span><strong>v2.02 · รองรับบัญชีเครดิตโบรกเกอร์</strong> — บัญชีที่ฝากเงินแล้วได้เครดิตแถม (เทรดได้จริงเท่ายอดฝาก+เครดิต) เปิด EA ได้แล้ว เดิมนับแค่ยอดฝากเลยไม่ให้เปิดถ้าทุนไม่ถึง</span></li>
+            <li><span>+</span><span><strong>ใหม่: ตัวกรองความร้อนตลาดใน STRADA+</strong> — วันไหนตลาดผันผวนแรงกว่าค่าเฉลี่ย 5 วันของตัวเอง EA งดเปิดกองใหม่ให้อัตโนมัติ รอตลาดเย็นลงค่อยเริ่มกองถัดไป ติดมากับโหมด STRADA+ เลย ไม่ต้องตั้งอะไรเพิ่ม</span></li>
+            <li><span>+</span><span><strong>รอบที่ Capital แตกน้อยลงเกินครึ่ง แลกกำไรนิดเดียว</strong> — ผลทดสอบย้อนหลัง 3 ปีครึ่ง: รอบที่ Capital ทั้งก้อนแตก (ต้องเริ่มปั้นใหม่) เหลือแค่ <strong>3 รอบ</strong> กระจายทุกปี ไม่ใช่ฟลุคปีเดียว แลกกำไรรวมลดเพียง ~7%</span></li>
+            <li><span>+</span><span><strong>กองที่เปิดอยู่ไม่โดนแตะ</strong> — ตัวกรองคุมแค่จังหวะเริ่มกองใหม่ ส่วนกองที่วิ่งอยู่ ซื้อเพิ่ม / เป้ากำไร / ล็อกกำไร / ตัดขาดทุน ทำงานเหมือนเดิมทุกอย่าง</span></li>
+            <li><span>+</span><span><strong>ตัวแจกเลือกได้ 2 โหมดแล้ว</strong> — SPORT+ (ค่าเริ่มต้น เหมือนเดิม) + STRADA+ (ใหม่ — สายเสี่ยงต่ำ มีตัวกรองความร้อน) · CORSA ยังไม่ปล่อย</span></li>
+            <li><span>+</span><span><strong>SPORT+ พฤติกรรมเดิม 100%</strong> — โหมดอื่นไม่ผ่านตัวกรองนี้ ใครใช้ SPORT+ อยู่ ทุกอย่างเหมือน v2.00 เป๊ะ</span></li>
           </ul>
-          <a href="/gdbasket-changelog.html" class="text-primary text-sm font-semibold hover:underline">ดูประวัติทุกเวอร์ชัน →</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT SIDEBAR -->
-    <aside class="flex flex-col gap-6">
-      <!-- About -->
-      <div>
-        <h3 class="text-gray-light font-bold text-[15px] mb-2">About</h3>
-        <p class="text-gray text-sm mb-4 leading-relaxed">Adaptive Buy Grid Behavior EA — ทยอยซื้อเป็นชุด ปิดรับกำไรทั้งชุด ใช้จริงบนพอร์ตจริง</p>
-        <div class="flex flex-col gap-2 text-sm border-t border-dark-border pt-3">
-          <div class="flex justify-between"><span class="text-gray-dark">ตลาด</span><span class="text-gray-light">GOLD (XAUUSD)</span></div>
-          <div class="flex justify-between"><span class="text-gray-dark">Timeframe</span><span class="text-gray-light">M15</span></div>
-          <div class="flex justify-between"><span class="text-gray-dark">Broker</span><a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="text-secondary font-semibold hover:underline">XM · เปิดบัญชี →</a></div>
-          <div class="flex justify-between"><span class="text-gray-dark">ราคา</span><span class="text-green">ฟรี</span></div>
-          <div class="flex justify-between"><span class="text-gray-dark">สถานะ</span><span class="text-green">ใช้งานจริง</span></div>
-        </div>
+          <a href="/gdbasket-changelog.html" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
+        </section>
       </div>
 
-      <!-- Trading Journal -->
-      <div class="border-t border-dark-border pt-5">
-        <h3 class="text-gray-light font-bold text-[15px] mb-3">Trading Journal <span class="text-[10px] text-gray-dark font-normal">· ผลเทรดจริง</span></h3>
-        <div class="rounded-xl border border-primary/30 bg-dark-card p-4">
+      <!-- RIGHT SIDEBAR -->
+      <aside class="repo-sidebar">
+        <!-- About -->
+        <section>
+          <h2>About</h2>
+          <p>Adaptive Buy Grid Behavior EA — ทยอยซื้อเป็นชุด ปิดรับกำไรทั้งชุด ใช้จริงบนพอร์ตจริง</p>
+          <dl>
+            <div><dt>ตลาด</dt><dd>GOLD (XAUUSD)</dd></div>
+            <div><dt>Timeframe</dt><dd>M15</dd></div>
+            <div><dt>Broker</dt><dd><a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="text-secondary font-semibold hover:underline">XM · เปิดบัญชี →</a></dd></div>
+            <div><dt>ราคา</dt><dd class="positive">ฟรี</dd></div>
+            <div><dt>สถานะ</dt><dd class="positive">ใช้งานจริง</dd></div>
+          </dl>
+        </section>
+
+        <!-- Trading Journal -->
+        <section>
+          <h2>Trading Journal <small>· ผลเทรดจริง</small></h2>
           <!-- toggle รวม/ต่อพอร์ต — ปุ่มสร้างจาก account_login จริงใน client script (label จาก accounts.display_name, fallback เลขบัญชี); ซ่อนไว้จนมีมากกว่า 1 พอร์ต -->
           <div id="tj-toggle" class="hidden gap-1 mb-3 bg-dark border border-dark-border rounded-lg p-1 text-[11px] font-semibold"></div>
-          <div class="grid grid-cols-3 gap-2 text-center mb-3">
-            <div><div id="tj-pnl" class="text-[17px] font-bold text-green">—</div><div class="text-[10px] text-gray-dark mt-0.5">กำไรสะสม</div></div>
-            <div><div id="tj-wr" class="text-[17px] font-bold text-gray-light">—</div><div class="text-[10px] text-gray-dark mt-0.5">Win rate</div></div>
-            <div><div id="tj-ct" class="text-[17px] font-bold text-gray-light">—</div><div class="text-[10px] text-gray-dark mt-0.5">จำนวนรอบ</div></div>
+          <div class="journal-box">
+            <div><span>กำไรสะสม</span><strong id="tj-pnl">—</strong></div>
+            <div><span>Win rate</span><strong id="tj-wr">—</strong></div>
+            <div><span>จำนวนรอบ</span><strong id="tj-ct">—</strong></div>
+            <a href={`${MAIN}/journal`}>ดูประวัติเทรดทั้งหมด →</a>
           </div>
-          <a href={`${MAIN}/journal`} class="block text-center bg-primary hover:bg-primary-dark text-white font-bold text-sm py-2 rounded-lg pixel-shadow">ดูประวัติเทรดทั้งหมด →</a>
-        </div>
-      </div>
+        </section>
 
-      <!-- Myfxbook — id="mfb-list" = ที่ client script (ท้ายไฟล์) clone การ์ดเพิ่มเวลามีพอร์ตอื่นผูกเข้า myfxbook -->
-      <div class="border-t border-dark-border pt-5">
-        <h3 class="text-gray-light font-bold text-[15px] mb-3">Myfxbook <span class="text-[10px] text-gray-dark font-normal">· ผลตรวจสอบจริง</span></h3>
-        <div id="mfb-list" class="flex flex-col gap-3">
-          {mfbCards.map((c) => (
-            <div class="rounded-xl border border-dark-border bg-dark-card p-4" data-mfb-id={c.id}>
-              <div class="mfb-label text-xs text-gray-dark font-semibold mb-2">{c.name} · {c.label}</div>
-              <div class="flex flex-col gap-1.5 text-sm">
-                <div class="flex justify-between"><span class="text-gray-dark">Gain</span><span class={`mfb-gain font-bold ${c.gain != null ? 'text-green' : 'text-gray-light'}`}>{c.gain != null ? `+${c.gain}%` : '—'}</span></div>
-                <div class="flex justify-between"><span class="text-gray-dark">กำไรรวม</span><span class={`mfb-absgain font-semibold ${c.absGain != null ? 'text-green' : 'text-gray-light'}`}>{c.absGain != null ? `+${c.absGain}%` : '—'}</span></div>
-                <div class="flex justify-between"><span class="text-gray-dark">ต่อเดือน</span><span class="mfb-monthly text-gray-light">{c.monthly != null ? `${c.monthly}%` : '—'}</span></div>
-                <div class="flex justify-between"><span class="text-gray-dark">ติดลบสูงสุด</span><span class="mfb-dd text-gray-light">{c.drawdown != null ? `${c.drawdown}%` : '—'}</span></div>
-                <div class="flex justify-between border-t border-dark-border pt-1.5 mt-0.5"><span class="text-gray-dark">ยอดเงิน</span><span class="mfb-balance text-gray-light">{c.balance != null ? `$${c.balance}` : '—'}</span></div>
+        <!-- Myfxbook — id="mfb-list" = ที่ client script (ท้ายไฟล์) clone การ์ดเพิ่มเวลามีพอร์ตอื่นผูกเข้า myfxbook -->
+        <section>
+          <h2>Myfxbook <small>· ผลตรวจสอบจริง</small></h2>
+          <div id="mfb-list" class="flex flex-col gap-3">
+            {mfbCards.map((c) => (
+              <div class="account-box" data-mfb-id={c.id}>
+                <div>
+                  <span class="status-dot"></span>
+                  <strong class="mfb-label">{c.name} · {c.label}</strong>
+                  <span>{c.gain != null ? 'LIVE' : 'ใหม่'}</span>
+                </div>
+                <dl>
+                  <div><dt>Gain</dt><dd class={`mfb-gain ${c.gain != null ? 'positive' : ''}`}>{c.gain != null ? `+${c.gain}%` : '—'}</dd></div>
+                  <div><dt>กำไรรวม</dt><dd class={`mfb-absgain ${c.absGain != null ? 'positive' : ''}`}>{c.absGain != null ? `+${c.absGain}%` : '—'}</dd></div>
+                  <div><dt>ต่อเดือน</dt><dd class="mfb-monthly">{c.monthly != null ? `${c.monthly}%` : '—'}</dd></div>
+                  <div><dt>ติดลบสูงสุด</dt><dd class="mfb-dd">{c.drawdown != null ? `${c.drawdown}%` : '—'}</dd></div>
+                  <div><dt>ยอดเงิน</dt><dd class="mfb-balance">{c.balance != null ? `$${c.balance}` : '—'}</dd></div>
+                </dl>
+                {c.newNote && <p class="mfb-new-note">{c.newNote}</p>}
+                <a href={c.url ?? '#'} target="_blank" rel="noopener noreferrer" class="mfb-link">ดูใน Myfxbook →</a>
               </div>
-              {c.newNote && <p class="mfb-new-note text-[11px] text-gray-dark mt-2 leading-relaxed">{c.newNote}</p>}
-              <a href={c.url ?? '#'} target="_blank" rel="noopener noreferrer" class="mfb-link block text-center mt-3 border border-dark-border hover:border-primary text-gray-light text-sm font-semibold py-2 rounded-lg transition-colors">ดูใน Myfxbook →</a>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <!-- Releases — widget สไตล์ GitHub: การ์ดรุ่นล่าสุด + ลิงก์หน้าเต็ม -->
-      <div id="releases" class="border-t border-dark-border pt-5 scroll-mt-20">
-        <div class="flex items-center justify-between mb-3">
-          <a href="/gdbasket-changelog.html" class="text-gray-light font-bold text-[15px] hover:text-primary transition-colors">Releases</a>
-          <span class="bg-dark-border text-gray-light text-[10px] px-1.5 py-0.5 rounded-full font-semibold">{releases.length}</span>
-        </div>
-        <a href="/gdbasket-changelog.html" class="block rounded-xl border border-dark-border bg-dark-card p-4 hover:border-primary transition-colors">
-          <div class="flex items-center gap-2 flex-wrap">
-            <svg class="w-4 h-4 text-green shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-            <span class="pixel text-gray-light text-[11px]">gdBasket {releases[0].version}</span>
-            <span class="bg-green/10 text-green text-[10px] px-1.5 py-0.5 rounded-full font-semibold">ล่าสุด</span>
+            ))}
           </div>
-          <p class="text-xs text-gray-dark mt-1.5 ml-6">{releases[0].dateLabel}</p>
-        </a>
-        <a href="/gdbasket-changelog.html" class="inline-block text-primary hover:underline text-sm mt-3">+ {releases.length - 1} releases ทั้งหมด →</a>
-      </div>
+        </section>
 
-      <!-- Contributor + bug report -->
-      <div class="border-t border-dark-border pt-5">
-        <h3 class="text-gray-light font-bold text-[15px] mb-3">ผู้พัฒนา</h3>
-        <div class="flex items-center gap-2 mb-4">
-          <img src={`${MAIN}/profile.jpg`} class="w-8 h-8 rounded-full bg-dark-border" alt="" />
-          <div><div class="text-sm text-gray-light">IntensiveTrader</div><div class="text-xs text-gray-dark">Kittitat Wasati</div></div>
-        </div>
-        <a href="https://www.facebook.com/IntensiveTraderArt" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 border border-dark-border text-gray-light hover:border-primary px-4 py-2 rounded-lg text-sm transition-colors">
-          <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          แจ้ง Bug / ติดต่อ
-        </a>
-      </div>
-    </aside>
+        <!-- Releases — widget สไตล์ GitHub: การ์ดรุ่นล่าสุด + ลิงก์หน้าเต็ม -->
+        <section id="releases-widget">
+          <div class="flex items-center justify-between mb-3">
+            <a href="/gdbasket-changelog.html" class="hover:text-primary transition-colors"><h2 class="!mb-0">Releases</h2></a>
+            <span class="bg-dark-border text-gray-light text-[10px] px-1.5 py-0.5 rounded-full font-semibold">{releases.length}</span>
+          </div>
+          <a href="/gdbasket-changelog.html" class="block rounded-xl border border-dark-border bg-dark-card p-4 hover:border-primary transition-colors">
+            <div class="flex items-center gap-2 flex-wrap">
+              <svg class="w-4 h-4 text-green shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
+              <span class="pixel text-gray-light text-[11px]">gdBasket {releases[0].version}</span>
+              <span class="bg-green/10 text-green text-[10px] px-1.5 py-0.5 rounded-full font-semibold">ล่าสุด</span>
+            </div>
+            <p class="text-xs text-gray-dark mt-1.5 ml-6">{releases[0].dateLabel}</p>
+          </a>
+          <a href="/gdbasket-changelog.html" class="inline-block text-primary hover:underline text-sm mt-3">+ {releases.length - 1} releases ทั้งหมด →</a>
+        </section>
 
+        <!-- Quick links -->
+        <section>
+          <h2>Quick links</h2>
+          <nav class="sidebar-links">
+            <a href="#readme">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13"/></svg>
+              README
+            </a>
+            <a href="#modes">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              Engine Profile
+            </a>
+            <a href="#install">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              วิธีติดตั้ง
+            </a>
+            <a href="#changelog">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Releases
+            </a>
+          </nav>
+        </section>
+
+        <!-- Topics -->
+        <section>
+          <h2>Topics</h2>
+          <div class="topic-list"><span>mt5</span><span>gold</span><span>grid-ea</span><span>risk-control</span><span>xm</span></div>
+        </section>
+
+        <!-- Contributor + bug report -->
+        <section>
+          <h2>ผู้พัฒนา</h2>
+          <div class="flex items-center gap-2 mb-4">
+            <img src={`${MAIN}/profile.jpg`} class="w-8 h-8 rounded-full bg-dark-border" alt="" />
+            <div><div class="text-sm text-gray-light">IntensiveTrader</div><div class="text-xs text-gray-dark">Kittitat Wasati</div></div>
+          </div>
+          <a href="https://www.facebook.com/IntensiveTraderArt" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 border border-dark-border text-gray-light hover:border-primary px-4 py-2 rounded-lg text-sm transition-colors">
+            <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            แจ้ง Bug / ติดต่อ
+          </a>
+        </section>
+      </aside>
+
+    </div>
   </div>
 </div>
 
@@ -585,7 +582,7 @@ const installSteps = [
           for (const b of sel) { const p = Number(b.pnl_usd) || 0; sum += p; if (p >= 0) win++; }
           const wr = sel.length ? Math.round((win / sel.length) * 100) : 0;
           const pnlEl = document.getElementById('tj-pnl');
-          if (pnlEl) { pnlEl.textContent = money(sum); pnlEl.className = 'text-[17px] font-bold ' + (sum >= 0 ? 'text-green' : 'text-primary'); }
+          if (pnlEl) { pnlEl.textContent = money(sum); pnlEl.style.color = sum >= 0 ? '' : '#ff665d'; }
           set('tj-wr', wr + '%');
           set('tj-ct', String(sel.length));
         };
@@ -650,6 +647,10 @@ const installSteps = [
         set('.mfb-monthly', acc.monthly, '', '%');
         set('.mfb-dd', acc.drawdown, '', '%');
         set('.mfb-balance', acc.balance, '$', '');
+        const gainEl = card.querySelector('.mfb-gain');
+        if (gainEl && acc.gain != null) gainEl.classList.add('positive');
+        const absGainEl = card.querySelector('.mfb-absgain');
+        if (absGainEl && acc.absGain != null) absGainEl.classList.add('positive');
         const label = card.querySelector('.mfb-label');
         if (label && acc.name) label.textContent = `${acc.name} · พอร์ต ${i + 1}`;
         // มีตัวเลขจริงแล้ว — เอา note "พอร์ตใหม่ รอผูก" ออก
