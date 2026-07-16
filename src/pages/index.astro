@@ -49,14 +49,17 @@ const pinnedItems = allItems
   .filter(i => i.pinned)
   .sort((a, b) => (a.pinOrder ?? 999) - (b.pinOrder ?? 999));
 const restItems = allItems.filter(i => !i.pinned);
+
+const learnCount = allItems.filter(i => i.cardType === 'learn' || i.cardType === 'learn-tool').length;
+const eaCount = allItems.filter(i => i.cardType === 'ea').length;
 ---
 
 <Layout title="Room — เรียน+เทรดฟรี | IntensiveTrader">
-  <section class="py-10">
-    <div class="max-w-[1100px] mx-auto px-5">
+  <div id="main-content" class="room-index">
 
-      <!-- HERO -->
-      <div class="flex items-start justify-between gap-5 flex-wrap max-md:flex-col max-md:items-center max-md:text-center">
+    <!-- INTRO -->
+    <section class="room-intro">
+      <div class="max-w-[1100px] mx-auto px-5 room-intro-grid">
         <div>
           <h1 class="text-[30px] max-md:text-[24px] font-bold text-gray-light leading-tight mb-2">
             เรียน<span class="text-primary">+</span>เทรด<br><span class="text-secondary">ฟรีทั้งหมด</span>
@@ -65,177 +68,204 @@ const restItems = allItems.filter(i => !i.pinned);
             คอร์สมือใหม่ + เครื่องมือเทรด (EA) สำหรับ MT5 — โหลดใช้ได้เลย ไม่มีค่าใช้จ่าย ไม่มีเงื่อนไข
           </p>
         </div>
-        <div class="flex gap-5 items-center mt-2 max-md:mt-4">
-          <div class="text-center">
-            <div class="text-[22px] font-bold text-secondary">{courses.length}</div>
-            <div class="text-[11px] text-gray-dark">คอร์ส</div>
-          </div>
-          <div class="text-center">
-            <div class="text-[22px] font-bold text-secondary">{eaItems.length}</div>
-            <div class="text-[11px] text-gray-dark">EA</div>
-          </div>
-          <div class="text-center">
-            <div class="text-[22px] font-bold text-secondary">{totalLessons}</div>
-            <div class="text-[11px] text-gray-dark">บทเรียน</div>
-          </div>
+        <div class="room-intro-rail">
+          <div class="room-index-signature pixel" aria-hidden="true"><span>ROOM</span><strong>/07</strong><small>OPEN CLASSROOM</small></div>
+          <dl class="room-stats" aria-label="จำนวนเนื้อหา">
+            <div><dt>คอร์ส</dt><dd>{courses.length}</dd></div>
+            <div><dt>EA</dt><dd>{eaItems.length}</dd></div>
+            <div><dt>บทเรียน</dt><dd>{totalLessons}</dd></div>
+          </dl>
         </div>
       </div>
+    </section>
 
-      <!-- FILTERS -->
-      <div class="flex gap-1.5 mt-6 flex-wrap max-md:justify-center" id="course-filter">
-        <button data-filter="all" class="filter-btn px-4 py-[7px] rounded-full text-[13px] font-medium transition-colors bg-primary text-white border border-primary cursor-pointer">ทั้งหมด</button>
-        <button data-filter="learn" class="filter-btn px-4 py-[7px] rounded-full text-[13px] font-medium transition-colors bg-transparent text-gray-dark border border-dark-border hover:border-primary hover:text-primary cursor-pointer">คอร์สเรียน</button>
-        <button data-filter="ea" class="filter-btn px-4 py-[7px] rounded-full text-[13px] font-medium transition-colors bg-transparent text-gray-dark border border-dark-border hover:border-primary hover:text-primary cursor-pointer">EA</button>
+    <!-- CATALOG -->
+    <section class="room-catalog max-w-[1100px] mx-auto px-5" aria-label="รายการเนื้อหาใน Room">
+      <div class="catalog-toolbar">
+        <div class="filter-pills" id="course-filter" role="group" aria-label="กรองรายการ">
+          <button data-filter="all" class="filter-btn active" aria-pressed="true">ทั้งหมด<span>{allItems.length}</span></button>
+          <button data-filter="learn" class="filter-btn" aria-pressed="false">คอร์สเรียน<span>{learnCount}</span></button>
+          <button data-filter="ea" class="filter-btn" aria-pressed="false">EA<span>{eaCount}</span></button>
+        </div>
       </div>
 
       <!-- PINNED -->
-      <div id="pinned-section" class={pinnedItems.length > 0 ? 'mt-7' : 'mt-7 hidden'}>
-          <div class="flex items-center gap-2 mb-3">
-            <svg class="w-4 h-4 text-secondary" fill="currentColor" viewBox="0 0 24 24"><path d="M16 3l5 5-1.5 1.5-1-.5-3.5 3.5.5 3.5-2 2-3.5-3.5L3 24l-1-1 6.5-8.5L5 11l2-2 3.5.5L14 6l-.5-1z"/></svg>
-            <span class="text-[11px] text-gray-dark uppercase tracking-[1.5px] font-semibold">ปักหมุด</span>
-          </div>
-          <div id="pinned-grid" class="grid grid-cols-2 max-md:grid-cols-1 gap-3.5">
-            {pinnedItems.map(item => (
-              <div data-course-type={item.cardType} data-item-key={item.kind === 'ea' ? `ea:${item.id}` : `course:${item.id}`}>
-                {item.kind === 'ea' ? (
-                  <a href={item.href} class="course-card group flex w-full text-left bg-dark-card rounded-[14px] border border-primary/40 hover:border-primary transition-all cursor-pointer overflow-hidden pixel-shadow">
-                    <div class="w-[150px] max-md:w-[110px] shrink-0 flex items-center justify-center bg-gradient-to-br from-stone-900 to-stone-800 relative">
-                      <img src="/gdbasket-mark.png" alt="gdBasket" class="w-16 h-16 object-contain" />
-                      <span class="absolute top-2.5 right-2.5 bg-green text-black text-[10px] font-bold px-2 py-0.5 rounded">FREE</span>
-                    </div>
-                    <div class="p-4 flex-1">
-                      <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-primary/15 text-primary">EA</span>
-                        {item.live && <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-green/10 text-green">LIVE</span>}
-                        <span class="text-[11px] text-gray-dark">{item.version}</span>
-                      </div>
-                      <div class="text-[16px] font-semibold group-hover:text-primary transition-colors mb-1">{item.title}</div>
-                      <div class="text-[13px] text-gray line-clamp-2 leading-snug">{item.description}</div>
-                    </div>
-                  </a>
-                ) : (
-                  <button data-course-id={item.id} class="course-card group flex w-full text-left bg-dark-card rounded-[14px] border border-primary/40 hover:border-primary transition-all cursor-pointer overflow-hidden pixel-shadow">
-                    <div class="w-[150px] max-md:w-[110px] shrink-0 flex items-center justify-center bg-gradient-to-br from-stone-900 to-stone-800 relative">
-                      <svg class="w-9 h-9 opacity-30 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                      <span class="absolute top-2.5 right-2.5 bg-green text-black text-[10px] font-bold px-2 py-0.5 rounded">FREE</span>
-                    </div>
-                    <div class="p-4 flex-1">
-                      <div class="flex items-center gap-2 mb-1.5">
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-primary/15 text-primary">คอร์สเรียน</span>
-                        <span class="text-[11px] text-gray-dark">{item.count} บท</span>
-                      </div>
-                      <div class="text-[16px] font-semibold group-hover:text-primary transition-colors mb-1">{item.title}</div>
-                      <div class="text-[13px] text-gray line-clamp-2 leading-snug">{item.description}</div>
-                    </div>
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
+      <div id="pinned-section" class={`catalog-group pinned-group${pinnedItems.length > 0 ? '' : ' hidden'}`}>
+        <div class="catalog-label">
+          <span>
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 3l5 5-1.5 1.5-1-.5-3.5 3.5.5 3.5-2 2-3.5-3.5L3 24l-1-1 6.5-8.5L5 11l2-2 3.5.5L14 6l-.5-1z"/></svg>
+            ปักหมุด
+          </span>
+          <small>ดูสถานะและ README ก่อนใช้</small>
         </div>
-
-      <!-- ALL (non-pinned) -->
-      <div id="rest-section" class={restItems.length > 0 ? 'mt-8' : 'mt-8 hidden'}>
-          <div class="text-[11px] text-gray-dark uppercase tracking-[1.5px] font-semibold mb-3">ทั้งหมด</div>
-          <div id="rest-grid" class="grid grid-cols-2 max-md:grid-cols-1 gap-3.5">
-            {restItems.map(item => (
-              <div data-course-type={item.cardType} data-item-key={item.kind === 'ea' ? `ea:${item.id}` : `course:${item.id}`}>
-                {item.kind === 'ea' ? (
-                  <a href={item.href} class="course-card group flex w-full text-left bg-dark-card rounded-[14px] border border-dark-border hover:border-primary transition-all cursor-pointer overflow-hidden">
-                    <div class="w-[150px] max-md:w-[110px] shrink-0 flex items-center justify-center bg-gradient-to-br from-stone-900 to-stone-800 relative">
-                      <img src="/gdbasket-mark.png" alt="gdBasket" class="w-16 h-16 object-contain" />
-                      <span class="absolute top-2.5 right-2.5 bg-green text-black text-[10px] font-bold px-2 py-0.5 rounded">FREE</span>
+        <div id="pinned-grid" class="resource-grid">
+          {pinnedItems.map(item => (
+            <div data-course-type={item.cardType} data-item-key={item.kind === 'ea' ? `ea:${item.id}` : `course:${item.id}`}>
+              {item.kind === 'ea' ? (
+                <a href={item.href} class="resource-card">
+                  <div class="resource-card-visual ea">
+                    <img src="/gdbasket-mark.png" alt="gdBasket" class="w-9 h-9 object-contain" />
+                    <span>FREE</span>
+                  </div>
+                  <div class="resource-card-body">
+                    <div class="resource-card-badges">
+                      <span class="resource-type ea">EA</span>
+                      {item.live && <span class="resource-live"><i></i> LIVE</span>}
+                      {item.version && <span class="resource-version">{item.version}</span>}
                     </div>
-                    <div class="p-4 flex-1">
-                      <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-primary/15 text-primary">EA</span>
-                        {item.live && <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-green/10 text-green">LIVE</span>}
-                        <span class="text-[11px] text-gray-dark">{item.version}</span>
-                      </div>
-                      <div class="text-[16px] font-semibold group-hover:text-primary transition-colors mb-1">{item.title}</div>
-                      <div class="text-[13px] text-gray line-clamp-2 leading-snug">{item.description}</div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <div class="resource-card-meta"><span></span><span>เปิด README</span></div>
+                  </div>
+                  <div class="resource-card-action" aria-hidden="true">
+                    <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7" /></svg>
+                  </div>
+                </a>
+              ) : (
+                <button type="button" data-course-id={item.id} class="resource-card" aria-expanded="false">
+                  <div class="resource-card-visual">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    <span>FREE</span>
+                  </div>
+                  <div class="resource-card-body">
+                    <div class="resource-card-badges">
+                      <span class="resource-type">คอร์สเรียน</span>
                     </div>
-                  </a>
-                ) : (
-                  <button data-course-id={item.id} class="course-card group flex w-full text-left bg-dark-card rounded-[14px] border border-dark-border hover:border-primary transition-all cursor-pointer overflow-hidden">
-                    <div class="w-[150px] max-md:w-[110px] shrink-0 flex items-center justify-center bg-gradient-to-br from-stone-900 to-stone-800 relative">
-                      <svg class="w-9 h-9 opacity-30 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                      <span class="absolute top-2.5 right-2.5 bg-green text-black text-[10px] font-bold px-2 py-0.5 rounded">FREE</span>
-                    </div>
-                    <div class="p-4 flex-1">
-                      <div class="flex items-center gap-2 mb-1.5">
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-primary/15 text-primary">คอร์สเรียน</span>
-                        <span class="text-[11px] text-gray-dark">{item.count} บท</span>
-                      </div>
-                      <div class="text-[16px] font-semibold group-hover:text-primary transition-colors mb-1">{item.title}</div>
-                      <div class="text-[13px] text-gray line-clamp-2 leading-snug">{item.description}</div>
-                    </div>
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <div class="resource-card-meta"><span>{item.count} บท</span><span>ดูบทเรียน</span></div>
+                  </div>
+                  <div class="resource-card-action" aria-hidden="true">
+                    <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9l6 6 6-6" /></svg>
+                  </div>
+                </button>
+              )}
+            </div>
+          ))}
         </div>
+      </div>
 
-      <!-- Inline course content (toggle on course-card click) -->
+      <!-- REST -->
+      <div id="rest-section" class={`catalog-group${restItems.length > 0 ? '' : ' hidden'}`}>
+        <div class="catalog-label">
+          <span>ทั้งหมด</span>
+        </div>
+        <div id="rest-grid" class="resource-grid">
+          {restItems.map(item => (
+            <div data-course-type={item.cardType} data-item-key={item.kind === 'ea' ? `ea:${item.id}` : `course:${item.id}`}>
+              {item.kind === 'ea' ? (
+                <a href={item.href} class="resource-card">
+                  <div class="resource-card-visual ea">
+                    <img src="/gdbasket-mark.png" alt="gdBasket" class="w-9 h-9 object-contain" />
+                    <span>FREE</span>
+                  </div>
+                  <div class="resource-card-body">
+                    <div class="resource-card-badges">
+                      <span class="resource-type ea">EA</span>
+                      {item.live && <span class="resource-live"><i></i> LIVE</span>}
+                      {item.version && <span class="resource-version">{item.version}</span>}
+                    </div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <div class="resource-card-meta"><span></span><span>เปิด README</span></div>
+                  </div>
+                  <div class="resource-card-action" aria-hidden="true">
+                    <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7" /></svg>
+                  </div>
+                </a>
+              ) : (
+                <button type="button" data-course-id={item.id} class="resource-card" aria-expanded="false">
+                  <div class="resource-card-visual">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    <span>FREE</span>
+                  </div>
+                  <div class="resource-card-body">
+                    <div class="resource-card-badges">
+                      <span class="resource-type">คอร์สเรียน</span>
+                    </div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <div class="resource-card-meta"><span>{item.count} บท</span><span>ดูบทเรียน</span></div>
+                  </div>
+                  <div class="resource-card-action" aria-hidden="true">
+                    <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9l6 6 6-6" /></svg>
+                  </div>
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Inline course content (toggle on resource-card click) -->
       {courses.map(course => {
         const courseLessons = renderedLessons.get(course.id) || [];
         const isMultiLesson = courseLessons.length > 1;
         return (
-          <div id={`content-${course.id}`} class="course-content hidden mt-6" data-course-content={course.id}>
-            <div class="bg-dark-card border border-dark-border rounded-[14px] p-6 max-md:p-4">
-              <div class="flex items-center justify-between mb-5">
-                <h2 class="text-[20px] max-md:text-[18px] font-bold text-gray-light">{course.data.title}</h2>
-                <button class="close-content text-gray-dark hover:text-gray-light transition-colors p-1 cursor-pointer" aria-label="ปิด">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+          <div id={`content-${course.id}`} class="course-preview hidden" data-course-content={course.id}>
+            <div class="course-preview-head">
+              <div>
+                <span>COURSE OUTLINE</span>
+                <h2>{course.data.title}</h2>
               </div>
-
-              {isMultiLesson && (
-                <div class="lesson-tabs flex gap-1.5 mb-6 flex-wrap" data-course-tabs={course.id}>
-                  {courseLessons.map((lesson, i) => (
-                    <button data-lesson-tab={`${course.id}/${lesson.id}`} class={`lesson-tab px-4 py-2 rounded-full text-[13px] font-medium transition-colors cursor-pointer ${i === 0 ? 'bg-primary text-white border border-primary' : 'bg-transparent text-gray-dark border border-dark-border hover:border-primary hover:text-primary'}`}>
-                      {i + 1}. {lesson.title}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {courseLessons.map((lesson, i) => (
-                <div data-lesson-content={`${course.id}/${lesson.id}`} class={`lesson-body ${i > 0 ? 'hidden' : ''}`}>
-                  {lesson.duration && <p class="text-[13px] text-gray-dark mb-4">{lesson.duration}</p>}
-                  <article class="prose prose-invert max-w-none
-                    prose-headings:font-bold prose-headings:text-gray-light
-                    prose-p:text-gray prose-p:leading-relaxed
-                    prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                    prose-strong:text-gray-light
-                    prose-code:text-primary-light prose-code:bg-dark prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
-                    prose-li:text-gray prose-ol:text-gray prose-ul:text-gray
-                    prose-table:text-gray prose-th:text-gray-light prose-td:border-dark-border prose-th:border-dark-border">
-                    <lesson.Content />
-                  </article>
-                </div>
-              ))}
-
-              <BrokerCTA placement="end-of-lesson" />
+              <button class="close-content" aria-label="ปิด">
+                <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
+
+            {isMultiLesson && (
+              <div class="lesson-tabs" data-course-tabs={course.id}>
+                {courseLessons.map((lesson, i) => (
+                  <button data-lesson-tab={`${course.id}/${lesson.id}`} class={`lesson-tab ${i === 0 ? 'active' : ''}`}>
+                    <span>{String(i + 1).padStart(2, '0')}</span>{lesson.title}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {courseLessons.map((lesson, i) => (
+              <div data-lesson-content={`${course.id}/${lesson.id}`} class={`lesson-preview-copy ${i > 0 ? 'hidden' : ''}`}>
+                {isMultiLesson && <div class="lesson-index">บทที่ {i + 1} / {courseLessons.length}</div>}
+                {lesson.duration && <p class="text-[13px] text-gray-dark mb-4">{lesson.duration}</p>}
+                <article class="prose prose-invert max-w-none
+                  prose-headings:font-bold prose-headings:text-gray-light
+                  prose-p:text-gray prose-p:leading-relaxed
+                  prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-gray-light
+                  prose-code:text-primary-light prose-code:bg-dark prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+                  prose-li:text-gray prose-ol:text-gray prose-ul:text-gray
+                  prose-table:text-gray prose-th:text-gray-light prose-td:border-dark-border prose-th:border-dark-border">
+                  <lesson.Content />
+                </article>
+              </div>
+            ))}
+
+            <BrokerCTA placement="end-of-lesson" />
           </div>
         );
       })}
 
-    </div>
-  </section>
+      <div id="catalog-empty" class="catalog-empty hidden">ยังไม่มีรายการในหมวดนี้</div>
+
+    </section>
+
+  </div>
 </Layout>
 
 <script>
   // Course card toggle (course cards only — EA cards are <a> links)
-  const courseCards = document.querySelectorAll<HTMLButtonElement>('button.course-card');
-  const courseContents = document.querySelectorAll<HTMLElement>('.course-content');
+  const courseCards = document.querySelectorAll<HTMLButtonElement>('button.resource-card');
+  const courseContents = document.querySelectorAll<HTMLElement>('.course-preview');
   let activeCourse: string | null = null;
 
-  function deactivateCard(courseId: string) {
-    document.querySelectorAll<HTMLButtonElement>(`button.course-card[data-course-id="${courseId}"]`).forEach(c => {
-      c.classList.remove('border-primary');
+  function setCardExpanded(courseId: string, expanded: boolean) {
+    document.querySelectorAll<HTMLButtonElement>(`button.resource-card[data-course-id="${courseId}"]`).forEach(card => {
+      card.classList.toggle('expanded', expanded);
+      card.setAttribute('aria-expanded', String(expanded));
+      const meta = card.querySelector('.resource-card-meta span:last-child');
+      if (meta) meta.textContent = expanded ? 'กำลังเปิด' : 'ดูบทเรียน';
+      const chevron = card.querySelector('.resource-card-action svg');
+      chevron?.classList.toggle('rotate', expanded);
     });
   }
 
@@ -244,15 +274,16 @@ const restItems = allItems.filter(i => !i.pinned);
       const courseId = card.getAttribute('data-course-id')!;
       if (activeCourse === courseId) {
         document.getElementById(`content-${courseId}`)?.classList.add('hidden');
-        deactivateCard(courseId);
+        setCardExpanded(courseId, false);
         activeCourse = null;
         return;
       }
       courseContents.forEach(c => c.classList.add('hidden'));
+      if (activeCourse) setCardExpanded(activeCourse, false);
       const content = document.getElementById(`content-${courseId}`);
       if (content) {
         content.classList.remove('hidden');
-        document.querySelectorAll<HTMLButtonElement>(`button.course-card[data-course-id="${courseId}"]`).forEach(c => c.classList.add('border-primary'));
+        setCardExpanded(courseId, true);
         activeCourse = courseId;
         setTimeout(() => content.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
       }
@@ -261,10 +292,11 @@ const restItems = allItems.filter(i => !i.pinned);
 
   document.querySelectorAll('.close-content').forEach(btn => {
     btn.addEventListener('click', () => {
-      const content = btn.closest('.course-content') as HTMLElement;
+      const content = btn.closest('.course-preview') as HTMLElement;
       if (content) {
         content.classList.add('hidden');
-        deactivateCard(content.getAttribute('data-course-content')!);
+        const courseId = content.getAttribute('data-course-content')!;
+        setCardExpanded(courseId, false);
         activeCourse = null;
       }
     });
@@ -275,12 +307,8 @@ const restItems = allItems.filter(i => !i.pinned);
     tab.addEventListener('click', () => {
       const lessonKey = tab.getAttribute('data-lesson-tab')!;
       const courseId = lessonKey.split('/')[0];
-      document.querySelectorAll<HTMLButtonElement>(`[data-lesson-tab^="${courseId}/"]`).forEach(t => {
-        t.classList.remove('bg-primary', 'text-white', 'border-primary');
-        t.classList.add('bg-transparent', 'text-gray-dark', 'border-dark-border');
-      });
-      tab.classList.remove('bg-transparent', 'text-gray-dark', 'border-dark-border');
-      tab.classList.add('bg-primary', 'text-white', 'border-primary');
+      document.querySelectorAll<HTMLButtonElement>(`[data-lesson-tab^="${courseId}/"]`).forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
       document.querySelectorAll<HTMLElement>(`[data-lesson-content^="${courseId}/"]`).forEach(body => body.classList.add('hidden'));
       document.querySelector<HTMLElement>(`[data-lesson-content="${lessonKey}"]`)?.classList.remove('hidden');
     });
@@ -289,25 +317,25 @@ const restItems = allItems.filter(i => !i.pinned);
   // Filter
   const filterBtns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
   const filterCards = document.querySelectorAll<HTMLElement>('[data-course-type]');
+  const catalogEmpty = document.getElementById('catalog-empty');
 
   function applyFilter(filter: string) {
     filterBtns.forEach(b => {
       const on = b.getAttribute('data-filter') === filter;
-      b.classList.toggle('bg-primary', on);
-      b.classList.toggle('text-white', on);
-      b.classList.toggle('border-primary', on);
-      b.classList.toggle('bg-transparent', !on);
-      b.classList.toggle('text-gray-dark', !on);
-      b.classList.toggle('border-dark-border', !on);
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
     });
+    let visibleCount = 0;
     filterCards.forEach(card => {
       const type = card.getAttribute('data-course-type');
       const match = filter === 'all' || type === filter || (filter === 'learn' && type === 'learn-tool');
       (card as HTMLElement).style.display = match ? '' : 'none';
+      if (match) visibleCount++;
     });
+    catalogEmpty?.classList.toggle('hidden', visibleCount > 0);
     // hide inline content while filtering
     courseContents.forEach(c => c.classList.add('hidden'));
-    courseCards.forEach(c => c.classList.remove('border-primary'));
+    if (activeCourse) setCardExpanded(activeCourse, false);
     activeCourse = null;
   }
 
@@ -319,14 +347,6 @@ const restItems = allItems.filter(i => !i.pinned);
 
   // ── ปักหมุดจาก admin: ดึง content_pins (site_settings) มาจัดโซนใหม่ ──
   // fetch fail / ไม่มี pins = คง frontmatter เดิม (SSR default)
-  function setPinnedStyle(wrapper: HTMLElement, on: boolean) {
-    const card = wrapper.querySelector('.course-card');
-    if (!card) return;
-    card.classList.toggle('border-primary/40', on);
-    card.classList.toggle('pixel-shadow', on);
-    card.classList.toggle('border-dark-border', !on);
-  }
-
   function applyPins(pins: { key: string; order?: number }[]) {
     const pinnedGrid = document.getElementById('pinned-grid');
     const restGrid = document.getElementById('rest-grid');
@@ -341,8 +361,8 @@ const restItems = allItems.filter(i => !i.pinned);
       .sort((a, b) => orderMap.get(a.dataset.itemKey!)! - orderMap.get(b.dataset.itemKey!)!);
     const rest = wrappers.filter(w => !orderMap.has(w.dataset.itemKey!));
 
-    pinned.forEach(w => { setPinnedStyle(w, true); pinnedGrid.appendChild(w); });
-    rest.forEach(w => { setPinnedStyle(w, false); restGrid.appendChild(w); });
+    pinned.forEach(w => pinnedGrid.appendChild(w));
+    rest.forEach(w => restGrid.appendChild(w));
     pinnedSection.classList.toggle('hidden', pinned.length === 0);
     restSection.classList.toggle('hidden', rest.length === 0);
   }
