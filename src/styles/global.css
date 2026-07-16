@@ -31,3 +31,108 @@
   .pixel-shadow { box-shadow: 4px 4px 0 var(--color-primary); }
   .glass-dark { @apply bg-dark-card/90 backdrop-blur-md border-b border-dark-border; }
 }
+
+/* Room index — compact catalog, filter-first navigation, horizontal resource cards.
+   Ported from approved mockup (client/src/index.css ~L497-607); tokens mapped to
+   production vars (--color-primary/-light, --color-dark/-card/-border, --color-gray/-dark, --color-green). */
+.room-index { min-height: 70vh; background: var(--color-dark); }
+.room-intro { position: relative; overflow: hidden; padding: 64px 0 42px; background: var(--color-dark-card); border-bottom: 1px solid var(--color-dark-border); }
+.room-intro::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .28; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 42px 42px; mask-image: linear-gradient(90deg, #000, transparent 78%); }
+.room-intro-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 64px; }
+.room-intro-rail { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.room-index-signature { align-self: stretch; display: grid; grid-template-columns: auto auto 1fr; align-items: baseline; gap: 5px; color: var(--color-gray-dark); }
+.room-index-signature::after { content: ""; height: 1px; margin-left: 7px; background: linear-gradient(90deg, var(--color-primary), transparent); }
+.room-index-signature span { color: var(--color-gray-light); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+.room-index-signature strong { color: var(--color-primary-light); font-size: 22px; line-height: 1; }
+.room-index-signature small { grid-column: 1 / -1; margin-top: -4px; color: var(--color-gray-dark); font-size: 7px; letter-spacing: .2em; }
+.room-stats { margin: 0; display: grid; grid-template-columns: repeat(3, 92px); border-top: 1px solid var(--color-dark-border); border-left: 1px solid var(--color-dark-border); }
+.room-stats div { min-height: 84px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: 4px; border-right: 1px solid var(--color-dark-border); border-bottom: 1px solid var(--color-dark-border); }
+.room-stats dt { color: var(--color-gray-dark); font-size: 11px; }
+.room-stats dd { margin: 0; color: var(--color-gray-light); font-size: 26px; font-weight: 700; }
+.room-catalog { padding-top: 30px; padding-bottom: 108px; }
+.catalog-toolbar { min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--color-dark-border); }
+.filter-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+.filter-pills button { min-height: 36px; display: inline-flex; align-items: center; gap: 9px; padding: 0 15px; color: var(--color-gray); background: transparent; border: 1px solid var(--color-dark-border); border-radius: 999px; font-size: 12px; font-weight: 650; cursor: pointer; transition: color 160ms ease-out, border-color 160ms ease-out, background 160ms ease-out, transform 160ms ease-out; }
+.filter-pills button:hover { color: var(--color-gray-light); border-color: var(--color-primary); }
+.filter-pills button:active { transform: scale(.97); }
+.filter-pills button.active { color: white; background: var(--color-primary); border-color: var(--color-primary); }
+.filter-pills button span { min-width: 17px; height: 17px; display: inline-grid; place-items: center; padding: 0 4px; color: inherit; background: rgba(255,255,255,.12); border-radius: 999px; font-size: 10px; }
+.catalog-group { margin-top: 35px; }
+.pinned-group { margin-top: 26px; }
+.catalog-label { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 20px; color: var(--color-gray-dark); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+.catalog-label > span { display: inline-flex; align-items: center; gap: 7px; color: var(--color-gray); font-weight: 650; }
+.catalog-label > span svg { color: var(--color-primary-light); }
+.catalog-label small { color: var(--color-gray-dark); font-size: 10px; letter-spacing: .05em; text-transform: none; }
+.resource-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.resource-card { position: relative; min-height: 158px; width: 100%; display: grid; grid-template-columns: 126px minmax(0, 1fr) 42px; align-items: stretch; padding: 0; overflow: hidden; color: var(--color-gray-light); text-align: left; background: var(--color-dark-card); border: 1px solid var(--color-dark-border); cursor: pointer; transition: transform 180ms ease-out, border-color 180ms ease-out; }
+.resource-card:hover { transform: translateY(-2px); border-color: rgba(220, 38, 38, .55); }
+.resource-card.expanded { border-color: var(--color-primary); box-shadow: 4px 4px 0 rgba(220, 38, 38, .13); }
+.resource-card-visual { position: relative; display: grid; place-items: center; overflow: hidden; color: var(--color-primary-light); background: var(--color-dark); border-right: 1px solid var(--color-dark-border); }
+.resource-card-visual::before { content: ""; position: absolute; inset: 0; opacity: .36; background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px); background-size: 18px 18px; }
+.resource-card-visual.ea { color: var(--color-green); }
+.resource-card-visual svg, .resource-card-visual img { position: relative; }
+.resource-card-visual > span { position: absolute; top: 10px; right: 9px; padding: 3px 6px; color: #0d1511; background: var(--color-green); font-size: 8px; font-weight: 800; letter-spacing: .08em; }
+.resource-card-body { min-width: 0; padding: 18px 17px 16px; }
+.resource-card-badges { min-height: 19px; display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.resource-type, .resource-live, .resource-version { font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+.resource-type { padding: 3px 7px; color: var(--color-primary-light); background: rgba(220, 38, 38, .1); }
+.resource-type.ea { color: var(--color-green); background: rgba(34, 197, 94, .09); }
+.resource-live { display: inline-flex; align-items: center; gap: 5px; color: var(--color-green); }
+.resource-live i { width: 5px; height: 5px; border-radius: 50%; background: var(--color-green); box-shadow: 0 0 0 3px rgba(34, 197, 94, .09); }
+.resource-version { color: var(--color-gray-dark); }
+.resource-card h3 { margin: 9px 0 5px; overflow: hidden; text-overflow: ellipsis; color: var(--color-gray-light); font-size: 18px; font-weight: 600; white-space: nowrap; }
+.resource-card-body > p { margin: 0; min-height: 40px; display: -webkit-box; overflow: hidden; color: var(--color-gray); font-size: 12.5px; line-height: 1.6; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.resource-card-meta { margin-top: 12px; display: flex; justify-content: space-between; gap: 12px; color: var(--color-gray-dark); font-size: 10px; }
+.resource-card-meta span:last-child { color: var(--color-gray); }
+.resource-card-action { display: grid; place-items: center; color: var(--color-gray-dark); border-left: 1px solid var(--color-dark-border); }
+.resource-card:hover .resource-card-action { color: var(--color-primary-light); }
+.resource-card-action svg { transition: transform 180ms ease-out; }
+.resource-card-action svg.rotate { transform: rotate(180deg); }
+.course-preview { margin-top: 18px; padding: 25px; background: var(--color-dark-card); border: 1px solid rgba(255,255,255,.14); box-shadow: 8px 8px 0 rgba(0,0,0,.18); }
+.course-preview-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--color-dark-border); }
+.course-preview-head span { color: var(--color-primary-light); font-size: 10px; letter-spacing: .16em; }
+.course-preview-head h2 { margin: 5px 0 0; font-size: 21px; font-weight: 700; color: var(--color-gray-light); }
+.course-preview-head button { width: 38px; height: 38px; display: grid; place-items: center; color: var(--color-gray); background: transparent; border: 1px solid var(--color-dark-border); cursor: pointer; }
+.course-preview-head button:hover { color: var(--color-gray-light); border-color: var(--color-primary); }
+.lesson-tabs { display: flex; flex-wrap: wrap; gap: 7px; padding: 18px 0; border-bottom: 1px solid var(--color-dark-border); }
+.lesson-tabs button { min-height: 37px; display: inline-flex; align-items: center; gap: 8px; padding: 0 13px; color: var(--color-gray); background: transparent; border: 1px solid var(--color-dark-border); border-radius: 999px; font-size: 12px; cursor: pointer; }
+.lesson-tabs button span { color: var(--color-gray-dark); font-size: 9px; }
+.lesson-tabs button.active { color: var(--color-gray-light); background: rgba(220, 38, 38, .08); border-color: var(--color-primary); }
+.lesson-tabs button.active span { color: var(--color-primary-light); }
+.lesson-preview-copy { max-width: 720px; padding-top: 21px; }
+.lesson-index { color: var(--color-gray-dark); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+.lesson-preview-copy h3 { margin: 7px 0 7px; font-size: 19px; }
+.catalog-empty { margin-top: 30px; padding: 60px 20px; color: var(--color-gray-dark); text-align: center; border: 1px dashed var(--color-dark-border); }
+
+@media (max-width: 820px) {
+  .room-intro { padding: 46px 0 34px; }
+  .room-intro-grid { grid-template-columns: 1fr; gap: 27px; align-items: start; }
+  .room-intro-rail { width: min(100%, 390px); align-items: stretch; }
+  .room-stats { grid-template-columns: repeat(3, minmax(78px, 1fr)); width: 100%; }
+  .room-stats div { min-height: 69px; }
+  .room-stats dd { font-size: 22px; }
+  .room-catalog { padding-top: 22px; padding-bottom: 76px; }
+  .resource-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .catalog-toolbar { align-items: flex-start; }
+  .filter-pills { width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; }
+  .filter-pills::-webkit-scrollbar { display: none; }
+  .filter-pills button { flex: 0 0 auto; }
+  .catalog-label small { display: none; }
+  .resource-card { min-height: 124px; grid-template-columns: 78px minmax(0, 1fr) 35px; }
+  .resource-card-visual > span { top: 7px; right: 6px; padding: 2px 4px; font-size: 6px; }
+  .resource-card-visual svg { width: 27px; height: 27px; }
+  .resource-card-visual img { width: 27px; height: 27px; }
+  .resource-card-body { padding: 14px 12px 12px; }
+  .resource-card h3 { margin-top: 7px; font-size: 15px; }
+  .resource-card-body > p { min-height: 34px; font-size: 11px; line-height: 1.5; }
+  .resource-card-meta { margin-top: 8px; font-size: 9px; }
+  .resource-card-meta span:last-child { display: none; }
+  .course-preview { margin-inline: -4px; padding: 18px 15px; }
+  .course-preview-head h2 { font-size: 18px; }
+  .lesson-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .lesson-tabs::-webkit-scrollbar { display: none; }
+  .lesson-tabs button { flex: 0 0 auto; }
+}
