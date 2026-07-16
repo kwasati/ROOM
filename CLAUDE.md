@@ -18,7 +18,7 @@ Unified hub (คอร์ส + EA) under IntensiveTrader brand — `room.intensi
 - **Layouts:** `src/layouts/Layout.astro` — Navbar + slot
 - **Content config:** `src/content.config.ts` — courses (+ pinned/pinOrder) + lessons
 - **Styling:** `src/styles/global.css` — Tailwind dark theme + Inter/Noto Sans Thai + **port จากเว็บหลัก:** Press Start 2P (`.pixel`) + `.pixel-shadow` + `.glass-dark`
-- **Deploy:** static build -> Vercel (own repo `kwasati/ROOM` -> room subdomain auto-deploy). submodule ของ WORKSPACE ที่ `projects/_archive/ROOM`. **Vercel env `MYFXBOOK_EMAIL/PASSWORD` set แล้ว (myfxbook card)**
+- **Deploy:** static build -> Vercel (own repo `kwasati/ROOM` -> room subdomain auto-deploy). submodule ของ WORKSPACE ที่ `projects/7-ROOM`. **Vercel env `MYFXBOOK_EMAIL/PASSWORD` set แล้ว (myfxbook card)**
 - **SEO:** `public/robots.txt` (allow all + AI bots) + `@astrojs/sitemap` (`site: room.intensivetrader.com`). favicon = `/favicon.png` (วงกลมโปร่งใส) — ดู memory `reference_room_gdbasket_web`
 - **Build:** `npm run build` (astro build)
 
