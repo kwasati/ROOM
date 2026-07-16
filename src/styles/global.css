@@ -40,7 +40,7 @@
 .room-intro::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .28; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 42px 42px; mask-image: linear-gradient(90deg, #000, transparent 78%); }
 .room-intro-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 64px; }
 .room-intro-rail { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
-.room-index-signature { align-self: stretch; display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 5px; color: var(--color-gray-dark); }
+.room-index-signature { align-self: stretch; display: grid; grid-template-columns: auto auto 1fr; align-items: baseline; gap: 5px; color: var(--color-gray-dark); }
 .room-index-signature::after { content: ""; height: 1px; margin-left: 7px; background: linear-gradient(90deg, var(--color-primary), transparent); }
 .room-index-signature span { color: var(--color-gray-light); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
 .room-index-signature strong { color: var(--color-primary-light); font-size: 22px; line-height: 1; }
