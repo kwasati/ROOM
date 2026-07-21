@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
+const JOURNAL = 'https://journal.intensivetrader.com/';
 const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v2.02 (publish/releases/v2.02/gdBasket_v2.02.ex5)
 const DL_V201 = `${MAIN}/d/gdbasket-v201`;
 const DL_V200 = `${MAIN}/d/gdbasket-v200`;
@@ -84,7 +85,7 @@ const fileRows = [
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Common-TP / PPTS / Broker-side Stop', meta: '6', href: '#features', color: 'text-primary' },
   { icon: 'clock', name: 'Releases', note: 'v2.02 · v2.01 · v2.00 · v1.37', meta: '5 rel', href: '/gdbasket-changelog.html', color: 'text-gray' },
   { icon: 'dl', name: 'gdBasket v2.02', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
-  { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: `${MAIN}/journal`, color: 'text-primary', accent: true },
+  { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
@@ -169,7 +170,7 @@ const engines = [
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         Releases <span>5</span>
       </a>
-      <a href={`${MAIN}/journal`}>Trading Journal</a>
+      <a href={JOURNAL}>Trading Journal</a>
     </nav>
 
     <div class="repo-columns">
@@ -456,7 +457,7 @@ const engines = [
             <div><span>กำไรสะสม</span><strong id="tj-pnl">—</strong></div>
             <div><span>Win rate</span><strong id="tj-wr">—</strong></div>
             <div><span>จำนวนรอบ</span><strong id="tj-ct">—</strong></div>
-            <a href={`${MAIN}/journal`}>ดูประวัติเทรดทั้งหมด →</a>
+            <a href={JOURNAL}>ดูประวัติเทรดทั้งหมด →</a>
           </div>
         </section>
 

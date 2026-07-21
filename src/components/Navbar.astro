@@ -2,10 +2,11 @@
 // Room stays static. The main site owns login/logout and exposes only a safe
 // session view to this exact origin.
 const MAIN = 'https://www.intensivetrader.com';
+const JOURNAL = 'https://journal.intensivetrader.com/';
 const navLinks = [
   { href: MAIN, label: 'หน้าแรก' },
   { href: '/', label: 'Room', active: true },
-  { href: `${MAIN}/journal`, label: 'Trading Journal' },
+  { href: JOURNAL, label: 'Trading Journal' },
 ];
 ---
 
