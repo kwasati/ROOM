@@ -1,7 +1,7 @@
 ---
-// Navbar โคลนเว็บหลัก intensivetrader.com — room เป็น static (ไม่มี supabase auth)
-// cross-subdomain = absolute URL ให้เนียนเป็นเว็บเดียว
-const MAIN = 'https://intensivetrader.com';
+// Room stays static. The main site owns login/logout and exposes only a safe
+// session view to this exact origin.
+const MAIN = 'https://www.intensivetrader.com';
 const navLinks = [
   { href: MAIN, label: 'หน้าแรก' },
   { href: '/', label: 'Room', active: true },
@@ -30,12 +30,9 @@ const navLinks = [
             {link.label}
           </a>
         ))}
-        <a
-          href={`${MAIN}/member`}
-          class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-medium transition-colors"
-        >
-          เข้าสู่ระบบ
-        </a>
+        <div id="room-auth-desktop" class="min-w-24 text-right text-sm text-gray" aria-live="polite" aria-busy="true">
+          กำลังตรวจบัญชี...
+        </div>
       </div>
 
       <!-- Mobile menu button -->
@@ -65,20 +62,135 @@ const navLinks = [
           {link.label}
         </a>
       ))}
-      <a
-        href={`${MAIN}/member`}
-        class="block px-3 py-2 bg-primary text-white text-center rounded-lg font-medium"
-      >
-        เข้าสู่ระบบ
-      </a>
+      <div id="room-auth-mobile" class="px-3 py-2 text-center text-sm text-gray" aria-live="polite" aria-busy="true">
+        กำลังตรวจบัญชี...
+      </div>
     </div>
   </div>
 </nav>
 
 <script>
+  const MAIN = 'https://www.intensivetrader.com';
+  const SESSION_URL = `${MAIN}/api/auth/session`;
   const menuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
+  const desktopAuth = document.getElementById('room-auth-desktop');
+  const mobileAuth = document.getElementById('room-auth-mobile');
+
+  interface SafeSession {
+    authenticated: boolean;
+    email: string | null;
+    displayName: string | null;
+    role: string | null;
+    avatarUrl: string | null;
+    banned: boolean;
+  }
+
   menuBtn?.addEventListener('click', () => {
     mobileMenu?.classList.toggle('hidden');
+  });
+
+  function ownerUrl(path: string): string {
+    const url = new URL(path, MAIN);
+    url.searchParams.set('redirect', window.location.href);
+    return url.toString();
+  }
+
+  function createLoginLink(mobile: boolean): HTMLAnchorElement {
+    const link = document.createElement('a');
+    link.href = ownerUrl('/member');
+    link.textContent = 'เข้าสู่ระบบ';
+    link.className = mobile
+      ? 'block bg-primary px-3 py-2 text-center font-medium text-white rounded-lg'
+      : 'inline-flex bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-medium transition-colors';
+    return link;
+  }
+
+  function createLogoutLink(): HTMLAnchorElement {
+    const link = document.createElement('a');
+    link.href = ownerUrl('/member/logout');
+    link.textContent = 'ออกจากระบบ';
+    link.className = 'text-xs text-gray hover:text-primary transition-colors';
+    link.addEventListener('click', renderGuest);
+    return link;
+  }
+
+  function avatarUrl(session: SafeSession): string {
+    if (session.avatarUrl) return session.avatarUrl;
+    const name = session.displayName || session.email || 'U';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=DC2626&color=fff&size=32`;
+  }
+
+  function createAccount(session: SafeSession, mobile: boolean): HTMLElement {
+    const wrapper = document.createElement('div');
+    wrapper.className = mobile
+      ? 'flex items-center justify-between gap-3'
+      : 'flex items-center gap-3';
+
+    const dashboard = document.createElement('a');
+    dashboard.href = `${MAIN}/member/dashboard`;
+    dashboard.className = 'flex min-w-0 items-center gap-2 text-gray-light hover:text-primary transition-colors';
+
+    const avatar = document.createElement('img');
+    avatar.src = avatarUrl(session);
+    avatar.alt = session.displayName || session.email || 'บัญชีผู้ใช้';
+    avatar.className = 'h-8 w-8 shrink-0 rounded-full border border-dark-border object-cover';
+
+    const name = document.createElement('span');
+    name.className = 'max-w-32 truncate font-medium';
+    name.textContent = session.displayName || session.email || 'สมาชิก';
+    dashboard.append(avatar, name);
+    wrapper.append(dashboard, createLogoutLink());
+    return wrapper;
+  }
+
+  function renderGuest() {
+    desktopAuth?.replaceChildren(createLoginLink(false));
+    mobileAuth?.replaceChildren(createLoginLink(true));
+  }
+
+  function renderBanned() {
+    const build = () => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex items-center justify-center gap-2 text-primary';
+      const label = document.createElement('span');
+      label.textContent = 'บัญชีถูกระงับ';
+      wrapper.append(label, createLogoutLink());
+      return wrapper;
+    };
+    desktopAuth?.replaceChildren(build());
+    mobileAuth?.replaceChildren(build());
+  }
+
+  async function loadSession() {
+    desktopAuth?.setAttribute('aria-busy', 'true');
+    mobileAuth?.setAttribute('aria-busy', 'true');
+    try {
+      const response = await fetch(SESSION_URL, {
+        credentials: 'include',
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error('session unavailable');
+      const session = (await response.json()) as SafeSession;
+
+      if (session.banned) {
+        renderBanned();
+      } else if (session.authenticated) {
+        desktopAuth?.replaceChildren(createAccount(session, false));
+        mobileAuth?.replaceChildren(createAccount(session, true));
+      } else {
+        renderGuest();
+      }
+    } catch {
+      renderGuest();
+    } finally {
+      desktopAuth?.setAttribute('aria-busy', 'false');
+      mobileAuth?.setAttribute('aria-busy', 'false');
+    }
+  }
+
+  void loadSession();
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) void loadSession();
   });
 </script>
