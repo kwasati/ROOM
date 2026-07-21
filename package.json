@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "test:links": "node --test tests/link-cutover.test.mjs",
+    "test:links:built": "node --test tests/link-cutover-built.test.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
