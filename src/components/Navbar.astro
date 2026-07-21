@@ -70,6 +70,8 @@ const navLinks = [
 </nav>
 
 <script>
+  import { createLatestRequestRunner, installRefreshLifecycle } from '../lib/sessionRefresh';
+
   const MAIN = 'https://www.intensivetrader.com';
   const SESSION_URL = `${MAIN}/api/auth/session`;
   const menuBtn = document.getElementById('mobile-menu-btn');
@@ -162,35 +164,72 @@ const navLinks = [
     mobileAuth?.replaceChildren(build());
   }
 
-  async function loadSession() {
-    desktopAuth?.setAttribute('aria-busy', 'true');
-    mobileAuth?.setAttribute('aria-busy', 'true');
-    try {
-      const response = await fetch(SESSION_URL, {
-        credentials: 'include',
-        headers: { Accept: 'application/json' }
-      });
-      if (!response.ok) throw new Error('session unavailable');
-      const session = (await response.json()) as SafeSession;
-
-      if (session.banned) {
-        renderBanned();
-      } else if (session.authenticated) {
-        desktopAuth?.replaceChildren(createAccount(session, false));
-        mobileAuth?.replaceChildren(createAccount(session, true));
-      } else {
-        renderGuest();
-      }
-    } catch {
-      renderGuest();
-    } finally {
-      desktopAuth?.setAttribute('aria-busy', 'false');
-      mobileAuth?.setAttribute('aria-busy', 'false');
+  async function fetchSession(signal: AbortSignal): Promise<SafeSession> {
+    const response = await fetch(SESSION_URL, {
+      credentials: 'include',
+      headers: { Accept: 'application/json' },
+      signal
+    });
+    if (!response.ok) throw new Error('session unavailable');
+    const session = (await response.json()) as SafeSession;
+    if (typeof session.authenticated !== 'boolean' || typeof session.banned !== 'boolean') {
+      throw new Error('invalid session response');
     }
+    return session;
   }
 
-  void loadSession();
-  window.addEventListener('pageshow', (event) => {
-    if (event.persisted) void loadSession();
+  function applySession(session: SafeSession) {
+    if (session.banned) {
+      renderBanned();
+    } else if (session.authenticated) {
+      desktopAuth?.replaceChildren(createAccount(session, false));
+      mobileAuth?.replaceChildren(createAccount(session, true));
+    } else {
+      renderGuest();
+    }
+    desktopAuth?.setAttribute('aria-busy', 'false');
+    mobileAuth?.setAttribute('aria-busy', 'false');
+  }
+
+  function startSessionRefresh(): () => void {
+    const runner = createLatestRequestRunner<SafeSession>({
+      load: fetchSession,
+      apply: applySession,
+      onError: () => applySession({
+        authenticated: false,
+        email: null,
+        displayName: null,
+        role: null,
+        avatarUrl: null,
+        banned: false
+      })
+    });
+
+    const refresh = () => {
+      desktopAuth?.setAttribute('aria-busy', 'true');
+      mobileAuth?.setAttribute('aria-busy', 'true');
+      void runner.run();
+    };
+    const stopLifecycle = installRefreshLifecycle({
+      refresh,
+      windowTarget: window,
+      documentTarget: document,
+      isDocumentVisible: () => document.visibilityState === 'visible'
+    });
+
+    refresh();
+    return () => {
+      stopLifecycle();
+      runner.dispose();
+    };
+  }
+
+  let stopSessionRefresh = startSessionRefresh();
+  window.addEventListener('pagehide', () => {
+    stopSessionRefresh();
   });
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) stopSessionRefresh = startSessionRefresh();
+  });
+
 </script>
