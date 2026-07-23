@@ -222,7 +222,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
     </section>
 
     <!-- ZONE 3 — ย้อนหลัง (ข้อมูลจริง) -->
-    <section class="readme-card" id="historical">
+    <section class="readme-card historical-results" id="historical">
       <div class="readme-title">ผลจริงย้อนหลัง — VELOCE</div>
       <div class="readme-body">
         <div class="zone-heading">
@@ -424,8 +424,13 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
   .withdraw-slider { width: 100%; max-width: 320px; margin-top: 10px; accent-color: var(--color-primary); }
   .slider-value { margin-top: 4px; color: var(--color-gray-light); font-size: 12px; font-weight: 700; }
 
+  .historical-results .readme-body { display: flex; flex-direction: column; gap: 20px; }
+  .historical-results .readme-body > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+  .historical-results #annual-section { display: flex; flex-direction: column; gap: 10px; }
+  .historical-results #annual-section > * { margin: 0 !important; }
+
   .kpi-grid dl { margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--color-dark-border); border-left: 1px solid var(--color-dark-border); border-radius: 7px; overflow: hidden; }
-  .kpi-grid dl > div { min-width: 0; display: flex; flex-direction: column-reverse; justify-content: center; padding: 10px 8px; border-right: 1px solid var(--color-dark-border); border-bottom: 1px solid var(--color-dark-border); text-align: center; background: var(--color-dark-card); }
+  .kpi-grid dl > div { min-width: 0; display: flex; flex-direction: column-reverse; justify-content: center; padding: 14px 10px; border-right: 1px solid var(--color-dark-border); border-bottom: 1px solid var(--color-dark-border); text-align: center; background: var(--color-dark-card); }
   .kpi-grid dt { color: var(--color-gray-dark); font-size: 8.5px; line-height: 1.35; }
   .kpi-grid dd { margin: 0; color: var(--color-green); font-size: 14px; font-weight: 700; }
   .kpi-grid dd.danger { color: var(--color-primary-light); }
