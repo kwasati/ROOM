@@ -101,15 +101,38 @@ export function buildFanSamples(bootstrapFn, cycles, state, horizonMonths, today
   const fracs = [0, 0.25, 0.5, 0.75, 1];
   const monthsSeen = new Set();
   const samples = [];
+  // "Today" point (month 0) hasn't run any future cycles yet, so the four
+  // extra metrics start at their present-day values (zero cycles booked, but
+  // withdrawn/active carry whatever the historical replay already produced)
+  // — matches the projection table's "อีก X ได้อะไรบ้าง" definition.
+  const todayActive = state.backing * state.cap + state.surplus;
+  const todayWithdrawn = state.withdrawn;
+  // Today's clamp status (cap already at/over the ceiling from the historical
+  // replay, before any future cycle runs) — derived here since buildFanSamples
+  // only gets the raw ledger state, not rolling-sim.mjs's summarize() output.
+  const todayClamped = state.capCeiling !== undefined && state.cap >= state.capCeiling;
   for (const f of fracs) {
     const m = f === 0 ? 0 : Math.max(1, Math.round(horizonMonths * f));
     if (monthsSeen.has(m)) continue;
     monthsSeen.add(m);
     if (m === 0) {
-      samples.push({ months: 0, p10: todayWealth, p25: todayWealth, p50: todayWealth, p75: todayWealth, p90: todayWealth });
+      samples.push({
+        months: 0,
+        p10: todayWealth, p25: todayWealth, p50: todayWealth, p75: todayWealth, p90: todayWealth,
+        success: { p10: 0, p50: 0, p90: 0 },
+        steps: { p10: 0, p50: 0, p90: 0 },
+        withdrawn: { p10: todayWithdrawn, p50: todayWithdrawn, p90: todayWithdrawn },
+        active: { p10: todayActive, p50: todayActive, p90: todayActive },
+        clampedFraction: todayClamped ? 1 : 0,
+      });
     } else {
       const bs = bootstrapFn(cycles, state, m, paths, seed);
-      samples.push({ months: m, p10: bs.p10, p25: bs.p25, p50: bs.p50, p75: bs.p75, p90: bs.p90, bustedCount: bs.bustedCount, paths: bs.paths });
+      samples.push({
+        months: m, p10: bs.p10, p25: bs.p25, p50: bs.p50, p75: bs.p75, p90: bs.p90,
+        bustedCount: bs.bustedCount, paths: bs.paths,
+        success: bs.success, steps: bs.steps, withdrawn: bs.withdrawn, active: bs.active,
+        clampedFraction: bs.clampedFraction,
+      });
     }
   }
   return samples;

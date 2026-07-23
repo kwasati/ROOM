@@ -29,7 +29,7 @@ function wealthDrawdown(peak, trough) {
  * bootstrap() (continuation runs, can skip event/stat tracking for speed).
  */
 function advance(cycles, state, params, opts = {}) {
-  const { backing, step, withdrawRate } = params;
+  const { backing, step, withdrawRate, capCeiling } = params;
   const collectEvents = opts.collectEvents !== false;
   const trackStats = opts.trackStats !== false;
 
@@ -68,6 +68,10 @@ function advance(cycles, state, params, opts = {}) {
     const scaledPnl = cycle.r * state.cap;
     state.surplus += scaledPnl;
     state.processedCycles += 1;
+    // Counts every booked cycle with a positive return ("ปั้นได้กำไร") —
+    // independent of collectEvents/trackStats so bootstrap() (which runs
+    // both false for speed) can still report it per synthetic path.
+    if (cycle.r > 0) state.successCount += 1;
 
     const activeNow = backing * state.cap + state.surplus;
     if (activeNow <= 0) {
@@ -94,6 +98,11 @@ function advance(cycles, state, params, opts = {}) {
     // Upgrade loop: every iteration consumes exactly one old-cap tranche;
     // overshoot stays in surplus and may fund another step (multi-step cycle).
     while (state.surplus + EPSILON >= step * state.cap) {
+      // Unconditional step counter (mirrors state.events.length when events
+      // ARE collected, but also works when collectEvents:false — bootstrap()
+      // relies on this to report "ขึ้นชั้น·ถอน" per synthetic path without
+      // paying for full event objects).
+      state.stepCount += 1;
       const capBefore = state.cap;
       const surplusBefore = state.surplus;
       const tranche = step * capBefore;
@@ -102,6 +111,27 @@ function advance(cycles, state, params, opts = {}) {
       state.surplus -= tranche;
       if (Math.abs(state.surplus) < EPSILON) state.surplus = 0;
       state.withdrawn += withdrawal;
+
+      // Web-only broker lot ceiling (2026-07-23) — when a single grid leg
+      // would exceed the broker's max order size (50 lot/order == cap
+      // capCeiling), freeze cap at the ceiling instead of letting it keep
+      // compounding past what's actually tradeable. withdrawRate/step keep
+      // working normally on the frozen cap (tranches still fire, still
+      // withdraw) — only the position-sizing basis stops growing.
+      // capCeiling is undefined by default (python-parity tester path) so
+      // this never fires unless a caller explicitly opts in (web page only).
+      if (capCeiling !== undefined && state.cap > capCeiling) {
+        // Cap can't grow past the broker lot ceiling. Park the un-growable
+        // retained money back in surplus (backing * excess cap = its money
+        // value) so total wealth is conserved (dW = 0 at the clamp step), then
+        // stop stepping this cycle — otherwise a 0%-withdraw (ทบหมด) run would
+        // return the full tranche to surplus every iteration and spin the
+        // upgrade loop forever (surplus never drops below step*ceiling).
+        state.surplus += backing * (state.cap - capCeiling);
+        state.cap = capCeiling;
+        state.capClamped = true;
+        break;
+      }
 
       const activeAfter = backing * state.cap + state.surplus;
       const totalWealth = activeAfter + state.withdrawn;
@@ -149,6 +179,9 @@ function initState(sourceCap, backing) {
     events: [],
     paybackTime: null,
     processedCycles: 0,
+    successCount: 0,
+    stepCount: 0,
+    capClamped: false,
     peakWealth: initialActive,
     maxDd: 0,
     peakActive: initialActive,
@@ -190,6 +223,8 @@ function summarize(state, { backing, step, withdrawRate, sourceCap }) {
     bust: state.bust,
     bustTime: state.bustTime,
     processedCycles: state.processedCycles,
+    successCount: state.successCount,
+    capClamped: state.capClamped,
     events: state.events,
   };
 }
@@ -211,14 +246,16 @@ function groupByMonth(cycles) {
  * Cap is never derived from funds. Mirrors cap_withdrawal_sim.py replay().
  *
  * @param {Array<{t:*, r:number, m:number}>} cycles
- * @param {{backing?:number, step?:number, withdrawRate:number, sourceCap?:number}} params
+ * @param {{backing?:number, step?:number, withdrawRate:number, sourceCap?:number, capCeiling?:number}} params
+ *   capCeiling is undefined by default (python-parity — no clamp). Web page
+ *   opts in explicitly to freeze cap at the broker's max-order-size ceiling.
  */
-export function replay(cycles, { backing = 3, step = 3, withdrawRate, sourceCap = 10000 } = {}) {
+export function replay(cycles, { backing = 3, step = 3, withdrawRate, sourceCap = 10000, capCeiling } = {}) {
   if (!cycles || cycles.length === 0) throw new Error('cannot replay zero cycles');
   if (withdrawRate === undefined) throw new Error('withdrawRate is required');
 
   const state = initState(sourceCap, backing);
-  advance(cycles, state, { backing, step, withdrawRate }, { collectEvents: true, trackStats: true });
+  advance(cycles, state, { backing, step, withdrawRate, capCeiling }, { collectEvents: true, trackStats: true });
 
   return summarize(state, { backing, step, withdrawRate, sourceCap });
 }
@@ -232,14 +269,14 @@ export function replay(cycles, { backing = 3, step = 3, withdrawRate, sourceCap 
  * (those come from replay()) — only for drawing the historical chart.
  *
  * @param {Array<{t:*, r:number, m:number}>} cycles
- * @param {{backing?:number, step?:number, withdrawRate:number, sourceCap?:number}} params
+ * @param {{backing?:number, step?:number, withdrawRate:number, sourceCap?:number, capCeiling?:number}} params
  */
-export function monthlySeries(cycles, { backing = 3, step = 3, withdrawRate, sourceCap = 10000 } = {}) {
+export function monthlySeries(cycles, { backing = 3, step = 3, withdrawRate, sourceCap = 10000, capCeiling } = {}) {
   if (!cycles || cycles.length === 0) throw new Error('cannot replay zero cycles');
   if (withdrawRate === undefined) throw new Error('withdrawRate is required');
 
   const state = initState(sourceCap, backing);
-  const params = { backing, step, withdrawRate };
+  const params = { backing, step, withdrawRate, capCeiling };
   const blocks = Array.from(groupByMonth(cycles).entries());
 
   const months = [];
@@ -298,7 +335,7 @@ function percentile(sortedAsc, p) {
  * violent down-day across many synthetic months and understate risk.
  *
  * @param {Array<{t:*, r:number, m:number}>} cycles
- * @param {{cap:number, surplus:number, withdrawn:number, backing:number, step:number, withdrawRate:number, initialActive?:number}} state
+ * @param {{cap:number, surplus:number, withdrawn:number, backing:number, step:number, withdrawRate:number, initialActive?:number, capCeiling?:number}} state
  * @param {number} months
  * @param {number} paths
  * @param {number} seed
@@ -311,10 +348,15 @@ export function bootstrap(cycles, state, months, paths, seed) {
   const blocks = Array.from(groupByMonth(cycles).values());
   if (blocks.length === 0) throw new Error('bootstrap needs at least one monthly block');
 
-  const { backing, step, withdrawRate } = state;
+  const { backing, step, withdrawRate, capCeiling } = state;
   const rng = mulberry32(seed);
   const wealths = new Array(paths);
+  const successCounts = new Array(paths);
+  const stepCounts = new Array(paths);
+  const withdrawns = new Array(paths);
+  const actives = new Array(paths);
   let bustedCount = 0;
+  let clampedCount = 0;
 
   for (let p = 0; p < paths; p++) {
     const pathState = {
@@ -326,6 +368,9 @@ export function bootstrap(cycles, state, months, paths, seed) {
       events: [],
       paybackTime: null,
       processedCycles: 0,
+      successCount: 0,
+      stepCount: 0,
+      capClamped: false,
       peakWealth: 0,
       maxDd: 0,
       peakActive: 0,
@@ -338,26 +383,57 @@ export function bootstrap(cycles, state, months, paths, seed) {
       if (pathState.bust) break;
       const idx = Math.floor(rng() * blocks.length);
       const block = blocks[idx];
-      advance(block, pathState, { backing, step, withdrawRate }, { collectEvents: false, trackStats: false });
+      advance(block, pathState, { backing, step, withdrawRate, capCeiling }, { collectEvents: false, trackStats: false });
     }
 
     const finalActive = backing * pathState.cap + pathState.surplus;
     wealths[p] = finalActive + pathState.withdrawn;
+    successCounts[p] = pathState.successCount;
+    stepCounts[p] = pathState.stepCount;
+    withdrawns[p] = pathState.withdrawn;
+    actives[p] = finalActive;
     if (pathState.bust) bustedCount++;
+    if (pathState.capClamped) clampedCount++;
   }
 
   wealths.sort((a, b) => a - b);
+  successCounts.sort((a, b) => a - b);
+  stepCounts.sort((a, b) => a - b);
+  withdrawns.sort((a, b) => a - b);
+  actives.sort((a, b) => a - b);
+
+  const countPercentiles = (sorted) => ({
+    p10: Math.round(percentile(sorted, 10)),
+    p50: Math.round(percentile(sorted, 50)),
+    p90: Math.round(percentile(sorted, 90)),
+  });
+  const moneyPercentiles = (sorted) => ({
+    p10: percentile(sorted, 10),
+    p50: percentile(sorted, 50),
+    p90: percentile(sorted, 90),
+  });
 
   return {
     paths,
     months,
     bustedCount,
+    // Fraction of synthetic paths where cap froze at capCeiling at some point
+    // (always 0 when capCeiling is undefined — python-parity default).
+    clampedFraction: clampedCount / paths,
     p10: percentile(wealths, 10),
     p25: percentile(wealths, 25),
     p50: percentile(wealths, 50),
     p75: percentile(wealths, 75),
     p90: percentile(wealths, 90),
     wealths,
+    // Per-path "อีก X ได้อะไรบ้าง" breakdown — rolling-capital.astro projection
+    // table (2026-07-23 redesign). success/steps rounded to whole cycles;
+    // withdrawn/active stay as raw money (rounded for display only, by money()
+    // on the page). See CLAUDE.md metric definitions in the work-order plan.
+    success: countPercentiles(successCounts),
+    steps: countPercentiles(stepCounts),
+    withdrawn: moneyPercentiles(withdrawns),
+    active: moneyPercentiles(actives),
   };
 }
 

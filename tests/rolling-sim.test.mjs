@@ -204,6 +204,59 @@ test('active-funds DD: default 2x backing reference computes and is sane (>= tot
 // just paused every calendar month to snapshot (refactor sanity check).
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// capCeiling clamp (2026-07-23, web-only broker lot ceiling) — undefined by
+// default (python-parity, all tests above must stay green unmodified). When
+// set, cap freezes at the ceiling instead of compounding past the broker's
+// max order size. sourceCap=50000 (5x the usual 10000) scales the whole
+// linear ledger 5x, so the 0/100 control's usual finalCap (640,000) becomes
+// 3,200,000 — comfortably past the 1,250,000 ceiling, giving a real clamp
+// case without needing new cycle data.
+// ---------------------------------------------------------------------------
+
+test('capCeiling clamp: aggressive 5x-scale control clamps finalCap to ceiling (off by default)', async () => {
+  const { cycles } = await loadCycles();
+
+  const unclamped = replay(cycles, { backing: 3, step: 3, withdrawRate: 0.0, sourceCap: 50000 });
+  assert.equal(unclamped.bust, false);
+  assert.equal(unclamped.capClamped, false, 'capClamped must be false when capCeiling is not passed');
+  closeTo(unclamped.finalCap, 3200000, TOL, 'unclamped 5x control finalCap (5x the usual 640,000)');
+
+  const clamped = replay(cycles, { backing: 3, step: 3, withdrawRate: 0.0, sourceCap: 50000, capCeiling: 1250000 });
+  assert.equal(clamped.bust, false);
+  assert.equal(clamped.capClamped, true, 'capClamped must be true once cap crosses the ceiling');
+  assert.ok(clamped.finalCap <= 1250000 + 1e-6, `finalCap (${clamped.finalCap}) must not exceed capCeiling`);
+});
+
+// ---------------------------------------------------------------------------
+// Projection table metrics (2026-07-23 redesign) — bootstrap() must return
+// success/steps/withdrawn/active percentile breakdowns, all monotonic
+// p10 <= p50 <= p90, with steps.p50 > 0 at the owner-locked default (2x
+// backing / step 3x / withdraw 50% / 1-year horizon).
+// ---------------------------------------------------------------------------
+
+test('bootstrap projection metrics: success/steps/withdrawn/active are monotonic and sane at default 2x, 1y horizon', async () => {
+  const { cycles } = await loadCycles();
+  const state = {
+    cap: 10000,
+    surplus: 0,
+    withdrawn: 0,
+    backing: 2,
+    step: 3,
+    withdrawRate: 0.5,
+    initialActive: 2 * 10000,
+  };
+  const result = bootstrap(cycles, state, 12, 1000, 20260723);
+
+  for (const key of ['success', 'steps', 'withdrawn', 'active']) {
+    assert.ok(result[key], `bootstrap result missing ${key}`);
+    const { p10, p50, p90 } = result[key];
+    assert.ok(p10 <= p50, `${key}.p10 (${p10}) should be <= p50 (${p50})`);
+    assert.ok(p50 <= p90, `${key}.p50 (${p50}) should be <= p90 (${p90})`);
+  }
+  assert.ok(result.steps.p50 > 0, `steps.p50 expected > 0 at default 2x/1y, got ${result.steps.p50}`);
+});
+
 test('monthlySeries: final summary matches replay() exactly at default 2x', async () => {
   const { cycles } = await loadCycles();
   const params = { backing: 2, step: 3, withdrawRate: 0.5, sourceCap: 10000 };

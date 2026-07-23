@@ -13,9 +13,12 @@ const cycles = cyclesFromJson(cyclesJson);
 const BOOTSTRAP_PATHS = 1000;
 const BOOTSTRAP_SEED = 20260723;
 const DEFAULTS = { capital: 10000, buffer: 2, step: 3, withdrawPct: 50, horizon: 12 };
-// จุดที่ไม้เดี่ยวลึกสุดเริ่มชนเพดานขนาดคำสั่งสูงสุดของโบรกเกอร์ (ต่อออเดอร์) — เตือนเฉยๆ ไม่ clamp
-// เลข ไม่แก้สูตร/ไม่เปลี่ยนผลลัพธ์ที่โชว์ ดู NOTE .claude/artifacts/notes/gdbasket-rolling-maxlot-impact.md
+// จุดที่ไม้เดี่ยวลึกสุดชนเพดานขนาดคำสั่งสูงสุดของโบรกเกอร์ (ต่อออเดอร์, 50 lot)
+// [2026-07-23] เจ้าของเคาะ: เว็บนี้ clamp cap จริงที่เพดานนี้ (engine รับผ่าน capCeiling —
+// undefined ค่าเริ่มต้น = ไม่ clamp = python-parity เดิม ที่ tester ยังใช้). ดู NOTE
+// .claude/artifacts/notes/gdbasket-rolling-projection-redesign.md
 const MAXLOT_GUARD_CAP = 1250000;
+const ceiling = MAXLOT_GUARD_CAP; // เว็บ-only clamp — ไม่ส่งเข้า tester/python-parity
 
 const THAI_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 const HORIZON_LABELS = { 6: '6 เดือน', 12: '1 ปี', 24: '2 ปี', 36: '3 ปี' };
@@ -86,7 +89,7 @@ function computeView(capital, buffer, stepMult, withdrawPct, horizonMonths, star
   }
 
   const withdrawRate = withdrawPct / 100;
-  const params = { backing: buffer, step: stepMult, withdrawRate, sourceCap: capital };
+  const params = { backing: buffer, step: stepMult, withdrawRate, sourceCap: capital, capCeiling: ceiling };
   const summary = replay(rangeCycles, params);
   const { months } = monthlySeries(rangeCycles, params);
   const hist = historicalChartGeometry(months);
@@ -99,6 +102,7 @@ function computeView(capital, buffer, stepMult, withdrawPct, horizonMonths, star
     step: stepMult,
     withdrawRate,
     initialActive: buffer * capital,
+    capCeiling: ceiling,
   };
   const samples = buildFanSamples(bootstrap, rangeCycles, bsState, horizonMonths, summary.totalWealth, BOOTSTRAP_PATHS, BOOTSTRAP_SEED);
   const fan = fanChartGeometry(samples);
@@ -247,9 +251,9 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
         <p class="fine-print" style="margin-top:0;"><strong>มูลค่ารวมสุทธิ</strong> = เงินถอนออกมาใช้แล้ว + เงินที่ยังเหลืออยู่ในพอร์ต — สองก้อนนี้คือเงินของมึงทั้งหมด</p>
         <p class="fine-print" id="coverage-note">ณ ช่วงหนักสุด เงินในบัญชีเหลือ <strong id="coverage-note-value">{coverageLabel(summary.minActiveCapCoverage)}</strong> ของทุนต่อรอบ (ต่ำกว่า 1 เท่า = เริ่มกินทุน / ถึง 0 = ล้างพอร์ต — ตอนนี้ <span id="coverage-note-status">{coverageRiskLabel(summary.minActiveCapCoverage)}</span>)</p>
 
-        <div class="risk-note" id="maxlot-guard" style={summary.peakCap > MAXLOT_GUARD_CAP ? '' : 'display:none;'}>
+        <div class="risk-note" id="maxlot-guard" style={(summary.capClamped || (lastSample.clampedFraction ?? 0) > 0) ? '' : 'display:none;'}>
           <span aria-hidden="true">⚠</span>
-          <p><strong>ทุนโตมาถึงจุดที่ตัวเลขเริ่มมองโลกสวยกว่าจริง</strong> — ก้อนนี้ใหญ่จนไม้เดี่ยวเริ่มชนเพดานขนาดคำสั่งสูงสุดที่โบรกเกอร์อนุญาตต่อออเดอร์ (50 lot) ตัวเลขก่อนหน้าจุดนี้ยังแม่นเป๊ะ แต่หลังจากนี้ของจริงจะทำกำไรได้น้อยกว่าที่จำลองไว้ เพราะไม้ที่ควรใหญ่กว่านี้ถูกตัดเพดานไว้</p>
+          <p><strong>ทุนโตถึงเพดานขนาดคำสั่งสูงสุดของโบรกแล้ว</strong> (50 lot/ออเดอร์) — จากจุดนี้จำลองแบบไม่ทบก้อนโตต่อ (เทรดที่ขนาดสูงสุดค้างไว้) ตัวเลขจริงอาจต่างได้ ตัวนี้คิดแบบระวังไว้ก่อน</p>
         </div>
 
         <div class="chart-wrap">
@@ -355,17 +359,54 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
             <line x1="0" y1="0" x2="0" y2="200" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3"></line>
           </svg>
           <div class="chart-legend">
-            <span><i style="background:rgba(34,197,94,.3);"></i>แถบ p10-p90 (แย่สุด-ดีสุด)</span>
-            <span><i style="background:rgba(34,197,94,.6);"></i>แถบ p25-p75</span>
-            <span><i style="background:#22C55E;"></i>เส้นกลาง (p50)</span>
+            <span><i style="background:rgba(34,197,94,.3);"></i>ช่วงที่เป็นไปได้เกือบทั้งหมด</span>
+            <span><i style="background:rgba(34,197,94,.6);"></i>ช่วงที่เจอบ่อย</span>
+            <span><i style="background:#22C55E;"></i>เส้นกลาง (ปกติ)</span>
           </div>
         </div>
 
-        <div class="future-cards">
-          <div class="bad"><span>แย่ (p10)</span><strong id="future-p10">{money(lastSample.p10)}</strong></div>
-          <div class="mid"><span>กลาง (p50)</span><strong id="future-p50">{money(lastSample.p50)}</strong></div>
-          <div class="good"><span>ดี (p90)</span><strong id="future-p90">{money(lastSample.p90)}</strong></div>
+        <h3 class="section-sub">อีก <span id="future-horizon-heading">{HORIZON_LABELS[DEFAULTS.horizon]}</span> ได้อะไรบ้าง (จาก 1,000 เส้นทางจำลอง)</h3>
+        <p class="fine-print" style="margin-top:0;">ตัวเลขในตารางนี้ = ที่ได้<strong>เพิ่ม</strong>ในช่วงนี้ (พอร์ต+เงินรวม = ยอด ณ สิ้นสุด)</p>
+        <div class="proof-table-wrap">
+          <table class="proof-table future-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>ถ้าเจอช่วงแย่<br /><span class="th-hint">แย่กว่านี้ 1 ใน 10</span></th>
+                <th>ปกติ</th>
+                <th>ถ้าเจอช่วงดี<br /><span class="th-hint">ดีกว่านี้ 1 ใน 10</span></th>
+              </tr>
+            </thead>
+            <tbody id="future-tbody">
+              <tr>
+                <td>ปั้นได้กำไรเพิ่ม (รอบ)<br /><span class="th-hint">รอบย่อยในช่วงนี้</span></td>
+                <td id="future-success-p10">{lastSample.success.p10.toLocaleString()}</td>
+                <td id="future-success-p50">{lastSample.success.p50.toLocaleString()}</td>
+                <td id="future-success-p90">{lastSample.success.p90.toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td>ขึ้นชั้น·ถอนเพิ่ม (รอบ)</td>
+                <td id="future-steps-p10">{lastSample.steps.p10}</td>
+                <td id="future-steps-p50">{lastSample.steps.p50}</td>
+                <td id="future-steps-p90">{lastSample.steps.p90}</td>
+              </tr>
+              <tr>
+                <td>ถอนออกมาใช้เพิ่ม</td>
+                <td class="positive" id="future-withdrawn-p10">{money(lastSample.withdrawn.p10 - summary.withdrawnCash)}</td>
+                <td class="positive" id="future-withdrawn-p50">{money(lastSample.withdrawn.p50 - summary.withdrawnCash)}</td>
+                <td class="positive" id="future-withdrawn-p90">{money(lastSample.withdrawn.p90 - summary.withdrawnCash)}</td>
+              </tr>
+              <tr>
+                <td>เงินในพอร์ต (สิ้นสุด)</td>
+                <td class="positive" id="future-active-p10">{money(lastSample.active.p10)}</td>
+                <td class="positive" id="future-active-p50">{money(lastSample.active.p50)}</td>
+                <td class="positive" id="future-active-p90">{money(lastSample.active.p90)}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+        <p class="fine-print" style="margin-top:8px;">เงินรวมสุทธิจะเป็นราวๆ <strong id="future-wealth-range">{money(lastSample.p10)} – {money(lastSample.p90)}</strong></p>
+        <p class="fine-print">EA ปั้นกำไรทีละรอบย่อย พอสะสมครบเกณฑ์ถึงขึ้นชั้น+ถอน 1 รอบ</p>
         <div class="busted-line" id="busted-line">
           <strong id="busted-count">{lastSample.bustedCount}</strong> จาก <strong>{BOOTSTRAP_PATHS.toLocaleString()}</strong> เส้นทางจำลอง ที่บัญชีแตกภายใน <span id="busted-horizon-label">{HORIZON_LABELS[DEFAULTS.horizon]}</span>ข้างหน้า —{' '}
           <span id="busted-note">{lastSample.bustedCount === 0 ? 'ไม่มีเส้นทางที่แตกในรอบจำลองนี้ — ไม่ได้แปลว่าเป็นไปไม่ได้' : 'เจอแล้วในรอบจำลองนี้ — เป็นไปได้จริง ไม่ใช่แค่ทฤษฎี'}</span>
@@ -444,13 +485,9 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
   .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 10.5px; color: var(--color-gray); }
   .chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
 
-  .future-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
-  .future-cards > div { padding: 14px 10px; text-align: center; background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 8px; }
-  .future-cards span { display: block; color: var(--color-gray-dark); font-size: 10px; margin-bottom: 6px; }
-  .future-cards strong { display: block; font-size: 15px; }
-  .future-cards .bad strong { color: var(--color-primary-light); }
-  .future-cards .mid strong { color: var(--color-gray-light); }
-  .future-cards .good strong { color: var(--color-green); }
+  .future-table { min-width: 460px; }
+  .future-table th:not(:first-child), .future-table td:not(:first-child) { text-align: center; }
+  .th-hint { display: block; margin-top: 2px; color: var(--color-gray-dark); font-size: 8.5px; font-weight: 400; }
   .busted-line { margin: 4px 0 10px; padding: 10px 12px; color: var(--color-gray-light); background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.25); border-radius: 6px; font-size: 12px; }
   .busted-line strong { color: var(--color-secondary); }
 
@@ -463,7 +500,6 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
 
   @media (max-width: 640px) {
     .kpi-grid dl { grid-template-columns: repeat(2, 1fr); }
-    .future-cards { grid-template-columns: 1fr; }
     .repo-header { flex-direction: column; }
   }
 </style>
@@ -489,6 +525,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
   const START_MIN = PERIOD_START.slice(0, 7);
   const MIN_MONTHS_FOR_RANGE = 3; // ต้องตรงกับ MIN_MONTHS_FOR_RANGE ในฝั่ง frontmatter (rolling-capital.astro)
   const MAXLOT_GUARD_CAP = 1250000; // ต้องตรงกับ MAXLOT_GUARD_CAP ในฝั่ง frontmatter (rolling-capital.astro)
+  const ceiling = MAXLOT_GUARD_CAP; // เว็บ-only clamp — ต้องตรงกับ ceiling ในฝั่ง frontmatter
 
   const state = { capital: 10000, buffer: 2, step: 3, withdrawPct: 50, horizon: 12, startMonth: START_MIN };
 
@@ -536,7 +573,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
     }
 
     const withdrawRate = state.withdrawPct / 100;
-    const params = { backing: state.buffer, step: state.step, withdrawRate, sourceCap: state.capital };
+    const params = { backing: state.buffer, step: state.step, withdrawRate, sourceCap: state.capital, capCeiling: ceiling };
     const summary = replay(rangeCycles, params);
     const { months } = monthlySeries(rangeCycles, params);
     const hist = historicalChartGeometry(months);
@@ -549,6 +586,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
       step: state.step,
       withdrawRate,
       initialActive: state.buffer * state.capital,
+      capCeiling: ceiling,
     };
     const samples = buildFanSamples(bootstrap, rangeCycles, bsState, state.horizon, summary.totalWealth, BOOTSTRAP_PATHS, BOOTSTRAP_SEED);
     const fan = fanChartGeometry(samples);
@@ -626,10 +664,11 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
     if (coverageNoteValueEl) coverageNoteValueEl.textContent = coverageLabel(summary.minActiveCapCoverage);
     if (coverageNoteStatusEl) coverageNoteStatusEl.textContent = coverageRiskLabel(summary.minActiveCapCoverage);
 
-    // max-lot guard — only surfaces when this scenario's peak cap blows past the
-    // broker's per-order size ceiling (see MAXLOT_GUARD_CAP comment above)
+    // max-lot guard — surfaces when cap has actually frozen at the ceiling,
+    // either in the historical replay (summary.capClamped) or in some slice
+    // of the projected future (lastSample.clampedFraction > 0)
     const maxlotGuardEl = document.getElementById('maxlot-guard');
-    if (maxlotGuardEl) maxlotGuardEl.style.display = summary.peakCap > MAXLOT_GUARD_CAP ? '' : 'none';
+    if (maxlotGuardEl) maxlotGuardEl.style.display = (summary.capClamped || (lastSample.clampedFraction ?? 0) > 0) ? '' : 'none';
 
     // historical chart
     const activeArea = document.getElementById('active-area');
@@ -705,12 +744,27 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
     if (fanInner) fanInner.setAttribute('points', fan.innerPoints);
     if (fanMid) fanMid.setAttribute('points', fan.midPoints);
 
-    const p10El = document.getElementById('future-p10');
-    const p50El = document.getElementById('future-p50');
-    const p90El = document.getElementById('future-p90');
-    if (p10El) p10El.textContent = money(lastSample.p10);
-    if (p50El) p50El.textContent = money(lastSample.p50);
-    if (p90El) p90El.textContent = money(lastSample.p90);
+    // "อีก X ได้อะไรบ้าง" projection table (4 metrics x p10/p50/p90)
+    const horizonHeadingEl = document.getElementById('future-horizon-heading');
+    if (horizonHeadingEl) horizonHeadingEl.textContent = HORIZON_LABELS[state.horizon] || `${state.horizon} เดือน`;
+
+    const setText = (id, text) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    };
+    setText('future-success-p10', lastSample.success.p10.toLocaleString());
+    setText('future-success-p50', lastSample.success.p50.toLocaleString());
+    setText('future-success-p90', lastSample.success.p90.toLocaleString());
+    setText('future-steps-p10', String(lastSample.steps.p10));
+    setText('future-steps-p50', String(lastSample.steps.p50));
+    setText('future-steps-p90', String(lastSample.steps.p90));
+    setText('future-withdrawn-p10', money(lastSample.withdrawn.p10 - summary.withdrawnCash));
+    setText('future-withdrawn-p50', money(lastSample.withdrawn.p50 - summary.withdrawnCash));
+    setText('future-withdrawn-p90', money(lastSample.withdrawn.p90 - summary.withdrawnCash));
+    setText('future-active-p10', money(lastSample.active.p10));
+    setText('future-active-p50', money(lastSample.active.p50));
+    setText('future-active-p90', money(lastSample.active.p90));
+    setText('future-wealth-range', `${money(lastSample.p10)} – ${money(lastSample.p90)}`);
 
     const bustedCountEl = document.getElementById('busted-count');
     const bustedNoteEl = document.getElementById('busted-note');
