@@ -240,6 +240,11 @@ const engines = [
           </div>
         </section>
 
+        <!-- (e2) VELOCE brand mark -->
+        <div style="text-align:center;margin:30px 0 32px;">
+          <img src="/veloce-wordmark.png" alt="gdBasket VELOCE" width="718" height="271" loading="lazy" style="width:100%;max-width:340px;height:auto;" />
+        </div>
+
         <!-- (f) AFFILIATE NOTE -->
         <section class="affiliate-note" aria-label="ข้อมูลโบรก">
           <div>
@@ -449,6 +454,15 @@ const engines = [
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 ดูสถิติเต็มทุกตัว ไม่มีย่อ →
               </button>
+            </div>
+
+            <div class="readme-callout" style="text-align:center;border-left-color:var(--color-secondary);">
+              <p style="margin:0 0 6px;color:var(--color-gray-light);font-size:15px;font-weight:700;">เห็นผลจริงย้อนหลังแล้ว อยากรู้ว่าเงินตัวเองจะโตแค่ไหน?</p>
+              <p style="margin:0 0 16px;">กรอกทุนของคุณ ลองวางแผนถอน/ทบทุนจากผลจริงย้อนหลัง เห็นตัวเลขทันทีในเบราว์เซอร์</p>
+              <a href="/ea/gdbasket/rolling-capital" class="repo-download" style="display:inline-flex;font-size:13.5px;min-height:46px;padding:0 26px;gap:9px;background:var(--color-secondary);border-color:var(--color-secondary-dark);">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 0v6m0-6L4 20"/></svg>
+                ลองวางแผนถอน/ทบทุนจากผลจริงย้อนหลัง →
+              </a>
             </div>
 
             <h2 id="install">วิธีติดตั้ง</h2>
@@ -793,7 +807,11 @@ const engines = [
   /* popup "ดูสถิติเต็ม" — overlay ใหม่ (backdrop-blur เดียวกับ .glass-dark) + กล่องเนื้อหายืมค่าจาก .readme-card/.course-preview */
   .stats-modal-overlay { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,.75); backdrop-filter: blur(6px); }
   .stats-modal-overlay.open { display: flex; }
-  .stats-modal { width: 100%; max-width: 880px; max-height: 88vh; overflow-y: auto; background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 9px; box-shadow: 8px 8px 0 rgba(0,0,0,.18); }
+  .stats-modal { width: 100%; max-width: 880px; max-height: 88vh; overflow-y: auto; background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 9px; box-shadow: 8px 8px 0 rgba(0,0,0,.18); scrollbar-width: thin; scrollbar-color: var(--color-dark-border) transparent; }
+  .stats-modal::-webkit-scrollbar { width: 8px; }
+  .stats-modal::-webkit-scrollbar-track { background: transparent; }
+  .stats-modal::-webkit-scrollbar-thumb { background: var(--color-dark-border); border-radius: 999px; }
+  .stats-modal::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
   .stats-modal-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px clamp(16px, 3vw, 28px); background: var(--color-dark-card); border-bottom: 1px solid var(--color-dark-border); }
   .stats-modal-head span.eyebrow { display: block; color: var(--color-primary-light); font-size: 10px; letter-spacing: .16em; }
   .stats-modal-head h2 { margin: 5px 0 0; font-size: 19px; font-weight: 700; color: var(--color-gray-light); border: 0; padding: 0; }

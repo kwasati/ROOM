@@ -50,10 +50,17 @@ function coverageTableClass(n) {
 function coverageRiskLabel(n) {
   return n < 1 ? 'กินทุนแล้ว' : n < 2 ? 'ยังไม่กินทุน แต่เบาะเหลือน้อย' : 'เบาะยังหนา';
 }
+function fmtSpan(years) {
+  const m = Math.round(years * 12);
+  const y = Math.floor(m / 12), mo = m % 12;
+  if (y === 0) return `${mo} เดือน`;
+  if (mo === 0) return `${y} ปี`;
+  return `${y} ปี ${mo} เดือน`;
+}
 
 const [periodStart, periodEnd] = cyclesJson.meta.period.split(' to ');
 const spanYears = (new Date(periodEnd) - new Date(periodStart)) / (1000 * 60 * 60 * 24 * 365.25);
-const spanLabel = `${spanYears.toFixed(1)} ปี`; // full-dataset span — ใช้เฉพาะ copy แนะนำทั่วไป ไม่ใช่ตัวเลขตามช่วงที่เลือก
+const spanLabel = fmtSpan(spanYears); // full-dataset span — ใช้เฉพาะ copy แนะนำทั่วไป ไม่ใช่ตัวเลขตามช่วงที่เลือก
 const START_MIN = periodStart.slice(0, 7);
 const START_MAX = periodEnd.slice(0, 7);
 const MIN_MONTHS_FOR_RANGE = 3; // เลือกช่วงสั้นกว่านี้ = คำนวณคาดการณ์อนาคตไม่พอ (guard, ไม่ error)
@@ -110,7 +117,7 @@ function computeView(capital, buffer, stepMult, withdrawPct, horizonMonths, star
   const rangeStart = rangeCycles[0].t;
   const rangeEnd = rangeCycles[rangeCycles.length - 1].t;
   const rangeSpanYears = (new Date(rangeEnd) - new Date(rangeStart)) / (1000 * 60 * 60 * 24 * 365.25);
-  const rangeSpanLabel = `${rangeSpanYears.toFixed(1)} ปี`;
+  const rangeSpanLabel = fmtSpan(rangeSpanYears);
   const rangePeriodLabel = `${thaiMonthYear(rangeStart)} - ${thaiMonthYear(rangeEnd)}`;
 
   return {
@@ -129,7 +136,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
 
 <Layout title="gdBasket — Rolling Capital Planner · วางแผนถอน/ทบทุน | Room" description="เครื่องคิดเลขวางแผนบริหารเงินกับ gdBasket — จากผลทดสอบจริงย้อนหลัง 3.5 ปี ลองปรับทุนค้ำ/เกณฑ์ขึ้นชั้น/สัดส่วนถอน แล้วเห็นผลย้อนหลัง+คาดการณ์อนาคตทันที">
 <div id="main-content" class="repo-page">
-  <div class="repo-shell rolling-shell">
+  <div class="repo-shell rolling-shell mx-auto px-4 sm:px-6 lg:px-8">
 
     <!-- ZONE 1 — หัวหน้า -->
     <nav class="repo-breadcrumb" aria-label="Breadcrumb">
@@ -138,6 +145,8 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
       <a href="/ea/gdbasket">gdBasket</a><span>/</span>
       <span>วางแผนเงิน</span>
     </nav>
+
+    <a href="/ea/gdbasket" class="rolling-back">← กลับหน้า gdBasket</a>
 
     <header class="repo-header">
       <div class="repo-identity">
@@ -225,8 +234,9 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
 
         <div class="kpi-grid">
           <dl id="kpi-grid">
-            <div><dt>เงินปลายทางรวม</dt><dd class="positive">{money(summary.totalWealth)}</dd></div>
-            <div><dt>เงินถอนสะสม</dt><dd class="positive">{money(summary.withdrawnCash)}</dd></div>
+            <div><dt>เงินถอนสะสม (ถอนออกมาใช้แล้ว)</dt><dd class="positive">{money(summary.withdrawnCash)}</dd></div>
+            <div><dt>เงินในพอร์ตเหลือ</dt><dd class="positive">{money(summary.finalActiveFunds)}</dd></div>
+            <div><dt>มูลค่ารวมสุทธิ (2 ก้อนรวมกัน)</dt><dd class="positive">{money(summary.totalWealth)}</dd></div>
             <div><dt>เฉียดตายแค่ไหน (เบาะเหลือต่ำสุด)</dt><dd class={coverageClass}>{coverageLabel(summary.minActiveCapCoverage)}</dd></div>
             <div><dt>พอร์ตแดงลึกสุด%</dt><dd class="danger">{pct(summary.maxActiveFundsDdPct)}</dd></div>
             <div><dt>ขึ้นชั้น</dt><dd class="neutral">{summary.steps} ครั้ง</dd></div>
@@ -234,6 +244,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
             <div><dt>สถานะ</dt><dd class={summary.bust ? 'danger' : 'positive'}>{statusText}</dd></div>
           </dl>
         </div>
+        <p class="fine-print" style="margin-top:0;"><strong>มูลค่ารวมสุทธิ</strong> = เงินถอนออกมาใช้แล้ว + เงินที่ยังเหลืออยู่ในพอร์ต — สองก้อนนี้คือเงินของมึงทั้งหมด</p>
         <p class="fine-print" id="coverage-note">ณ ช่วงหนักสุด เงินในบัญชีเหลือ <strong id="coverage-note-value">{coverageLabel(summary.minActiveCapCoverage)}</strong> ของทุนต่อรอบ (ต่ำกว่า 1 เท่า = เริ่มกินทุน / ถึง 0 = ล้างพอร์ต — ตอนนี้ <span id="coverage-note-status">{coverageRiskLabel(summary.minActiveCapCoverage)}</span>)</p>
 
         <div class="risk-note" id="maxlot-guard" style={summary.peakCap > MAXLOT_GUARD_CAP ? '' : 'display:none;'}>
@@ -264,7 +275,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
         <h3 class="section-sub">เทียบนโยบายถอน (ที่ทุนค้ำเดียวกัน)</h3>
         <div class="proof-table-wrap">
           <table class="proof-table">
-            <thead><tr><th>นโยบายถอน</th><th>เงินปลายทาง</th><th>ถอนสะสม</th><th>พอร์ตแดงลึกสุด%</th><th>ขึ้นชั้น</th><th>คืนทุน</th></tr></thead>
+            <thead><tr><th>นโยบายถอน</th><th>มูลค่ารวม</th><th>ถอนสะสม</th><th>พอร์ตแดงลึกสุด%</th><th>ขึ้นชั้น</th><th>คืนทุน</th></tr></thead>
             <tbody id="policy-tbody">
               {policyRows.map((r) => (
                 <tr class={Math.round(r.withdrawRate * 100) === DEFAULTS.withdrawPct ? 'highlight' : ''}>
@@ -300,7 +311,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
         <h3 class="section-sub">ทุนค้ำ 1x vs 2x vs 3x (ถอน% เดียวกัน)</h3>
         <div class="proof-table-wrap">
           <table class="proof-table">
-            <thead><tr><th>ทุนค้ำ</th><th>เงินปลายทาง</th><th>ถอนสะสม</th><th>พอร์ตแดงลึกสุด%</th><th>เฉียดตาย (min coverage)</th></tr></thead>
+            <thead><tr><th>ทุนค้ำ</th><th>มูลค่ารวม</th><th>ถอนสะสม</th><th>พอร์ตแดงลึกสุด%</th><th>เฉียดตาย (min coverage)</th></tr></thead>
             <tbody id="backing-tbody">
               {backingRows.map((r, i) => (
                 <tr class={[1, 2, 3][i] === DEFAULTS.buffer ? 'highlight' : ''}>
@@ -390,6 +401,8 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
 
 <style>
   .rolling-shell { max-width: 820px; }
+  .rolling-back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; padding: 7px 13px; color: var(--color-gray-light); background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 7px; font-size: 12px; font-weight: 650; transition: border-color 140ms ease-out, color 140ms ease-out; }
+  .rolling-back:hover { color: var(--color-primary-light); border-color: var(--color-primary); }
   .section-sub { margin: 22px 0 10px; font-size: 13px; color: var(--color-gray-light); }
 
   .zone-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
@@ -460,6 +473,13 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
   const BOOTSTRAP_SEED = 20260723;
   const THAI_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
   const HORIZON_LABELS = { 6: '6 เดือน', 12: '1 ปี', 24: '2 ปี', 36: '3 ปี' };
+  function fmtSpan(years) {
+    const m = Math.round(years * 12);
+    const y = Math.floor(m / 12), mo = m % 12;
+    if (y === 0) return `${mo} เดือน`;
+    if (mo === 0) return `${y} ปี`;
+    return `${y} ปี ${mo} เดือน`;
+  }
   const [PERIOD_START] = cyclesJson.meta.period.split(' to ');
   const START_MIN = PERIOD_START.slice(0, 7);
   const MIN_MONTHS_FOR_RANGE = 3; // ต้องตรงกับ MIN_MONTHS_FOR_RANGE ในฝั่ง frontmatter (rolling-capital.astro)
@@ -542,7 +562,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
     const rangeStart = rangeCycles[0].t;
     const rangeEnd = rangeCycles[rangeCycles.length - 1].t;
     const rangeSpanYears = (new Date(rangeEnd) - new Date(rangeStart)) / (1000 * 60 * 60 * 24 * 365.25);
-    const rangeSpanLabel = `${rangeSpanYears.toFixed(1)} ปี`;
+    const rangeSpanLabel = fmtSpan(rangeSpanYears);
     const rangePeriodLabel = `${thaiMonthYear(rangeStart)} - ${thaiMonthYear(rangeEnd)}`;
 
     return {
@@ -584,8 +604,9 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
     const kpiEl = document.getElementById('kpi-grid');
     if (kpiEl) {
       kpiEl.innerHTML = `
-        <div><dt>เงินปลายทางรวม</dt><dd class="positive">${money(summary.totalWealth)}</dd></div>
-        <div><dt>เงินถอนสะสม</dt><dd class="positive">${money(summary.withdrawnCash)}</dd></div>
+        <div><dt>เงินถอนสะสม (ถอนออกมาใช้แล้ว)</dt><dd class="positive">${money(summary.withdrawnCash)}</dd></div>
+        <div><dt>เงินในพอร์ตเหลือ</dt><dd class="positive">${money(summary.finalActiveFunds)}</dd></div>
+        <div><dt>มูลค่ารวมสุทธิ (2 ก้อนรวมกัน)</dt><dd class="positive">${money(summary.totalWealth)}</dd></div>
         <div><dt>เฉียดตายแค่ไหน (เบาะเหลือต่ำสุด)</dt><dd class="${coverageClass}">${coverageLabel(summary.minActiveCapCoverage)}</dd></div>
         <div><dt>พอร์ตแดงลึกสุด%</dt><dd class="danger">${pct(summary.maxActiveFundsDdPct)}</dd></div>
         <div><dt>ขึ้นชั้น</dt><dd class="neutral">${summary.steps} ครั้ง</dd></div>
