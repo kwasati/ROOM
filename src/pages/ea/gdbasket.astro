@@ -84,6 +84,7 @@ const fileRows = [
   { icon: 'modes', name: 'Engine Profile', note: 'STRADA+ / SPORT+ / CORSA — เลือกตามความกล้าเสี่ยง', meta: '3', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Common-TP / PPTS / Broker-side Stop', meta: '6', href: '#features', color: 'text-primary' },
   { icon: 'clock', name: 'Releases', note: 'v2.02 · v2.01 · v2.00 · v1.37', meta: '5 rel', href: '/gdbasket-changelog.html', color: 'text-gray' },
+  { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
   { icon: 'dl', name: 'gdBasket v2.02', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
@@ -216,6 +217,7 @@ const engines = [
                 {row.icon === 'clock' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
                 {row.icon === 'dl' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>}
                 {row.icon === 'journal' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>}
+                {row.icon === 'calc' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h.01M12 11h.01M15 11h.01M9 15h.01M12 15h.01M15 15h.01M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>}
                 <strong>{row.name}</strong>
                 <span>{row.note}</span>
                 <b>{row.meta}{(row.download || row.accent) ? ' →' : ''}</b>
@@ -522,6 +524,10 @@ const engines = [
             <a href="#changelog">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               Releases
+            </a>
+            <a href="/ea/gdbasket/rolling-capital">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h.01M12 11h.01M15 11h.01M9 15h.01M12 15h.01M15 15h.01M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
+              วางแผนเงิน Rolling Capital
             </a>
           </nav>
         </section>
