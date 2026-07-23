@@ -172,6 +172,12 @@ function summarize(state, { backing, step, withdrawRate, sourceCap }) {
     sourceCap,
     initialActiveFunds: state.initialActive,
     finalCap: state.cap,
+    // Cap only ever grows inside advance()'s upgrade loop (state.cap += ...),
+    // never shrinks — so the peak cap reached during the whole run is always
+    // the final cap. Exposed as its own field (rather than reusing finalCap)
+    // so callers that only care about "how big did a single grid leg get"
+    // (e.g. the max-lot guard on the web page) read intent, not a coincidence.
+    peakCap: state.cap,
     finalSurplus: state.surplus,
     finalActiveFunds: finalActive,
     withdrawnCash: state.withdrawn,

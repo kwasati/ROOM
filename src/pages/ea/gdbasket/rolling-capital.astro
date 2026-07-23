@@ -13,6 +13,9 @@ const cycles = cyclesFromJson(cyclesJson);
 const BOOTSTRAP_PATHS = 1000;
 const BOOTSTRAP_SEED = 20260723;
 const DEFAULTS = { capital: 10000, buffer: 2, step: 3, withdrawPct: 50, horizon: 12 };
+// จุดที่ไม้เดี่ยวลึกสุดเริ่มชนเพดานขนาดคำสั่งสูงสุดของโบรกเกอร์ (ต่อออเดอร์) — เตือนเฉยๆ ไม่ clamp
+// เลข ไม่แก้สูตร/ไม่เปลี่ยนผลลัพธ์ที่โชว์ ดู NOTE .claude/artifacts/notes/gdbasket-rolling-maxlot-impact.md
+const MAXLOT_GUARD_CAP = 1250000;
 
 const THAI_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 const HORIZON_LABELS = { 6: '6 เดือน', 12: '1 ปี', 24: '2 ปี', 36: '3 ปี' };
@@ -232,6 +235,11 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
           </dl>
         </div>
         <p class="fine-print" id="coverage-note">ณ ช่วงหนักสุด เงินในบัญชีเหลือ <strong id="coverage-note-value">{coverageLabel(summary.minActiveCapCoverage)}</strong> ของทุนต่อรอบ (ต่ำกว่า 1 เท่า = เริ่มกินทุน / ถึง 0 = ล้างพอร์ต — ตอนนี้ <span id="coverage-note-status">{coverageRiskLabel(summary.minActiveCapCoverage)}</span>)</p>
+
+        <div class="risk-note" id="maxlot-guard" style={summary.peakCap > MAXLOT_GUARD_CAP ? '' : 'display:none;'}>
+          <span aria-hidden="true">⚠</span>
+          <p><strong>ทุนโตมาถึงจุดที่ตัวเลขเริ่มมองโลกสวยกว่าจริง</strong> — ก้อนนี้ใหญ่จนไม้เดี่ยวเริ่มชนเพดานขนาดคำสั่งสูงสุดที่โบรกเกอร์อนุญาตต่อออเดอร์ (50 lot) ตัวเลขก่อนหน้าจุดนี้ยังแม่นเป๊ะ แต่หลังจากนี้ของจริงจะทำกำไรได้น้อยกว่าที่จำลองไว้ เพราะไม้ที่ควรใหญ่กว่านี้ถูกตัดเพดานไว้</p>
+        </div>
 
         <div class="chart-wrap">
           <svg viewBox="0 0 600 200" preserveAspectRatio="none" id="hist-svg" role="img" aria-label="กราฟเงินในบัญชีและเงินถอนสะสมไล่เวลา">
@@ -455,6 +463,7 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
   const [PERIOD_START] = cyclesJson.meta.period.split(' to ');
   const START_MIN = PERIOD_START.slice(0, 7);
   const MIN_MONTHS_FOR_RANGE = 3; // ต้องตรงกับ MIN_MONTHS_FOR_RANGE ในฝั่ง frontmatter (rolling-capital.astro)
+  const MAXLOT_GUARD_CAP = 1250000; // ต้องตรงกับ MAXLOT_GUARD_CAP ในฝั่ง frontmatter (rolling-capital.astro)
 
   const state = { capital: 10000, buffer: 2, step: 3, withdrawPct: 50, horizon: 12, startMonth: START_MIN };
 
@@ -590,6 +599,11 @@ const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.b
     const coverageNoteStatusEl = document.getElementById('coverage-note-status');
     if (coverageNoteValueEl) coverageNoteValueEl.textContent = coverageLabel(summary.minActiveCapCoverage);
     if (coverageNoteStatusEl) coverageNoteStatusEl.textContent = coverageRiskLabel(summary.minActiveCapCoverage);
+
+    // max-lot guard — only surfaces when this scenario's peak cap blows past the
+    // broker's per-order size ceiling (see MAXLOT_GUARD_CAP comment above)
+    const maxlotGuardEl = document.getElementById('maxlot-guard');
+    if (maxlotGuardEl) maxlotGuardEl.style.display = summary.peakCap > MAXLOT_GUARD_CAP ? '' : 'none';
 
     // historical chart
     const activeArea = document.getElementById('active-area');
