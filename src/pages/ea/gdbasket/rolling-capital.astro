@@ -1,0 +1,800 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { replay, monthlySeries, bootstrap, cyclesFromJson } from '../../../lib/rolling-sim.mjs';
+import { historicalChartGeometry, fanChartGeometry, buildFanSamples } from '../../../lib/rolling-chart.mjs';
+import cyclesJson from '../../../data/gdbasket-rolling-cycles.json';
+
+// content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม) — ปุ่มโหลดต้องใช้ const
+// ตัวเดียวกับหน้าแม่เสมอ ห้าม hardcode v3.01 จนกว่าจะ release จริง (release gate — ดู plan Stop Conditions)
+const MAIN = 'https://intensivetrader.com';
+const DL_LATEST = `${MAIN}/d/gdbasket`;
+
+const cycles = cyclesFromJson(cyclesJson);
+const BOOTSTRAP_PATHS = 1000;
+const BOOTSTRAP_SEED = 20260723;
+const DEFAULTS = { capital: 10000, buffer: 2, step: 3, withdrawPct: 50, horizon: 12 };
+// จุดที่ไม้เดี่ยวลึกสุดเริ่มชนเพดานขนาดคำสั่งสูงสุดของโบรกเกอร์ (ต่อออเดอร์) — เตือนเฉยๆ ไม่ clamp
+// เลข ไม่แก้สูตร/ไม่เปลี่ยนผลลัพธ์ที่โชว์ ดู NOTE .claude/artifacts/notes/gdbasket-rolling-maxlot-impact.md
+const MAXLOT_GUARD_CAP = 1250000;
+
+const THAI_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const HORIZON_LABELS = { 6: '6 เดือน', 12: '1 ปี', 24: '2 ปี', 36: '3 ปี' };
+
+function thaiDate(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  return `${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+function money(n) {
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+function pct(n) {
+  return n.toFixed(2) + '%';
+}
+function coverageLabel(n) {
+  return n.toFixed(2) + ' เท่า';
+}
+function thaiMonthYear(iso) {
+  const d = new Date(iso);
+  return `${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+// เขียว >2 เท่า (สบาย) / เหลือง 1-2 เท่า (ระวัง) / แดง <1 เท่า (เริ่มกินทุน)
+// สอง class vocab เพราะ CSS scope คนละจุด — KPI grid ใช้ danger/warn (scoped .kpi-grid dd.*),
+// ตารางเทียบใช้ negative/warn (scoped .proof-table .*, reuse global .negative ที่มีอยู่แล้ว)
+function coverageRiskClass(n) {
+  return n < 1 ? 'danger' : n < 2 ? 'warn' : '';
+}
+function coverageTableClass(n) {
+  return n < 1 ? 'negative' : n < 2 ? 'warn' : '';
+}
+function coverageRiskLabel(n) {
+  return n < 1 ? 'กินทุนแล้ว' : n < 2 ? 'ยังไม่กินทุน แต่เบาะเหลือน้อย' : 'เบาะยังหนา';
+}
+function fmtSpan(years) {
+  const m = Math.round(years * 12);
+  const y = Math.floor(m / 12), mo = m % 12;
+  if (y === 0) return `${mo} เดือน`;
+  if (mo === 0) return `${y} ปี`;
+  return `${y} ปี ${mo} เดือน`;
+}
+
+const [periodStart, periodEnd] = cyclesJson.meta.period.split(' to ');
+const spanYears = (new Date(periodEnd) - new Date(periodStart)) / (1000 * 60 * 60 * 24 * 365.25);
+const spanLabel = fmtSpan(spanYears); // full-dataset span — ใช้เฉพาะ copy แนะนำทั่วไป ไม่ใช่ตัวเลขตามช่วงที่เลือก
+const START_MIN = periodStart.slice(0, 7);
+const START_MAX = periodEnd.slice(0, 7);
+const MIN_MONTHS_FOR_RANGE = 3; // เลือกช่วงสั้นกว่านี้ = คำนวณคาดการณ์อนาคตไม่พอ (guard, ไม่ error)
+
+function filterCyclesFrom(cycleList, startMonth) {
+  if (!startMonth || startMonth <= START_MIN) return cycleList;
+  const startISO = `${startMonth}-01`;
+  return cycleList.filter((c) => String(c.t) >= startISO);
+}
+
+/** Same view-model assembly as the client script's computeView() — kept in
+ * sync by hand since Astro frontmatter and a browser <script> can't share a
+ * plain function, but both call the exact same imported engine functions
+ * (replay/monthlySeries/bootstrap/historicalChartGeometry/fanChartGeometry),
+ * so the underlying math is always single-sourced. `startMonth` ("YYYY-MM")
+ * filters cycles to only those closing on/after that month before replaying
+ * — lets the visitor re-run the whole planner from any point in the past. */
+function computeView(capital, buffer, stepMult, withdrawPct, horizonMonths, startMonth) {
+  const rangeCycles = filterCyclesFrom(cycles, startMonth);
+  const monthCount = new Set(rangeCycles.map((c) => String(c.t).slice(0, 7))).size;
+  if (rangeCycles.length === 0 || monthCount < MIN_MONTHS_FOR_RANGE) {
+    return { tooShort: true, rangeCount: rangeCycles.length, monthCount };
+  }
+
+  const withdrawRate = withdrawPct / 100;
+  const params = { backing: buffer, step: stepMult, withdrawRate, sourceCap: capital };
+  const summary = replay(rangeCycles, params);
+  const { months } = monthlySeries(rangeCycles, params);
+  const hist = historicalChartGeometry(months);
+
+  const bsState = {
+    cap: summary.finalCap,
+    surplus: summary.finalSurplus,
+    withdrawn: summary.withdrawnCash,
+    backing: buffer,
+    step: stepMult,
+    withdrawRate,
+    initialActive: buffer * capital,
+  };
+  const samples = buildFanSamples(bootstrap, rangeCycles, bsState, horizonMonths, summary.totalWealth, BOOTSTRAP_PATHS, BOOTSTRAP_SEED);
+  const fan = fanChartGeometry(samples);
+  const lastSample = samples[samples.length - 1];
+
+  const policyRows = [0, 0.5, 0.6, 0.7, 1].map((w) => replay(rangeCycles, { backing: buffer, step: stepMult, withdrawRate: w, sourceCap: capital }));
+  const backingRows = [1, 2, 3].map((b) => replay(rangeCycles, { backing: b, step: stepMult, withdrawRate, sourceCap: capital }));
+
+  const byYear = new Map();
+  for (const e of summary.events) {
+    const y = String(e.cycleTime).slice(0, 4);
+    byYear.set(y, (byYear.get(y) || 0) + e.withdrawal);
+  }
+  const annualRows = Array.from(byYear.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+
+  const rangeStart = rangeCycles[0].t;
+  const rangeEnd = rangeCycles[rangeCycles.length - 1].t;
+  const rangeSpanYears = (new Date(rangeEnd) - new Date(rangeStart)) / (1000 * 60 * 60 * 24 * 365.25);
+  const rangeSpanLabel = fmtSpan(rangeSpanYears);
+  const rangePeriodLabel = `${thaiMonthYear(rangeStart)} - ${thaiMonthYear(rangeEnd)}`;
+
+  return {
+    tooShort: false,
+    summary, hist, fan, lastSample, policyRows, backingRows, annualRows,
+    rangeCount: rangeCycles.length, rangeSpanLabel, rangePeriodLabel,
+  };
+}
+
+const DEFAULTS_WITH_RANGE = { ...DEFAULTS, startMonth: START_MIN };
+const view = computeView(DEFAULTS_WITH_RANGE.capital, DEFAULTS_WITH_RANGE.buffer, DEFAULTS_WITH_RANGE.step, DEFAULTS_WITH_RANGE.withdrawPct, DEFAULTS_WITH_RANGE.horizon, DEFAULTS_WITH_RANGE.startMonth);
+const { summary, hist, fan, lastSample, policyRows, backingRows, annualRows, rangeCount, rangeSpanLabel, rangePeriodLabel } = view;
+const coverageClass = coverageRiskClass(summary.minActiveCapCoverage);
+const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.bustTime)}` : `รอดตลอด ${rangeSpanLabel}`;
+---
+
+<Layout title="gdBasket — Rolling Capital Planner · วางแผนถอน/ทบทุน | Room" description="เครื่องคิดเลขวางแผนบริหารเงินกับ gdBasket — จากผลทดสอบจริงย้อนหลัง 3.5 ปี ลองปรับทุนค้ำ/เกณฑ์ขึ้นชั้น/สัดส่วนถอน แล้วเห็นผลย้อนหลัง+คาดการณ์อนาคตทันที">
+<div id="main-content" class="repo-page">
+  <div class="repo-shell rolling-shell mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- ZONE 1 — หัวหน้า -->
+    <nav class="repo-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Room</a><span>/</span>
+      <a href="/?filter=ea">EA</a><span>/</span>
+      <a href="/ea/gdbasket">gdBasket</a><span>/</span>
+      <span>วางแผนเงิน</span>
+    </nav>
+
+    <a href="/ea/gdbasket" class="rolling-back">← กลับหน้า gdBasket</a>
+
+    <header class="repo-header">
+      <div class="repo-identity">
+        <div class="repo-mark" aria-hidden="true">$</div>
+        <div>
+          <div class="repo-name">
+            <span>gdBasket</span><i>/</i><strong class="pixel" style="font-size:14px;">ROLLING CAPITAL</strong>
+          </div>
+          <p>เครื่องคิดเลขวางแผนบริหารเงินกับ gdBasket — จากผลทดสอบจริงย้อนหลัง {spanLabel}</p>
+        </div>
+      </div>
+      <div class="repo-version"><span>ข้อมูลอ้างอิง</span><strong>VELOCE</strong></div>
+    </header>
+
+    <div class="readme-callout">
+      <p>gdBasket ทำงานแบ่งเงินเป็น <strong>3 กระเป๋า</strong> — ทุนต่อรอบ (Capital) / เงินค้ำในบัญชี / เงินถอนออกมาใช้</p>
+      <p>พอกำไรสะสมครบเกณฑ์ที่ตั้งไว้ ระบบ <strong>ขึ้นชั้น</strong> — แบ่งไปถอนตาม % ที่ตั้ง ที่เหลือทบเพิ่ม Capital ก้อนใหม่ (เบาะค้ำยังคงสัดส่วนเท่าเดิมเสมอ ไม่ทบเต็มเม็ด)</p>
+      <p>หน้านี้เอาเลขจริงจากผลทดสอบย้อนหลังมาให้ลองปรับดู — <strong>ไม่ใช่คำสัญญากำไร</strong></p>
+    </div>
+
+    <!-- ZONE 2 — แผงกรอก -->
+    <section class="readme-card" id="panel">
+      <div class="readme-title">แผงกรอก — ลองปรับดู</div>
+      <div class="readme-body">
+
+        <div class="field-group">
+          <label class="field-label" for="capital-input">เงินต่อรอบ (Capital)</label>
+          <input class="capital-input" type="number" id="capital-input" value={DEFAULTS.capital} step="500" min="0" />
+          <div class="total-funds">เงินทั้งหมดที่ใช้ค้ำ = Capital × ทุนค้ำ = <strong id="total-funds-value">{money(DEFAULTS.capital * DEFAULTS.buffer)}</strong></div>
+          <p class="fine-print" style="margin-top:8px;">ตัวเลขจำลองจากผลทดสอบที่ทุนต่อรอบ ~$10,000 — ทุนต่ำมากๆ ผลอาจต่างเล็กน้อยจากขั้นต่ำของไม้ (ทดสอบจริงที่ทุน $1,000 แล้วผลไม่ต่างมาก)</p>
+          <p class="fine-print" id="capital-note" style="display:none;margin-top:4px;">หมายเหตุ: Capital ต่ำกว่า $10,000 — ผลอาจต่างเล็กน้อยจากขั้นต่ำของไม้ ไม่ใช่ว่าเชื่อไม่ได้</p>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="start-input">จุดเริ่มจากอดีต</label>
+          <input class="capital-input" type="month" id="start-input" value={START_MIN} min={START_MIN} max={START_MAX} />
+          <span class="field-hint">เริ่มต้นสุด = เอาข้อมูลทั้งเส้นตั้งแต่ {thaiMonthYear(periodStart)} — เลือกช้ากว่านี้เพื่อดูผลเฉพาะช่วงที่ต้องการ (เช่น ตั้งแต่เข้าซื้อจริง)</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">ทุนค้ำ (buffer) — เบาะกันบัญชีแตก</label>
+          <div class="chip-row" data-group="buffer">
+            <button type="button" data-value="1">1x</button>
+            <button type="button" class="active" data-value="2">2x</button>
+            <button type="button" data-value="3">3x</button>
+          </div>
+          <span class="field-hint">2x = ค่าเริ่มต้น (รอดตลอด {spanLabel} ในผลทดสอบ — ดูตารางเทียบด้านล่าง)</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">เกณฑ์ขึ้นชั้น (step) — กำไรสะสมครบกี่เท่าของ Capital ถึงขึ้นชั้น</label>
+          <div class="chip-row" data-group="step">
+            <button type="button" data-value="1">1x</button>
+            <button type="button" data-value="1.5">1.5x</button>
+            <button type="button" data-value="2">2x</button>
+            <button type="button" class="active" data-value="3">3x</button>
+          </div>
+          <span class="field-hint">ต่ำ = ขึ้นชั้น/ถอนถี่ขึ้น · สูง = รอสะสมนานขึ้นต่อชั้น</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">% ถอนต่อชั้น</label>
+          <div class="chip-row" data-group="withdraw" style="margin-bottom:8px;">
+            <button type="button" data-value="0">0% (ทบหมด)</button>
+            <button type="button" class="active" data-value="50">50%</button>
+            <button type="button" data-value="60">60%</button>
+            <button type="button" data-value="70">70%</button>
+          </div>
+          <input class="withdraw-slider" type="range" min="0" max="100" value={DEFAULTS.withdrawPct} id="withdraw-slider" />
+          <div class="slider-value"><span id="withdraw-slider-value">{DEFAULTS.withdrawPct}</span>% ถอนออก / เหลือ <span id="withdraw-slider-remain">{100 - DEFAULTS.withdrawPct}</span>% ทบเพิ่ม Capital</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZONE 3 — ย้อนหลัง (ข้อมูลจริง) -->
+    <section class="readme-card" id="historical">
+      <div class="readme-title">ผลจริงย้อนหลัง — VELOCE</div>
+      <div class="readme-body">
+        <div class="zone-heading">
+          <span class="zone-badge real">● ข้อมูลจริง</span>
+          <h2 id="hist-period">ผลจริง {rangePeriodLabel} ({rangeCount.toLocaleString()} รอบ, {rangeSpanLabel})</h2>
+        </div>
+        <p class="fine-print" id="range-guard-msg" style="display:none;margin-top:0;">ช่วงที่เลือกสั้นเกินไป — เหลือรอบไม่พอคำนวณคาดการณ์อนาคต ลองเลื่อนจุดเริ่มให้ไกลกว่านี้ (ตัวเลขด้านล่างยังเป็นของช่วงก่อนหน้า)</p>
+        <p id="hist-subline" style="margin-top:0;">ตั้ง Capital {money(DEFAULTS.capital)} · ทุนค้ำ {DEFAULTS.buffer}x · เกณฑ์ขึ้นชั้น {DEFAULTS.step}x · ถอน {DEFAULTS.withdrawPct}% ต่อชั้น — เล่นซ้ำผลจริงทุกรอบที่ gdBasket VELOCE ปิดจริง</p>
+
+        <div class="kpi-grid">
+          <dl id="kpi-grid">
+            <div><dt>เงินถอนสะสม (ถอนออกมาใช้แล้ว)</dt><dd class="positive">{money(summary.withdrawnCash)}</dd></div>
+            <div><dt>เงินในพอร์ตเหลือ</dt><dd class="positive">{money(summary.finalActiveFunds)}</dd></div>
+            <div><dt>มูลค่ารวมสุทธิ (2 ก้อนรวมกัน)</dt><dd class="positive">{money(summary.totalWealth)}</dd></div>
+            <div><dt>เฉียดตายแค่ไหน (เบาะเหลือต่ำสุด)</dt><dd class={coverageClass}>{coverageLabel(summary.minActiveCapCoverage)}</dd></div>
+            <div><dt>พอร์ตแดงลึกสุด%</dt><dd class="danger">{pct(summary.maxActiveFundsDdPct)}</dd></div>
+            <div><dt>ขึ้นชั้น</dt><dd class="neutral">{summary.steps} ครั้ง</dd></div>
+            <div><dt>คืนทุนตั้งต้นเมื่อ</dt><dd class="neutral">{summary.paybackDate ? thaiDate(summary.paybackDate) : 'ยังไม่คืน'}</dd></div>
+            <div><dt>สถานะ</dt><dd class={summary.bust ? 'danger' : 'positive'}>{statusText}</dd></div>
+          </dl>
+        </div>
+        <p class="fine-print" style="margin-top:0;"><strong>มูลค่ารวมสุทธิ</strong> = เงินถอนออกมาใช้แล้ว + เงินที่ยังเหลืออยู่ในพอร์ต — สองก้อนนี้คือเงินของมึงทั้งหมด</p>
+        <p class="fine-print" id="coverage-note">ณ ช่วงหนักสุด เงินในบัญชีเหลือ <strong id="coverage-note-value">{coverageLabel(summary.minActiveCapCoverage)}</strong> ของทุนต่อรอบ (ต่ำกว่า 1 เท่า = เริ่มกินทุน / ถึง 0 = ล้างพอร์ต — ตอนนี้ <span id="coverage-note-status">{coverageRiskLabel(summary.minActiveCapCoverage)}</span>)</p>
+
+        <div class="risk-note" id="maxlot-guard" style={summary.peakCap > MAXLOT_GUARD_CAP ? '' : 'display:none;'}>
+          <span aria-hidden="true">⚠</span>
+          <p><strong>ทุนโตมาถึงจุดที่ตัวเลขเริ่มมองโลกสวยกว่าจริง</strong> — ก้อนนี้ใหญ่จนไม้เดี่ยวเริ่มชนเพดานขนาดคำสั่งสูงสุดที่โบรกเกอร์อนุญาตต่อออเดอร์ (50 lot) ตัวเลขก่อนหน้าจุดนี้ยังแม่นเป๊ะ แต่หลังจากนี้ของจริงจะทำกำไรได้น้อยกว่าที่จำลองไว้ เพราะไม้ที่ควรใหญ่กว่านี้ถูกตัดเพดานไว้</p>
+        </div>
+
+        <div class="chart-wrap">
+          <svg viewBox="0 0 600 200" preserveAspectRatio="none" id="hist-svg" role="img" aria-label="กราฟเงินในบัญชีและเงินถอนสะสมไล่เวลา">
+            <line x1="0" y1="50" x2="600" y2="50" stroke="#2A2A2A" stroke-width="1"></line>
+            <line x1="0" y1="100" x2="600" y2="100" stroke="#2A2A2A" stroke-width="1"></line>
+            <line x1="0" y1="150" x2="600" y2="150" stroke="#2A2A2A" stroke-width="1"></line>
+            <polygon id="active-area" points={hist.activeAreaPoints} fill="rgba(34,197,94,.28)" stroke="none"></polygon>
+            <polygon id="withdrawn-area" points={hist.withdrawnAreaPoints} fill="rgba(245,158,11,.32)" stroke="none"></polygon>
+            <polyline id="total-line" points={hist.totalLinePoints} fill="none" stroke="#F59E0B" stroke-width="2"></polyline>
+            <g id="markers">
+              {hist.markers.map((mk) => <circle cx={mk.x.toFixed(1)} cy={mk.y.toFixed(1)} r="3.5" fill="#EF4444"></circle>)}
+            </g>
+          </svg>
+          <div class="chart-legend">
+            <span><i style="background:rgba(34,197,94,.6);"></i>เงินในบัญชี (active)</span>
+            <span><i style="background:rgba(245,158,11,.6);"></i>เงินถอนสะสม</span>
+            <span><i style="background:#EF4444;border-radius:50%;width:8px;height:8px;"></i>จุดขึ้นชั้น (<span id="hist-steps-count">{summary.steps}</span> ครั้ง)</span>
+          </div>
+        </div>
+        <p class="chart-caption">แกน Y ไม่เป็นเชิงเส้น (บีบสเกลแบบ sqrt) — ปีท้ายๆ ทรัพย์โตเร็วเพราะ Capital ที่ทบใหญ่ขึ้นทุกรอบขึ้นชั้น (เอฟเฟกต์ทบต้น)</p>
+
+        <h3 class="section-sub">เทียบนโยบายถอน (ที่ทุนค้ำเดียวกัน)</h3>
+        <div class="proof-table-wrap">
+          <table class="proof-table">
+            <thead><tr><th>นโยบายถอน</th><th>มูลค่ารวม</th><th>ถอนสะสม</th><th>พอร์ตแดงลึกสุด%</th><th>ขึ้นชั้น</th><th>คืนทุน</th></tr></thead>
+            <tbody id="policy-tbody">
+              {policyRows.map((r) => (
+                <tr class={Math.round(r.withdrawRate * 100) === DEFAULTS.withdrawPct ? 'highlight' : ''}>
+                  <td>{r.withdrawRate === 0 ? '0% (ทบหมด)' : r.withdrawRate === 1 ? '100% (ถอนหมด)' : `${Math.round(r.withdrawRate * 100)}%`}{Math.round(r.withdrawRate * 100) === DEFAULTS.withdrawPct ? ' ← เลือกอยู่' : ''}</td>
+                  <td class="positive">{money(r.totalWealth)}</td>
+                  <td class="positive">{money(r.withdrawnCash)}</td>
+                  <td>{pct(r.maxActiveFundsDdPct)}</td>
+                  <td>{r.steps}</td>
+                  <td>{r.bust ? `แตก ${thaiDate(r.bustTime)}` : (r.paybackDate ? thaiDate(r.paybackDate) : '-')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="fine-print">"พอร์ตแดงลึกสุด%" วัดจากเงินในบัญชีจริงล้วน (ไม่รวมเงินที่ถอนออกไปแล้ว) — ยิ่งถอนเยอะ เงินคงเหลือในบัญชียิ่งบางลงเทียบจุดสูงสุดเดิม แม้เงินรวมจะไม่ได้หายไปไหน (ไปอยู่ในกระเป๋าถอนแล้ว)</p>
+
+        <div id="annual-section" style={DEFAULTS.withdrawPct > 0 ? '' : 'display:none;'}>
+          <h3 class="section-sub">เงินถอนรายปี (ที่ setting ปัจจุบัน)</h3>
+          <div class="proof-table-wrap">
+            <table class="proof-table">
+              <thead><tr><th>ปี</th><th>ถอนปีนั้น</th></tr></thead>
+              <tbody id="annual-tbody">
+                {annualRows.length === 0 && <tr><td colspan="2">ยังไม่มีการถอนที่ setting นี้</td></tr>}
+                {annualRows.map(([y, amt]) => <tr><td>{y}</td><td class="positive">{money(amt)}</td></tr>)}
+                {annualRows.length > 0 && (
+                  <tr class="total"><td>รวม</td><td class="positive">{money(annualRows.reduce((a, [, amt]) => a + amt, 0))}</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3 class="section-sub">ทุนค้ำ 1x vs 2x vs 3x (ถอน% เดียวกัน)</h3>
+        <div class="proof-table-wrap">
+          <table class="proof-table">
+            <thead><tr><th>ทุนค้ำ</th><th>มูลค่ารวม</th><th>ถอนสะสม</th><th>พอร์ตแดงลึกสุด%</th><th>เฉียดตาย (min coverage)</th></tr></thead>
+            <tbody id="backing-tbody">
+              {backingRows.map((r, i) => (
+                <tr class={[1, 2, 3][i] === DEFAULTS.buffer ? 'highlight' : ''}>
+                  <td>{[1, 2, 3][i]}x{[1, 2, 3][i] === DEFAULTS.buffer ? ' ← เลือกอยู่' : ''}</td>
+                  <td class="positive">{money(r.totalWealth)}</td>
+                  <td class="positive">{money(r.withdrawnCash)}</td>
+                  <td>{pct(r.maxActiveFundsDdPct)}</td>
+                  <td class={coverageTableClass(r.minActiveCapCoverage)}>{coverageLabel(r.minActiveCapCoverage)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="fine-print">"เฉียดตาย" = จุดที่เบาะเหลือน้อยที่สุดเทียบ Capital ปัจจุบัน (เขียว/ว่าง &gt;2 เท่า สบาย · เหลือง 1-2 เท่า ระวัง · แดง &lt;1 เท่า เริ่มกินทุน)</p>
+      </div>
+    </section>
+
+    <!-- ZONE 4 — อนาคต (จำลอง) -->
+    <section class="readme-card" id="future">
+      <div class="readme-title">คาดการณ์ (จำลองจากอดีต — ไม่ใช่คำทำนาย)</div>
+      <div class="readme-body">
+        <div class="zone-heading">
+          <span class="zone-badge sim">● จำลอง</span>
+          <h2>ถ้าอนาคตสุ่มหน้าตาเหมือนอดีต — สุ่มเรียงเหตุการณ์จริงใหม่ 1,000 แบบ</h2>
+        </div>
+        <div class="chip-row" data-group="horizon" style="margin-bottom:6px;">
+          <button type="button" data-value="6">6 เดือน</button>
+          <button type="button" class="active" data-value="12">1 ปี</button>
+          <button type="button" data-value="24">2 ปี</button>
+          <button type="button" data-value="36">3 ปี</button>
+        </div>
+
+        <div class="chart-wrap">
+          <svg viewBox="0 0 600 200" preserveAspectRatio="none" id="fan-svg" role="img" aria-label="fan chart คาดการณ์อนาคต">
+            <line x1="0" y1="50" x2="600" y2="50" stroke="#2A2A2A" stroke-width="1"></line>
+            <line x1="0" y1="100" x2="600" y2="100" stroke="#2A2A2A" stroke-width="1"></line>
+            <line x1="0" y1="150" x2="600" y2="150" stroke="#2A2A2A" stroke-width="1"></line>
+            <polygon id="fan-outer" points={fan.outerPoints} fill="rgba(34,197,94,.14)" stroke="none"></polygon>
+            <polygon id="fan-inner" points={fan.innerPoints} fill="rgba(34,197,94,.30)" stroke="none"></polygon>
+            <polyline id="fan-mid" points={fan.midPoints} fill="none" stroke="#22C55E" stroke-width="2"></polyline>
+            <line x1="0" y1="0" x2="0" y2="200" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,3"></line>
+          </svg>
+          <div class="chart-legend">
+            <span><i style="background:rgba(34,197,94,.3);"></i>แถบ p10-p90 (แย่สุด-ดีสุด)</span>
+            <span><i style="background:rgba(34,197,94,.6);"></i>แถบ p25-p75</span>
+            <span><i style="background:#22C55E;"></i>เส้นกลาง (p50)</span>
+          </div>
+        </div>
+
+        <div class="future-cards">
+          <div class="bad"><span>แย่ (p10)</span><strong id="future-p10">{money(lastSample.p10)}</strong></div>
+          <div class="mid"><span>กลาง (p50)</span><strong id="future-p50">{money(lastSample.p50)}</strong></div>
+          <div class="good"><span>ดี (p90)</span><strong id="future-p90">{money(lastSample.p90)}</strong></div>
+        </div>
+        <div class="busted-line" id="busted-line">
+          <strong id="busted-count">{lastSample.bustedCount}</strong> จาก <strong>{BOOTSTRAP_PATHS.toLocaleString()}</strong> เส้นทางจำลอง ที่บัญชีแตกภายใน <span id="busted-horizon-label">{HORIZON_LABELS[DEFAULTS.horizon]}</span>ข้างหน้า —{' '}
+          <span id="busted-note">{lastSample.bustedCount === 0 ? 'ไม่มีเส้นทางที่แตกในรอบจำลองนี้ — ไม่ได้แปลว่าเป็นไปไม่ได้' : 'เจอแล้วในรอบจำลองนี้ — เป็นไปได้จริง ไม่ใช่แค่ทฤษฎี'}</span>
+        </div>
+        <p class="chart-caption">อนาคตจำลองด้วยการสุ่มเรียงเหตุการณ์จริงในอดีตใหม่ 1,000 แบบ (สุ่มเป็นบล็อกรายเดือน ไม่ใช่รายวัน — กันวันดิ่งแรงถูกสุ่มกระจายจนดูปลอดภัยเกินจริง) อดีต {spanLabel} นี้เป็นช่วงทองขาขึ้นแรง อนาคตจริงอาจต่างไปได้มาก</p>
+      </div>
+    </section>
+
+    <!-- ZONE 5 — caveat ใหญ่ (ติดตาย) -->
+    <section class="readme-card" id="caveat">
+      <div class="readme-title">ข้อควรอ่านก่อนเชื่อเลขนี้</div>
+      <div class="readme-body">
+        <div class="risk-note" style="flex-direction:column;align-items:stretch;">
+          <ol class="caveat-list">
+            <li>นี่คือ<strong>การเล่นซ้ำผลทดสอบย้อนหลัง</strong> ไม่ใช่การรันเทรดใหม่ และไม่ใช่คำสัญญากำไร</li>
+            <li>แม่นเฉพาะ <strong>Capital ≥ $10,000 (Standard)</strong> — ต่ำกว่านั้นไม้แรกชนขั้นต่ำ สัดส่วนเพี้ยน</li>
+            <li>รอบที่แตกถือว่าเสียเป็น <strong>% เท่ากันทุกขนาดทุน</strong> (ของจริงเพี้ยนเล็กน้อยจากขั้นต่ำ lot)</li>
+            <li>ช่วงทดสอบ {periodStart.slice(0, 4)}-{periodEnd.slice(0, 4)} <strong>ทองเป็นขาขึ้นใหญ่</strong> — ผลช่วงตลาดแบบอื่นอาจแย่กว่านี้</li>
+          </ol>
+        </div>
+        <p class="fine-print" style="margin-top:14px;">ไม่ใช่คำแนะนำการลงทุน · การเทรดมีความเสี่ยง อาจขาดทุนได้ ตัดสินใจด้วยตัวเอง</p>
+      </div>
+    </section>
+
+    <!-- ZONE 6 — CTA -->
+    <div class="cta-row">
+      <a class="back-link" href="/ea/gdbasket">← กลับหน้า gdBasket</a>
+      <a class="repo-download" href={DL_LATEST} download>ดาวน์โหลด gdBasket ล่าสุด</a>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .rolling-shell { max-width: 820px; }
+  .rolling-back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; padding: 7px 13px; color: var(--color-gray-light); background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 7px; font-size: 12px; font-weight: 650; transition: border-color 140ms ease-out, color 140ms ease-out; }
+  .rolling-back:hover { color: var(--color-primary-light); border-color: var(--color-primary); }
+  .section-sub { margin: 22px 0 10px; font-size: 13px; color: var(--color-gray-light); }
+
+  .zone-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+  .zone-badge.real { color: var(--color-green); background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.35); }
+  .zone-badge.sim { color: var(--color-secondary); background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.35); }
+  .zone-heading { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 4px; }
+  .zone-heading h2 { margin: 0; color: var(--color-gray-light); font-size: 15px; }
+
+  .field-group { margin-bottom: 18px; }
+  .field-label { display: block; margin-bottom: 7px; color: var(--color-gray-light); font-size: 12px; font-weight: 650; }
+  .field-hint { display: block; margin-top: 5px; color: var(--color-gray-dark); font-size: 10.5px; }
+  .capital-input { width: 100%; max-width: 260px; padding: 10px 12px; color: var(--color-gray-light); background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 7px; font-size: 14px; font-family: inherit; }
+  .capital-input:focus { outline: none; border-color: var(--color-primary); }
+  .total-funds { margin-top: 8px; color: var(--color-gray); font-size: 11.5px; }
+  .total-funds strong { color: var(--color-green); font-size: 13px; }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip-row button { min-height: 34px; padding: 0 14px; color: var(--color-gray); background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .chip-row button.active { color: white; background: var(--color-primary); border-color: var(--color-primary-light); }
+  .withdraw-slider { width: 100%; max-width: 320px; margin-top: 10px; accent-color: var(--color-primary); }
+  .slider-value { margin-top: 4px; color: var(--color-gray-light); font-size: 12px; font-weight: 700; }
+
+  .kpi-grid dl { margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--color-dark-border); border-left: 1px solid var(--color-dark-border); border-radius: 7px; overflow: hidden; }
+  .kpi-grid dl > div { min-width: 0; display: flex; flex-direction: column-reverse; justify-content: center; padding: 10px 8px; border-right: 1px solid var(--color-dark-border); border-bottom: 1px solid var(--color-dark-border); text-align: center; background: var(--color-dark-card); }
+  .kpi-grid dt { color: var(--color-gray-dark); font-size: 8.5px; line-height: 1.35; }
+  .kpi-grid dd { margin: 0; color: var(--color-green); font-size: 14px; font-weight: 700; }
+  .kpi-grid dd.danger { color: var(--color-primary-light); }
+  .kpi-grid dd.neutral { color: var(--color-gray-light); }
+  .kpi-grid dd.warn { color: var(--color-secondary); }
+  .proof-table .warn { color: var(--color-secondary) !important; }
+
+  .chart-wrap { margin: 14px 0 6px; border: 1px solid var(--color-dark-border); border-radius: 8px; background: var(--color-dark-card); padding: 12px 12px 6px; }
+  .chart-wrap svg { display: block; width: 100%; height: auto; }
+  .chart-caption { margin: 8px 0 0; color: var(--color-gray-dark); font-size: 10.5px; line-height: 1.6; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 10.5px; color: var(--color-gray); }
+  .chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+
+  .future-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+  .future-cards > div { padding: 14px 10px; text-align: center; background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 8px; }
+  .future-cards span { display: block; color: var(--color-gray-dark); font-size: 10px; margin-bottom: 6px; }
+  .future-cards strong { display: block; font-size: 15px; }
+  .future-cards .bad strong { color: var(--color-primary-light); }
+  .future-cards .mid strong { color: var(--color-gray-light); }
+  .future-cards .good strong { color: var(--color-green); }
+  .busted-line { margin: 4px 0 10px; padding: 10px 12px; color: var(--color-gray-light); background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.25); border-radius: 6px; font-size: 12px; }
+  .busted-line strong { color: var(--color-secondary); }
+
+  .caveat-list { margin: 8px 0 0; padding-left: 20px; }
+  .caveat-list li { margin-bottom: 8px; color: var(--color-gray); font-size: 12px; line-height: 1.65; }
+  .caveat-list li strong { color: var(--color-gray-light); }
+  .cta-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 18px 4px 4px; }
+  .cta-row a.back-link { color: var(--color-gray); font-size: 12.5px; text-decoration: none; }
+  .cta-row a.back-link:hover { color: var(--color-primary-light); }
+
+  @media (max-width: 640px) {
+    .kpi-grid dl { grid-template-columns: repeat(2, 1fr); }
+    .future-cards { grid-template-columns: 1fr; }
+    .repo-header { flex-direction: column; }
+  }
+</style>
+
+<script>
+  import { replay, monthlySeries, bootstrap, cyclesFromJson } from '../../../lib/rolling-sim.mjs';
+  import { historicalChartGeometry, fanChartGeometry, buildFanSamples } from '../../../lib/rolling-chart.mjs';
+  import cyclesJson from '../../../data/gdbasket-rolling-cycles.json';
+
+  const cycles = cyclesFromJson(cyclesJson);
+  const BOOTSTRAP_PATHS = 1000;
+  const BOOTSTRAP_SEED = 20260723;
+  const THAI_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+  const HORIZON_LABELS = { 6: '6 เดือน', 12: '1 ปี', 24: '2 ปี', 36: '3 ปี' };
+  function fmtSpan(years) {
+    const m = Math.round(years * 12);
+    const y = Math.floor(m / 12), mo = m % 12;
+    if (y === 0) return `${mo} เดือน`;
+    if (mo === 0) return `${y} ปี`;
+    return `${y} ปี ${mo} เดือน`;
+  }
+  const [PERIOD_START] = cyclesJson.meta.period.split(' to ');
+  const START_MIN = PERIOD_START.slice(0, 7);
+  const MIN_MONTHS_FOR_RANGE = 3; // ต้องตรงกับ MIN_MONTHS_FOR_RANGE ในฝั่ง frontmatter (rolling-capital.astro)
+  const MAXLOT_GUARD_CAP = 1250000; // ต้องตรงกับ MAXLOT_GUARD_CAP ในฝั่ง frontmatter (rolling-capital.astro)
+
+  const state = { capital: 10000, buffer: 2, step: 3, withdrawPct: 50, horizon: 12, startMonth: START_MIN };
+
+  function thaiDate(iso) {
+    if (!iso) return '-';
+    const d = new Date(iso);
+    return `${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  }
+  function thaiMonthYear(iso) {
+    const d = new Date(iso);
+    return `${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  }
+  function money(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+  function pct(n) {
+    return n.toFixed(2) + '%';
+  }
+  function coverageLabel(n) {
+    return n.toFixed(2) + ' เท่า';
+  }
+  function coverageRiskClass(n) {
+    return n < 1 ? 'danger' : n < 2 ? 'warn' : '';
+  }
+  function coverageTableClass(n) {
+    return n < 1 ? 'negative' : n < 2 ? 'warn' : '';
+  }
+  function coverageRiskLabel(n) {
+    return n < 1 ? 'กินทุนแล้ว' : n < 2 ? 'ยังไม่กินทุน แต่เบาะเหลือน้อย' : 'เบาะยังหนา';
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  }
+  function filterCyclesFrom(startMonth) {
+    if (!startMonth || startMonth <= START_MIN) return cycles;
+    const startISO = `${startMonth}-01`;
+    return cycles.filter((c) => String(c.t) >= startISO);
+  }
+
+  function computeView() {
+    const rangeCycles = filterCyclesFrom(state.startMonth);
+    const monthCount = new Set(rangeCycles.map((c) => String(c.t).slice(0, 7))).size;
+    if (rangeCycles.length === 0 || monthCount < MIN_MONTHS_FOR_RANGE) {
+      return { tooShort: true, rangeCount: rangeCycles.length, monthCount };
+    }
+
+    const withdrawRate = state.withdrawPct / 100;
+    const params = { backing: state.buffer, step: state.step, withdrawRate, sourceCap: state.capital };
+    const summary = replay(rangeCycles, params);
+    const { months } = monthlySeries(rangeCycles, params);
+    const hist = historicalChartGeometry(months);
+
+    const bsState = {
+      cap: summary.finalCap,
+      surplus: summary.finalSurplus,
+      withdrawn: summary.withdrawnCash,
+      backing: state.buffer,
+      step: state.step,
+      withdrawRate,
+      initialActive: state.buffer * state.capital,
+    };
+    const samples = buildFanSamples(bootstrap, rangeCycles, bsState, state.horizon, summary.totalWealth, BOOTSTRAP_PATHS, BOOTSTRAP_SEED);
+    const fan = fanChartGeometry(samples);
+    const lastSample = samples[samples.length - 1];
+
+    const policyRows = [0, 0.5, 0.6, 0.7, 1].map((w) => replay(rangeCycles, { backing: state.buffer, step: state.step, withdrawRate: w, sourceCap: state.capital }));
+    const backingRows = [1, 2, 3].map((b) => replay(rangeCycles, { backing: b, step: state.step, withdrawRate, sourceCap: state.capital }));
+
+    const byYear = new Map();
+    for (const e of summary.events) {
+      const y = String(e.cycleTime).slice(0, 4);
+      byYear.set(y, (byYear.get(y) || 0) + e.withdrawal);
+    }
+    const annualRows = Array.from(byYear.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+
+    const rangeStart = rangeCycles[0].t;
+    const rangeEnd = rangeCycles[rangeCycles.length - 1].t;
+    const rangeSpanYears = (new Date(rangeEnd) - new Date(rangeStart)) / (1000 * 60 * 60 * 24 * 365.25);
+    const rangeSpanLabel = fmtSpan(rangeSpanYears);
+    const rangePeriodLabel = `${thaiMonthYear(rangeStart)} - ${thaiMonthYear(rangeEnd)}`;
+
+    return {
+      tooShort: false,
+      summary, hist, fan, lastSample, policyRows, backingRows, annualRows,
+      rangeCount: rangeCycles.length, rangeSpanLabel, rangePeriodLabel,
+    };
+  }
+
+  function render(view) {
+    const guardEl = document.getElementById('range-guard-msg');
+
+    // total funds + capital note (always independent of tooShort — capital field is separate from range)
+    const totalFundsEl = document.getElementById('total-funds-value');
+    if (totalFundsEl) totalFundsEl.textContent = money(state.capital * state.buffer);
+    const capitalNoteEl = document.getElementById('capital-note');
+    if (capitalNoteEl) capitalNoteEl.style.display = state.capital < 10000 ? 'block' : 'none';
+
+    if (view.tooShort) {
+      if (guardEl) guardEl.style.display = 'block';
+      // เก็บตัวเลขก่อนหน้าไว้บนจอ ไม่เคลียร์ทิ้ง — กันจอว่าง/error, แค่บอกว่าเลขที่เห็นเป็นของช่วงก่อนหน้า
+      return;
+    }
+    if (guardEl) guardEl.style.display = 'none';
+
+    const { summary, hist, fan, lastSample, policyRows, backingRows, annualRows, rangeCount, rangeSpanLabel, rangePeriodLabel } = view;
+
+    // period heading
+    const histPeriodEl = document.getElementById('hist-period');
+    if (histPeriodEl) histPeriodEl.textContent = `ผลจริง ${rangePeriodLabel} (${rangeCount.toLocaleString()} รอบ, ${rangeSpanLabel})`;
+
+    // subline
+    const sublineEl = document.getElementById('hist-subline');
+    if (sublineEl) sublineEl.textContent = `ตั้ง Capital ${money(state.capital)} · ทุนค้ำ ${state.buffer}x · เกณฑ์ขึ้นชั้น ${state.step}x · ถอน ${state.withdrawPct}% ต่อชั้น — เล่นซ้ำผลจริงทุกรอบที่ gdBasket VELOCE ปิดจริง`;
+
+    // KPI grid
+    const coverageClass = coverageRiskClass(summary.minActiveCapCoverage);
+    const statusText = summary.bust ? `แตกเมื่อ ${thaiDate(summary.bustTime)}` : `รอดตลอด ${rangeSpanLabel}`;
+    const kpiEl = document.getElementById('kpi-grid');
+    if (kpiEl) {
+      kpiEl.innerHTML = `
+        <div><dt>เงินถอนสะสม (ถอนออกมาใช้แล้ว)</dt><dd class="positive">${money(summary.withdrawnCash)}</dd></div>
+        <div><dt>เงินในพอร์ตเหลือ</dt><dd class="positive">${money(summary.finalActiveFunds)}</dd></div>
+        <div><dt>มูลค่ารวมสุทธิ (2 ก้อนรวมกัน)</dt><dd class="positive">${money(summary.totalWealth)}</dd></div>
+        <div><dt>เฉียดตายแค่ไหน (เบาะเหลือต่ำสุด)</dt><dd class="${coverageClass}">${coverageLabel(summary.minActiveCapCoverage)}</dd></div>
+        <div><dt>พอร์ตแดงลึกสุด%</dt><dd class="danger">${pct(summary.maxActiveFundsDdPct)}</dd></div>
+        <div><dt>ขึ้นชั้น</dt><dd class="neutral">${summary.steps} ครั้ง</dd></div>
+        <div><dt>คืนทุนตั้งต้นเมื่อ</dt><dd class="neutral">${summary.paybackDate ? thaiDate(summary.paybackDate) : 'ยังไม่คืน'}</dd></div>
+        <div><dt>สถานะ</dt><dd class="${summary.bust ? 'danger' : 'positive'}">${statusText}</dd></div>
+      `;
+    }
+
+    // coverage note (ณ ช่วงหนักสุด...)
+    const coverageNoteValueEl = document.getElementById('coverage-note-value');
+    const coverageNoteStatusEl = document.getElementById('coverage-note-status');
+    if (coverageNoteValueEl) coverageNoteValueEl.textContent = coverageLabel(summary.minActiveCapCoverage);
+    if (coverageNoteStatusEl) coverageNoteStatusEl.textContent = coverageRiskLabel(summary.minActiveCapCoverage);
+
+    // max-lot guard — only surfaces when this scenario's peak cap blows past the
+    // broker's per-order size ceiling (see MAXLOT_GUARD_CAP comment above)
+    const maxlotGuardEl = document.getElementById('maxlot-guard');
+    if (maxlotGuardEl) maxlotGuardEl.style.display = summary.peakCap > MAXLOT_GUARD_CAP ? '' : 'none';
+
+    // historical chart
+    const activeArea = document.getElementById('active-area');
+    const withdrawnArea = document.getElementById('withdrawn-area');
+    const totalLine = document.getElementById('total-line');
+    const markersG = document.getElementById('markers');
+    if (activeArea) activeArea.setAttribute('points', hist.activeAreaPoints);
+    if (withdrawnArea) withdrawnArea.setAttribute('points', hist.withdrawnAreaPoints);
+    if (totalLine) totalLine.setAttribute('points', hist.totalLinePoints);
+    if (markersG) markersG.innerHTML = hist.markers.map((mk) => `<circle cx="${mk.x.toFixed(1)}" cy="${mk.y.toFixed(1)}" r="3.5" fill="#EF4444"></circle>`).join('');
+    const stepsCountEl = document.getElementById('hist-steps-count');
+    if (stepsCountEl) stepsCountEl.textContent = String(summary.steps);
+
+    // policy comparison table
+    const policyBody = document.getElementById('policy-tbody');
+    if (policyBody) {
+      policyBody.innerHTML = policyRows
+        .map((r) => {
+          const wPct = Math.round(r.withdrawRate * 100);
+          const isSelected = wPct === state.withdrawPct;
+          const label = r.withdrawRate === 0 ? '0% (ทบหมด)' : r.withdrawRate === 1 ? '100% (ถอนหมด)' : `${wPct}%`;
+          const paybackCell = r.bust ? `แตก ${thaiDate(r.bustTime)}` : (r.paybackDate ? thaiDate(r.paybackDate) : '-');
+          return `<tr class="${isSelected ? 'highlight' : ''}">
+            <td>${label}${isSelected ? ' ← เลือกอยู่' : ''}</td>
+            <td class="positive">${money(r.totalWealth)}</td>
+            <td class="positive">${money(r.withdrawnCash)}</td>
+            <td>${pct(r.maxActiveFundsDdPct)}</td>
+            <td>${r.steps}</td>
+            <td>${esc(paybackCell)}</td>
+          </tr>`;
+        })
+        .join('');
+    }
+
+    // annual withdrawals
+    const annualSection = document.getElementById('annual-section');
+    const annualBody = document.getElementById('annual-tbody');
+    if (annualSection) annualSection.style.display = state.withdrawPct > 0 ? '' : 'none';
+    if (annualBody) {
+      if (annualRows.length === 0) {
+        annualBody.innerHTML = `<tr><td colspan="2">ยังไม่มีการถอนที่ setting นี้</td></tr>`;
+      } else {
+        const total = annualRows.reduce((a, [, amt]) => a + amt, 0);
+        annualBody.innerHTML =
+          annualRows.map(([y, amt]) => `<tr><td>${y}</td><td class="positive">${money(amt)}</td></tr>`).join('') +
+          `<tr class="total"><td>รวม</td><td class="positive">${money(total)}</td></tr>`;
+      }
+    }
+
+    // backing comparison table
+    const backingBody = document.getElementById('backing-tbody');
+    if (backingBody) {
+      backingBody.innerHTML = backingRows
+        .map((r, i) => {
+          const b = [1, 2, 3][i];
+          const isSelected = b === state.buffer;
+          return `<tr class="${isSelected ? 'highlight' : ''}">
+            <td>${b}x${isSelected ? ' ← เลือกอยู่' : ''}</td>
+            <td class="positive">${money(r.totalWealth)}</td>
+            <td class="positive">${money(r.withdrawnCash)}</td>
+            <td>${pct(r.maxActiveFundsDdPct)}</td>
+            <td class="${coverageTableClass(r.minActiveCapCoverage)}">${coverageLabel(r.minActiveCapCoverage)}</td>
+          </tr>`;
+        })
+        .join('');
+    }
+
+    // fan chart
+    const fanOuter = document.getElementById('fan-outer');
+    const fanInner = document.getElementById('fan-inner');
+    const fanMid = document.getElementById('fan-mid');
+    if (fanOuter) fanOuter.setAttribute('points', fan.outerPoints);
+    if (fanInner) fanInner.setAttribute('points', fan.innerPoints);
+    if (fanMid) fanMid.setAttribute('points', fan.midPoints);
+
+    const p10El = document.getElementById('future-p10');
+    const p50El = document.getElementById('future-p50');
+    const p90El = document.getElementById('future-p90');
+    if (p10El) p10El.textContent = money(lastSample.p10);
+    if (p50El) p50El.textContent = money(lastSample.p50);
+    if (p90El) p90El.textContent = money(lastSample.p90);
+
+    const bustedCountEl = document.getElementById('busted-count');
+    const bustedNoteEl = document.getElementById('busted-note');
+    const bustedHorizonEl = document.getElementById('busted-horizon-label');
+    if (bustedCountEl) bustedCountEl.textContent = String(lastSample.bustedCount ?? 0);
+    if (bustedHorizonEl) bustedHorizonEl.textContent = HORIZON_LABELS[state.horizon] || `${state.horizon} เดือน`;
+    if (bustedNoteEl) {
+      bustedNoteEl.textContent = (lastSample.bustedCount ?? 0) === 0
+        ? 'ไม่มีเส้นทางที่แตกในรอบจำลองนี้ — ไม่ได้แปลว่าเป็นไปไม่ได้'
+        : 'เจอแล้วในรอบจำลองนี้ — เป็นไปได้จริง ไม่ใช่แค่ทฤษฎี';
+    }
+  }
+
+  function recomputeAndRender() {
+    render(computeView());
+  }
+
+  // --- wiring ---
+  let debounceHandle = null;
+  function debouncedRecompute() {
+    clearTimeout(debounceHandle);
+    debounceHandle = setTimeout(recomputeAndRender, 150);
+  }
+
+  const capitalInput = document.getElementById('capital-input');
+  if (capitalInput) {
+    capitalInput.addEventListener('input', () => {
+      const v = Number(capitalInput.value);
+      state.capital = Number.isFinite(v) && v >= 0 ? v : 0;
+      debouncedRecompute();
+    });
+  }
+
+  const startInput = document.getElementById('start-input');
+  if (startInput) {
+    startInput.addEventListener('change', () => {
+      state.startMonth = startInput.value || START_MIN;
+      recomputeAndRender();
+    });
+  }
+
+  document.querySelectorAll('.chip-row').forEach((row) => {
+    const group = row.dataset.group;
+    row.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        row.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const value = Number(btn.dataset.value);
+        if (group === 'buffer') state.buffer = value;
+        else if (group === 'step') state.step = value;
+        else if (group === 'withdraw') {
+          state.withdrawPct = value;
+          const slider = document.getElementById('withdraw-slider');
+          if (slider) slider.value = String(value);
+          const valEl = document.getElementById('withdraw-slider-value');
+          const remainEl = document.getElementById('withdraw-slider-remain');
+          if (valEl) valEl.textContent = String(value);
+          if (remainEl) remainEl.textContent = String(100 - value);
+        } else if (group === 'horizon') {
+          state.horizon = value;
+        }
+        recomputeAndRender();
+      });
+    });
+  });
+
+  const slider = document.getElementById('withdraw-slider');
+  if (slider) {
+    slider.addEventListener('input', () => {
+      const value = Number(slider.value);
+      state.withdrawPct = value;
+      const valEl = document.getElementById('withdraw-slider-value');
+      const remainEl = document.getElementById('withdraw-slider-remain');
+      if (valEl) valEl.textContent = String(value);
+      if (remainEl) remainEl.textContent = String(100 - value);
+      // sync chip highlight if slider lands exactly on a chip value, else clear all
+      const withdrawRow = document.querySelector('.chip-row[data-group="withdraw"]');
+      if (withdrawRow) {
+        withdrawRow.querySelectorAll('button').forEach((b) => {
+          b.classList.toggle('active', Number(b.dataset.value) === value);
+        });
+      }
+      debouncedRecompute();
+    });
+  }
+
+  // initial paint already matches server-rendered defaults — recompute once
+  // anyway so client state (and every subsequent interaction) is driven by
+  // the exact same live engine call from the very start.
+  recomputeAndRender();
+</script>
+</Layout>
