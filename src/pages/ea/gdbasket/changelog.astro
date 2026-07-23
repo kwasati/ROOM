@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+---
+// gdBasket Releases — ประวัติทุกเวอร์ชัน
+// ย้ายมาจาก public/gdbasket-changelog.html (§3.1) — หน้าตาเท่าเดิม 100%, แค่เปลี่ยนที่อยู่ + เนื้อรุ่นล่าสุด
+---
 <html lang="th">
 <head>
 <meta charset="UTF-8">
@@ -98,8 +101,42 @@
 
 <div class="wrap releases">
 
-  <!-- v2.02 -->
+  <!-- v3.02 (ใหม่ — VELOCE) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.02</span></span>
+      <div class="date">23 ก.ค. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <div class="head">
+          <h2>VELOCE มาแล้ว — โหมดใหม่ค่าเริ่มต้น อัปเดตใหญ่สุดของสาย v3</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.02 · 23 ก.ค. 2026</p>
+        <p class="lead">โหมดเทรดใหม่ VELOCE ตั้งเป็นค่าเริ่มต้น พร้อมแผงจัดการสดที่แม่นขึ้น เวลาไทยบนจอ และป้ายผลปิดรอบที่ถูกต้อง — อัปเดตใหญ่สุดของสาย v3 ตั้งแต่เปิดตัว</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>โหมดใหม่ VELOCE ค่าเริ่มต้น</strong> — เครื่องพีระมิด 2 บ้าน บ้านขาขึ้นเติมไม้ไล่ตามราคาขึ้น บ้านขาลง/กลางไล่ล็อกกำไรตามจังหวะ ค่าทุกตัวล็อกจากการพิสูจน์บนสนามทดสอบยาว 3 ปี 6 เดือน ต่อให้ไฟล์ตั้งค่าเก่าค้างอยู่หรือเผลอตั้งขัดกัน EA ก็ใช้ค่าที่ล็อกไว้เสมอ — ทดสอบแล้วสูตรไม่กระทบพฤติกรรมเดิมของโหมดอื่นเลย ผ่านทดสอบทุนสำรอง 3 เท่ารอด 100%</span></li>
+          <li><span class="plus">+</span><span><strong>แผงจัดการสดแม่นขึ้น</strong> — เปลี่ยนมานับจากเหตุการณ์จริงของ EA เอง แทนคำนวณย้อนจากยอดบัญชีทั้งก้อน (เดิมถ้าบัญชีมีฝาก-ถอนหรือมี EA อื่นทำงานร่วม ตัวเลขเพี้ยนได้ทันที) เพิ่มแถวกำไร-ขาดทุนของรอบปัจจุบัน และแถวโซนสถานะบอกเหตุผลสดว่าทำไมยังไม่เปิดไม้ พร้อมแก้บั๊กจำนวนรอบสำเร็จที่เคยถูกเขียนทับเป็น 0 ตอนตะกร้ากำลังจม และเลข "เหลืออีกเท่าไหร่ถึงเป้า" ที่เคยเพี้ยนติดลบได้</span></li>
+          <li><span class="plus">+</span><span><strong>เวลาบนกล่องสถานะเป็นเวลาไทยแล้ว</strong> — เดิมโชว์เวลาเซิร์ฟเวอร์โบรก (ช้ากว่าไทย 4-5 ชม.) อ่านสับสน ตอนนี้แปลงเป็นเวลาไทยให้ + มีช่องตั้งเองถ้าอยู่โซนเวลาอื่น + เรียงเวลาถูก ไม่กระโดดข้ามวันเวลาขึ้นรอบใหม่</span></li>
+          <li><span class="plus">+</span><span><strong>เห็นไม้พีระมิดบนจอแล้ว</strong> — เดิมไม้เติมตอนกำไร (pyramid) วางแล้วจอเงียบ ตอนนี้ขึ้นบรรทัด "Spawn P" ให้เห็นทันทีที่วาง</span></li>
+          <li><span class="plus">+</span><span><strong>นับรอบย้อนหลังตอนติดตั้งใหม่/รีสตาร์ท</strong> — ไล่ประวัติการเทรดของตัวเอง แล้วประกอบรอบเก่าขึ้นมาให้ทันที (รอบที่สำเร็จ / รอบที่โดนล้าง / เงินแต่ละรอบ) แทนเริ่มนับศูนย์ใหม่ทุกครั้ง</span></li>
+          <li><span class="plus">+</span><span><strong>ป้ายเหตุปิดรอบถูกต้อง (จุดสำคัญที่สุดของรุ่นนี้)</strong> — เดิมตะกร้าที่ปิดด้วยตัวล็อกกำไรแล้วดันติดลบนิดหน่อยตอนปิด เคยถูกตีป้ายผิดเป็น "โดนล้างพอร์ต" ทั้งที่ไม่ใช่ ตอนนี้แก้ให้เช็คว่าไม้นั้นปิดด้วยกลไกไหนก่อนตัดสินป้าย — ป้ายผิดที่เคยมีหายหมด เหลือป้ายโดนล้างจริงเท่านั้น</span></li>
+          <li><span class="plus">+</span><span><strong>ช่องเลือกโหมดเหลือ 3</strong> — strada+ / sport+ / VELOCE ตั้ง VELOCE เป็นค่าเริ่มต้น ตัด CORSA ออกจากช่องเลือก — พิสูจน์แล้วว่าเลือกโหมดไหนได้ผลตรงโหมดนั้นจริงทั้ง 3 ตัว</span></li>
+          <li><span class="plus">+</span><span><strong>อัปเกรดจากรุ่นเก่า</strong> — โครงช่องเลือกเปลี่ยนไป ลาก EA ขึ้นชาร์ตครั้งแรกให้กด Reset ที่หน้า Inputs หนึ่งครั้ง ให้ค่าตั้งต้นมาถูกต้อง</span></li>
+          <li><span class="plus">+</span><span><strong>การเทรดไม่เปลี่ยนแม้แต่บาทเดียว</strong> — ของใหม่ทั้งหมดในรุ่นนี้เป็นแค่การแสดงผลบนจอ ไม่แตะการตัดสินใจเปิด/ปิดไม้เลย</span></li>
+          <li><span class="plus">+</span><span><strong>ผลพิสูจน์เต็มเส้น 3 ปี 6 เดือน</strong> — กำไรสุทธิ +250,351.30 · โดนล้าง 4 จาก 31 รอบ · ทนทุกช่วงเวลาที่ทดสอบ 100%</span></li>
+        </ul>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.02
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v2.02 (demoted) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v2.02</span></span>
       <div class="date">13 ก.ค. 2026</div>
@@ -108,7 +145,6 @@
       <div class="card">
         <div class="head">
           <h2>รองรับบัญชีที่โบรกแถมเครดิต</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v2.02 · 13 ก.ค. 2026</p>
         <p class="lead">บัญชีที่ฝากเงินแล้วได้เครดิตแถมจากโบรก เปิด EA ได้แล้ว — เดิมนับแค่ยอดเงินฝากเลยบล็อกถ้าทุนไม่ถึง</p>
@@ -116,7 +152,7 @@
           <li><span class="plus">+</span><span><strong>นับเครดิตโบรกเกอร์เป็นทุนด้วย</strong> — บัญชีที่ฝาก $50 ได้เครดิตแถมอีก $50 (เทรดได้จริง $100) ตอนนี้เปิด EA ได้แล้ว เดิม EA เห็นแค่ยอดฝาก $50 เลยไม่ให้เปิดถ้าตั้ง Capital สูงกว่านั้น</span></li>
           <li><span class="plus">+</span><span><strong>บัญชีปกติไม่มีอะไรเปลี่ยน</strong> — ใครไม่มีเครดิตแถม ทุกอย่างเหมือน v2.01 เป๊ะ · การซื้อเพิ่ม / เป้ากำไร / ล็อกกำไร / ตัดขาดทุน ไม่แตะเลย</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v202" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด v2.02
         </a>
@@ -144,7 +180,7 @@
           <li><span class="plus">+</span><span><strong>ตัวแจกเลือกได้ 2 โหมดแล้ว</strong> — SPORT+ (ค่าเริ่มต้น เหมือนเดิม) + STRADA+ (ใหม่ — สายเสี่ยงต่ำ มีตัวกรองความร้อน) · CORSA ยังไม่ปล่อย</span></li>
           <li><span class="plus">+</span><span><strong>SPORT+ พฤติกรรมเดิม 100%</strong> — โหมดอื่นไม่ผ่านตัวกรองนี้ ใครใช้ SPORT+ อยู่ ทุกอย่างเหมือน v2.00 เป๊ะ</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket-v201" download>
+        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v201" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด v2.01
         </a>
@@ -228,7 +264,7 @@
           <li><span class="plus">+</span><span><strong>Broker-side Stop</strong> — กันชนขาดทุนจริงที่โบรก กันพอร์ตเสียหนักตอนตลาดกระโดด</span></li>
           <li><span class="plus">+</span><span><strong>Capital-based</strong> — ตั้ง Capital ช่องเดียว ที่เหลือ (ขนาดไม้/ระยะซื้อ/เป้ากำไร) มันคิดให้เอง</span></li>
           <li><span class="plus">+</span><span><strong>Engine Profile STRADA / SPORT</strong> + รองรับทั้งบัญชี Standard และ Micro</span></li>
-          <li><span class="plus">+</span><span><strong>เสถียรพร้อมแจก</strong> — เพิ่มระบบกันพลาดตอนตลาดกระชากแรง (ไม่เผลอเปิดไม้เพิ่ม/ปิดซ้ำจนกว่าจะปิดชุดสำเร็จ) + แก้ขนาดไม้บัญชี Micro + รุ่นนี้แก้บั๊กตรวจพอร์ตแตกผิดพลาด (false SO) ตอนเจอราคาผิดปกติ/ข่าว/สเปรดกระชาก</span></li>
+          <li><span class="plus">+</span><span><strong>เสถียรพร้อมแจก</strong> — เพิ่มระบบกันพลาดตอนตลาดกระชากแรง (ไม่เผลอเปิดไม้เพิ่ม/ปิดซ้ำจนกว่าจะปิดชุดสำเร็จ) + แก้ขนาดไม้บัญชี Micro + รุ่นนี้แก้บั๊กตรวจพอร์ตแตกผิดพลาด (false SO) ตอนเจอราคาผิดปกติ/ข่าว/ตลาดกระชากแรง</span></li>
         </ul>
         <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v118" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
