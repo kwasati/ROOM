@@ -4,7 +4,8 @@ import Layout from '../../layouts/Layout.astro';
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
-const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.02 (publish/releases/v3.02/gdBasket_v3.02.ex5)
+const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.03 (publish/releases/v3.03/gdBasket_v3.03.ex5)
+const DL_V302 = `${MAIN}/d/gdbasket-v302`;
 const DL_V202 = `${MAIN}/d/gdbasket-v202`;
 const DL_V201 = `${MAIN}/d/gdbasket-v201`;
 const DL_V200 = `${MAIN}/d/gdbasket-v200`;
@@ -83,7 +84,8 @@ const veloceSteps = [
 ];
 
 const releases = [
-  { version: 'v3.02', dateLabel: '23 ก.ค. 2026', latest: true, url: DL_LATEST },
+  { version: 'v3.03', dateLabel: '26 ก.ค. 2026', latest: true, url: DL_LATEST },
+  { version: 'v3.02', dateLabel: '23 ก.ค. 2026', latest: false, url: DL_V302 },
   { version: 'v2.02', dateLabel: '13 ก.ค. 2026', latest: false, url: DL_V202 },
   { version: 'v2.01', dateLabel: '10 ก.ค. 2026', latest: false, url: DL_V201 },
   { version: 'v2.00', dateLabel: '8 ก.ค. 2026', latest: false, url: DL_V200 },
@@ -97,14 +99,14 @@ const fileRows = [
   { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · ลากใส่กราฟ GOLD M15 · 6 ขั้นจบ', meta: '6 ขั้น', href: '#install', color: 'text-secondary' },
   { icon: 'modes', name: 'Engine Profile', note: 'strada+ / sport+ / VELOCE — ค่าเริ่มต้น VELOCE', meta: '3', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Common-TP / PPTS / Live Management', meta: '8', href: '#features', color: 'text-primary' },
-  { icon: 'clock', name: 'Releases', note: 'v3.02 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '6 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
+  { icon: 'clock', name: 'Releases', note: 'v3.03 · v3.02 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '7 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
-  { icon: 'dl', name: 'gdBasket v3.02', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
+  { icon: 'dl', name: 'gdBasket v3.03', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
-  'ดาวน์โหลดไฟล์ <strong>gdBasket v3.02</strong> จากปุ่มด้านบน',
+  'ดาวน์โหลดไฟล์ <strong>gdBasket v3.03</strong> จากปุ่มด้านบน',
   'เปิด <strong>MetaTrader 5</strong> → <strong>File → Open Data Folder</strong>',
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
@@ -142,7 +144,7 @@ const engines = [
 ];
 ---
 
-<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — โหมดใหม่ VELOCE ผ่านพิสูจน์ 3 ปี 6 เดือน — โหลดฟรี v3.02" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
+<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — โหมดใหม่ VELOCE ผ่านพิสูจน์ 3 ปี 6 เดือน — โหลดฟรี v3.03" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
 <div id="main-content" class="repo-page">
   <div class="repo-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -164,7 +166,7 @@ const engines = [
           <p>Adaptive Buy Grid Behavior EA · GOLD M15</p>
         </div>
       </div>
-      <div class="repo-version"><span>เวอร์ชัน</span><strong>v3.02</strong></div>
+      <div class="repo-version"><span>เวอร์ชัน</span><strong>v3.03</strong></div>
     </header>
 
     <!-- (c) SUB-NAV TABS -->
@@ -183,7 +185,7 @@ const engines = [
       </a>
       <a href="/ea/gdbasket/changelog">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Releases <span>6</span>
+        Releases <span>7</span>
       </a>
       <a href={JOURNAL}>Trading Journal</a>
     </nav>
@@ -196,17 +198,17 @@ const engines = [
         <div class="repo-toolbar">
           <div class="branch-pill">
             <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
-            <strong>v3.02</strong>
+            <strong>v3.03</strong>
           </div>
           <span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-            <strong>6</strong> เวอร์ชัน
+            <strong>7</strong> เวอร์ชัน
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            ดาวน์โหลดฟรี <span>v3.02</span>
+            ดาวน์โหลดฟรี <span>v3.03</span>
           </a>
-          <p>ไฟล์รุ่น <strong>v3.02</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
+          <p>ไฟล์รุ่น <strong>v3.03</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
         </div>
 
         <!-- (e) FILE BROWSER -->
@@ -214,8 +216,8 @@ const engines = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v3.02 — VELOCE โหมดใหม่ค่าเริ่มต้น + แผงจัดการสด</p>
-            <time>อัปเดต 23 ก.ค. 2026</time>
+            <p>v3.03 — ปรับสวอปให้ชดเชยที่กำไรอัตโนมัติเสมอ</p>
+            <time>อัปเดต 26 ก.ค. 2026</time>
           </div>
           <div class="file-list">
             {fileRows.map((row) => (
@@ -519,10 +521,11 @@ const engines = [
         <section id="changelog" class="release-card scroll-mt-20">
           <div>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <strong>อัปเดตล่าสุด — v3.02</strong>
+            <strong>อัปเดตล่าสุด — v3.03</strong>
           </div>
-          <p>v3.02 — โหมดใหม่ <strong>VELOCE</strong> ค่าเริ่มต้น พร้อมแผงจัดการสดแม่นขึ้น เวลาไทย และป้ายเหตุปิดรอบถูกต้อง</p>
+          <p>v3.03 — ปรับสวอปให้ชดเชยที่เป้ากำไรอัตโนมัติเสมอ กันกำไรโดนกินตอนถือข้ามคืน</p>
           <ul>
+            <li><span>+</span><span><strong>ชดเชยสวอปที่เป้ากำไรอัตโนมัติ</strong> — ถือไม้ข้ามคืนโดนหักสวอปทุกคืน EA ปรับเป้ากำไรชดเชยให้เองแล้ว ไม่ต้องตั้งอะไรเพิ่ม</span></li>
             <li><span>+</span><span><strong>โหมดใหม่ VELOCE ค่าเริ่มต้น</strong> — เครื่องพีระมิด 2 บ้าน ค่าล็อกจากการพิสูจน์บนสนามทดสอบยาว 3 ปี 6 เดือน</span></li>
             <li><span>+</span><span><strong>แผงจัดการสดแม่นขึ้น</strong> — นับจากเหตุการณ์จริงของ EA เอง มีแถวกำไรรอบปัจจุบัน + บอกเหตุผลสดว่าทำไมยังไม่เปิดไม้</span></li>
             <li><span>+</span><span><strong>เวลาบนกล่องสถานะเป็นเวลาไทยแล้ว</strong> — ตั้งเองได้ + เรียงเวลาถูก ไม่กระโดดข้ามวัน</span></li>
