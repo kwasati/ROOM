@@ -57,21 +57,17 @@ try {
 } catch (e) { /* ใช้ fallback */ }
 
 const features = [
-  { title: 'Adaptive Buy Grid', desc: 'ราคาลงยิ่งซื้อเพิ่มถัวเฉลี่ย ระยะซื้อปรับตามความเหวี่ยงตลาดเอง ไม่ไล่ซื้อรัวจนพอร์ตบาน' },
-  { title: 'Common-TP', desc: 'เป้ากำไรร่วมวางจริงที่โบรก ถึงเป้าปิดทั้งชุดให้เองแม้คอมดับ/ปิดโปรแกรม' },
-  { title: 'PPTS', desc: 'ราคาวิ่งเข้าทางไม่รีบปิด ไล่ล็อกกำไรตามขึ้นไป ให้กำไรวิ่งต่อโดยไม่คืนของ' },
-  { title: 'Broker-side Stop', desc: 'จุดตัดขาดทุนจริงที่โบรกเป็นกันชนสุดท้าย กันพอร์ตเสียหนักตอนตลาดกระโดด' },
-  { title: 'Engine Profile', desc: '3 สไตล์การขับ เลือกตามความกล้าเสี่ยง ค่าเริ่มต้น VELOCE ผ่านพิสูจน์แล้ว' },
-  { title: 'Std + Micro Ready', desc: 'รองรับทั้งบัญชีใหญ่และไมโคร ปรับขนาดไม้ให้พอดีบัญชีอัตโนมัติ' },
-  { title: 'Live Management Panel', desc: 'แผงบนจอนับจากเหตุการณ์จริงของ EA เอง มีแถวกำไรรอบปัจจุบัน + บอกเหตุผลสดว่าทำไมยังไม่เปิดไม้' },
-  { title: 'นับรอบย้อนหลัง', desc: 'ติดตั้งใหม่หรือรีสตาร์ทเครื่อง ไม่เริ่มนับรอบเป็นศูนย์ — ไล่ประวัติเทรดจริงประกอบรอบเก่าให้เอง' },
+  { title: 'Adaptive Grid Behavior', desc: 'ตรวจจับว่าราคาอยู่โซนไหน แล้วปรับระยะ Grid และขนาด Lot ให้เหมาะกับสถานการณ์ ตลาดเป็นใจจะเปิดโอกาสให้กำไรโตขึ้น ตลาดไม่เป็นใจจะเปลี่ยนมาเล่นอย่างระมัดระวังมากขึ้น', tag: 'ปรับ Grid + Lot ตามโซนราคา' },
+  { title: 'Market Temperature', desc: 'วัดความร้อนของตลาดก่อนเปิดรอบใหม่ ถ้าความผันผวนอันตรายเกินเกณฑ์ ระบบจะงดเข้าเทรดและรอให้ตลาดกลับมาเหมาะสมกว่า', tag: 'กรองอันตรายก่อนเริ่มกอง' },
+  { title: 'PPTS', desc: 'เมื่อราคาเดินถูกทาง ระบบจะค่อยๆ เติมไม้เพื่อเพิ่มโอกาสทำกำไร พร้อมไล่ล็อกกำไรรวมของทั้งชุด ให้กำไรวิ่งต่อโดยไม่ปล่อยของที่เก็บมาแล้วไหลกลับมากเกินไป', tag: 'เติมไม้ขาขึ้น + ไล่ล็อกกำไร' },
 ];
 
 const howSteps = [
-  '<strong class="text-gray-light">Hour Entry :</strong> เปิดไม้แรกตามจังหวะเวลา — ไม่ต้องรอสัญญาณอะไรให้ปวดหัว ใช้กลไกเปิดออเดอร์ทุกต้นชั่วโมงในจังหวะที่ตลาดเป็นใจ',
-  'ราคาลงถึงระยะที่มันคำนวณไว้ → ทยอยซื้อเพิ่มถัวเฉลี่ยแบบอัจฉริยะ (<strong class="text-gray-light">Adaptive Grid</strong>) ระยะห่างปรับตามความเหวี่ยงตลาดเอง',
-  'ตั้งเป้ากำไรร่วมไว้จุดเดียว (<strong class="text-gray-light">Common-TP</strong>) → ราคาแตะ โบรกปิดทั้งชุดให้ รับกำไรพร้อมกันทุกไม้ ไม่หวังพึ่งการส่งคำสั่งจาก EA ที่ปิดช้าไม่ทันกิน',
-  'มี <strong class="text-gray-light">Broker-side Stop</strong> วางจริงที่โบรก เผื่อวันตลาดกระโดดแรงหรือ EA ดับ — พอร์ตไม่เสียหายเกินที่ตั้งไว้',
+  '<strong class="text-gray-light">เริ่มรอบเมื่อสภาพตลาดเหมาะ</strong> ระบบดูอุณหภูมิตลาดก่อน ไม่รีบเปิดกองในจังหวะที่อันตรายเกินเกณฑ์',
+  '<strong class="text-gray-light">อ่านโซนราคา</strong> ปรับวิธีวาง Grid และขนาด Lot ตามตำแหน่งราคาและความเหวี่ยงของตลาด',
+  '<strong class="text-gray-light">ราคาลง ระบบทยอยซื้อ</strong> วางไม้เพิ่มตามระยะที่คำนวณไว้ เพื่อขยับราคาเฉลี่ยของทั้งกอง',
+  '<strong class="text-gray-light">ราคาขึ้น ระบบเติมกำไร</strong> PPTS เติมไม้ตามทาง พร้อมไล่ล็อกกำไรรวมขึ้นไป',
+  '<strong class="text-gray-light">ปิดทั้งชุด</strong> เมื่อราคาแตะ Common-TP โบรกจะปิดทุกไม้ในรอบพร้อมกัน',
 ];
 
 // "กว่าจะมาเป็น VELOCE" — 5 ขั้น (ย่อ story 5 บท)
@@ -97,8 +93,9 @@ const releases = [
 const fileRows = [
   { icon: 'doc', name: 'ภาพรวม gdBasket', note: 'Adaptive Buy Grid Behavior EA · ทยอยซื้อเป็นชุด ปิดรับกำไรทั้งชุด', meta: 'อ่าน', href: '#readme', color: 'text-gray' },
   { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · ลากใส่กราฟ GOLD M15 · 6 ขั้นจบ', meta: '6 ขั้น', href: '#install', color: 'text-secondary' },
-  { icon: 'modes', name: 'Engine Profile', note: 'strada+ / sport+ / VELOCE — ค่าเริ่มต้น VELOCE', meta: '3', href: '#modes', color: 'text-primary' },
-  { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Common-TP / PPTS / Live Management', meta: '8', href: '#features', color: 'text-primary' },
+  { icon: 'modes', name: 'เครื่องยนต์ VELOCE', note: 'ค่าพร้อมใช้ที่ผ่านการทดสอบมาแล้ว · ไม่ต้องเลือกโหมด', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
+  { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
+  { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
   { icon: 'clock', name: 'Releases', note: 'v3.03 · v3.02 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '7 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
   { icon: 'dl', name: 'gdBasket v3.03', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
@@ -111,40 +108,12 @@ const installSteps = [
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
   'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊กอนุญาตเทรดอัตโนมัติ → กดปุ่ม <strong>Algo Trading</strong> ให้ขึ้น<strong class="text-green">สีเขียว</strong>',
-  'ตั้ง <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — Standard ขั้นต่ำ <strong>$1,000</strong> · Micro ขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) ส่วน Engine Profile ตั้ง <strong>VELOCE</strong> มาให้แล้ว ไม่ต้องเลือก — สายนิ่งค่อยสลับ <strong>strada+</strong> / <strong>sport+</strong>',
+  'ตั้ง <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — Standard ขั้นต่ำ <strong>$1,000</strong> · Micro ขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) และใช้ <strong>VELOCE</strong> ที่ตั้งมาให้พร้อมใช้ได้เลย',
 ];
 
-// Engine Profile — 3 เครื่องยนต์ (markup-only render data สำหรับ engine-tabs; VELOCE = ค่าเริ่มต้น, ตัด CORSA ออกจากช่องเลือก)
-const engines = [
-  {
-    key: 'strada', name: 'strada+', subtitle: 'grand tourer',
-    badge: 'พร้อมใช้ · เน้นนิ่ง · ปลอดภัย',
-    copy: [
-      'ขับทางไกลแบบนิ่งๆ เลือกจังหวะเข้าที่มั่นใจ เก็บกำไรเรื่อยๆ ไม่หวือหวา เหมาะกับคนอยากนอนหลับสบาย',
-      'มี<strong>ตัวกรองความร้อนตลาด</strong>ติดมาในตัว — วันไหนตลาดผันผวนแรงกว่าค่าเฉลี่ยของตัวเอง มันงดเปิดกองใหม่ให้อัตโนมัติ รอตลาดเย็นลงค่อยเริ่มกองถัดไป',
-    ],
-    profit: '+90,184', wins: '10', stops: '3',
-  },
-  {
-    key: 'sport', name: 'sport+', subtitle: 'สปอร์ตสมดุล',
-    badge: 'พร้อมใช้ · แนะนำ',
-    copy: [
-      'สมดุลระหว่างบุกกับเซฟ รู้จักดูว่าทองอยู่โซนแพงหรือถูกแล้วปรับสไตล์เล่นให้เหมาะกับจังหวะนั้น มีระบบเบรกกันเร่งเกินตอนตลาดดิ่งแรง',
-    ],
-    profit: '+199,673', wins: '28', stops: '20',
-  },
-  {
-    key: 'veloce', name: 'VELOCE', subtitle: 'เรือธงรุ่นใหม่',
-    badge: 'ใหม่ใน v3.02 · ค่าเริ่มต้น · ผ่านพิสูจน์ 3 ปี 6 เดือน',
-    copy: [
-      'สูตรที่ชนะทุกด้านพร้อมกัน — ถูกนำมาตรึงเป็นค่าตั้งต้นของรุ่นใหม่ ทุกตัวเลขผ่านการพิสูจน์บนสนามทดสอบยาวหลายปี ไม่ต้องมานั่งเดาว่าจะตั้งค่ายังไงให้ดี เปิดมาก็เจอค่าที่ผ่านการทดสอบมาแล้วทันที',
-    ],
-    profit: '+250,351', wins: '26', stops: '4',
-  },
-];
 ---
 
-<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — โหมดใหม่ VELOCE ผ่านพิสูจน์ 3 ปี 6 เดือน — โหลดฟรี v3.03" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
+<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — VELOCE ผ่านพิสูจน์ 3 ปี 6 เดือน — โหลดฟรี v3.03" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
 <div id="main-content" class="repo-page">
   <div class="repo-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -230,6 +199,7 @@ const engines = [
                 {row.icon === 'gear' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>}
                 {row.icon === 'modes' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>}
                 {row.icon === 'star' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>}
+                {row.icon === 'risk' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.82 14A2 2 0 003.18 21h17.64a2 2 0 001.71-3.14l-8.82-14a2 2 0 00-3.42 0z"/></svg>}
                 {row.icon === 'clock' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
                 {row.icon === 'dl' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>}
                 {row.icon === 'journal' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>}
@@ -259,7 +229,7 @@ const engines = [
               <span class="bg-dark border border-dark-border rounded-lg px-3 py-1.5 text-gray-light">เปิดบัญชี <span class="text-secondary">ฟรี</span></span>
             </div>
           </div>
-          <div class="ref-code">
+          <div class="ref-code referral-strip">
             <span>รหัสผู้แนะนำ:</span>
             <strong>{XM_CODE}</strong>
             <button type="button" data-copy={XM_CODE} class="copy-code">
@@ -282,7 +252,7 @@ const engines = [
             <h1 class="pixel">gdBasket</h1>
             <p class="readme-subtitle">Adaptive Buy Grid Behavior EA</p>
             <p>EA เทรดทองคำด้วยระบบ <strong>Adaptive Grid Behavior</strong> ปรับพฤติกรรมการวาง Grid ตามสภาวะความผันผวนของตลาดแบบอัตโนมัติ และเสริมความแกร่งในการทำกำไรด้วยระบบ <strong>Peak Profit Trail System</strong> เก็บกำไรเก่ง เติมไม้ทำกำไรในช่วงตลาดพุ่ง — ใช้ระบบ Safety แบบ <strong>Common-TP/SL</strong> ที่วางจริงไว้ที่โบรก — ถึงเป้าปิดให้เองแม้คุณไม่ได้เปิดเครื่อง</p>
-            <p>รุ่นล่าสุดมีโหมดใหม่ <strong>VELOCE</strong> เป็นค่าเริ่มต้น — เครื่องพีระมิด 2 บ้าน ผ่านการพิสูจน์ยาว 3 ปี 6 เดือน มาพร้อม<strong>แผงจัดการสด</strong>บนจอที่บอกเหตุผลแบบเรียลไทม์ว่าทำไมมันยังไม่เปิดไม้</p>
+            <p>รุ่นล่าสุดใช้ <strong>VELOCE</strong> เป็นค่าพร้อมใช้ — เครื่องพีระมิด 2 บ้าน ผ่านการพิสูจน์ยาว 3 ปี 6 เดือน มาพร้อม<strong>แผงจัดการสด</strong>บนจอที่บอกเหตุผลแบบเรียลไทม์ว่าทำไมมันยังไม่เปิดไม้</p>
 
             <!-- KPI row เด่น — สรุปผล VELOCE -->
             <dl class="kpi-row" aria-label="สรุปผล VELOCE">
@@ -293,7 +263,20 @@ const engines = [
             </dl>
             <p class="fine-print mb-6">ตัวเลขทั้งหมดคำนวณจากทุนตั้งต้น (buffer) 30,000 + ตั้งทุนต่อรอบ (capital) 10,000 → เป้าถอน 20,000/รอบ</p>
 
-            <h2 id="how">ทำงานยังไง</h2>
+            <h2 id="features">จุดเด่นของระบบ</h2>
+            <p>แกนของ gdBasket คือการรู้ว่าเมื่อไรควรบุก เมื่อไรควรระวัง และใช้จังหวะที่ถูกทางให้คุ้มที่สุด</p>
+            <div class="gdb-core-features">
+              {features.map((f, i) => (
+                <section>
+                  <span class="gdb-core-num">0{i + 1}</span>
+                  <h3>{f.title}</h3>
+                  <p>{f.desc}</p>
+                  <span class="gdb-core-tag">{f.tag}</span>
+                </section>
+              ))}
+            </div>
+
+            <h2 id="how">หนึ่งรอบทำงานอย่างไร</h2>
             <ol class="readme-steps">
               {howSteps.map((step, i) => (
                 <li><span>{i + 1}</span><p set:html={step} /></li>
@@ -321,49 +304,70 @@ const engines = [
               </div>
             </div>
 
-            <h2 id="features">จุดเด่น</h2>
-            <div class="feature-list">
-              {features.map(f => (
-                <div>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                  <p><strong>{f.title}</strong><span>{f.desc}</span></p>
-                </div>
-              ))}
+            <h2>จัดการกำไรและความเสียหายเป็นชุดเดียวกัน</h2>
+            <div class="gdb-safety-grid">
+              <section>
+                <b>Common-TP</b>
+                <p>ทุกไม้มีเป้ากำไรราคาเดียวกัน วางจริงไว้กับโบรก ถึงเป้าปิดทั้งชุดให้เอง แม้หน้าจอ MT5 ไม่ได้เปิดอยู่</p>
+              </section>
+              <section>
+                <b>Swap Adjust</b>
+                <p>ถ้าถือข้ามคืน ระบบขยับเป้ากำไรเพื่อชดเชยค่า Swap ที่ถูกหักจริง ไม่ปล่อยให้ต้นทุนข้ามคืนกินเป้าเดิม</p>
+              </section>
+              <section>
+                <b>Broker-side Stop</b>
+                <p>มีจุดหยุดขาดทุนรวมวางจริงไว้กับโบรก เป็นกันชนสุดท้ายเมื่อราคาไหลแรง โปรแกรมดับ หรือเกิด Gap</p>
+              </section>
             </div>
 
-            <h2 id="modes">Engine Profile — เลือกเครื่องยนต์ให้เข้ากับใจคุณ</h2>
-            <p>gdBasket มี 3 เครื่องยนต์ให้เลือก — แต่ละตัวปรับสไตล์การเล่นตามจังหวะตลาดเอง ต่างกันที่ "คันเร่ง" ว่าจะบุกแค่ไหน</p>
-            <div class="engine-tabs" role="tablist" aria-label="Engine Profile">
-              {engines.map((e) => (
-                <button type="button" id={`etab-${e.key}`} role="tab" aria-selected={e.key === 'veloce'} class={e.key === 'veloce' ? 'active' : ''} onclick={`showEngine('${e.key}')`}>
-                  <strong class="pixel">{e.name}</strong><span>{e.subtitle}</span>
-                </button>
-              ))}
-            </div>
-            {engines.map((e) => (
-              <div id={`engine-${e.key}`} class={`engine-readout${e.key === 'veloce' ? '' : ' hidden'}`}>
-                <div>
-                  <span class="status-dot"></span><small>{e.badge}</small>
-                  <h3 class="pixel">{e.name}</h3>
-                  {e.copy.map((p) => <p set:html={p} />)}
-                </div>
-                <dl>
-                  <div><dt>กำไรสุทธิย้อนหลัง</dt><dd>{e.profit}</dd></div>
-                  <div><dt>รอบสำเร็จ</dt><dd>{e.wins}</dd></div>
-                  <div><dt>รอบชนเพดาน</dt><dd class="danger">{e.stops}</dd></div>
-                </dl>
+            <h2 id="capital">Capital และ Rolling Capital</h2>
+            <div class="gdb-capital-grid">
+              <div>
+                <h3>Capital ต่อรอบ</h3>
+                <div class="gdb-formula">$1,000 → เป้ากำไร $1,000</div>
+                <p>Capital คือเงินที่มึงยอมเสี่ยงต่อหนึ่งรอบ ไม่ใช่ยอดเงินทั้งหมดในบัญชี ระบบใช้ตัวเลขนี้เป็นฐานคำนวณขนาดไม้ เป้ากำไร และเพดานของรอบ</p>
+                <p class="fine-print">ราคา Gap หรือ Slippage อาจทำให้ผลจริงเกินจุดที่ตั้งใจ จึงไม่ใช่ยอดขาดทุนสูงสุดแบบรับประกัน</p>
               </div>
-            ))}
-            <script is:inline>
-              function showEngine(which){
-                ['strada','sport','veloce'].forEach(function(k){
-                  var panel = document.getElementById('engine-'+k);
-                  var tab = document.getElementById('etab-'+k);
-                  if (panel) panel.classList.toggle('hidden', k !== which);
-                  if (tab) { tab.classList.toggle('active', k === which); tab.setAttribute('aria-selected', k === which ? 'true' : 'false'); }
-                });
-              }
-            </script>
+              <div>
+                <h3>Rolling Capital</h3>
+                <p>เลือกถอนกำไรบางส่วนและนำที่เหลือกลับไปเพิ่มทุนได้ ระบบแยกเงินแต่ละหน้าที่ออกจากกัน และลดขนาดไม้หรือหยุดเปิดรอบใหม่เมื่อเงินจริงไม่พอ</p>
+                <div class="gdb-wallets">
+                  <div><b>ทุนต่อรอบ</b>ฐานความเสี่ยง</div>
+                  <div><b>เงินรอทบ</b>กำไรที่รอเพิ่มทุน</div>
+                  <div><b>เงินทำงาน</b>ยอดจริงในบัญชี</div>
+                  <div><b>เงินถอนสะสม</b>เงินที่นำออกแล้ว</div>
+                </div>
+                <a href="/ea/gdbasket/rolling-capital" class="repo-download rolling-cta mt-4" style="display:inline-flex;min-height:40px;padding:0 16px;gap:8px;background:var(--color-secondary);border-color:var(--color-secondary-dark);">ลองวางแผนถอน/ทบทุนจากผลจริงย้อนหลัง →</a>
+              </div>
+            </div>
+
+            <h2>พร้อมใช้จริงบนพอร์ตจริง</h2>
+            <div class="gdb-support-grid">
+              <section><b>Standard + Micro</b><p>อ่านขนาดสัญญาจริงและปรับขนาดไม้ให้เข้ากับบัญชีอัตโนมัติ</p></section>
+              <section><b>จำสถานะหลังรีสตาร์ต</b><p>ไล่ประวัติจริงกลับมาประกอบรอบเดิม ไม่เริ่มนับใหม่เป็นศูนย์</p></section>
+              <section><b>พักหลังชนเพดาน</b><p>เว้นช่วงก่อนเริ่มรอบใหม่ ไม่รีบกลับเข้าเทรดทันทีหลังรอบเสีย</p></section>
+              <section><b>Live Management Panel</b><p>เห็นกำไรรอบปัจจุบัน สถานะ และเหตุผลที่ยังไม่เปิดไม้บนกราฟ</p></section>
+            </div>
+
+            <h2 id="modes">VELOCE · เครื่องยนต์ 2 บ้านที่รู้จังหวะบุกและระวัง</h2>
+            <p>VELOCE คือสูตรเรือธงของ gdBasket ที่ให้บ้านบนและบ้านล่างทำงานคู่กัน ระบบอ่านโซนราคาและอุณหภูมิตลาดก่อนเลือกวิธีวาง Grid กับขนาด Lot จึงไม่ใช้แรงเท่ากันทุกสถานการณ์</p>
+            <section class="engine-readout veloce-panel" id="engine-veloce">
+              <div>
+                <span class="status-dot"></span><small>ค่าพร้อมใช้ · ผ่านพิสูจน์ 3 ปี 6 เดือน</small>
+                <h3 class="pixel">VELOCE</h3>
+                <p class="veloce-lead">เป้าหมายของ VELOCE ไม่ใช่แค่ปิดรอบให้ได้ แต่คือ<strong>เร่งเก็บกำไรเมื่อได้ทาง และลดแรงปะทะเมื่อตลาดไม่เป็นใจ</strong></p>
+                <div class="veloce-behavior">
+                  <div><b>เมื่อตลาดเป็นใจ</b><span>PPTS จะเติมไม้ตามทางและไล่ล็อกกำไรรวมขึ้นไป เพื่อใช้ช่วงที่ราคาวิ่งดีให้คุ้มที่สุด</span></div>
+                  <div><b>เมื่อตลาดไม่เป็นใจ</b><span>ระบบจะปรับระยะ Grid และน้ำหนัก Lot ให้เหมาะกับโซนราคา พร้อมกรองจังหวะอันตรายก่อนเปิดรอบใหม่</span></div>
+                </div>
+                <p>ค่าหลักของ VELOCE ถูกคัดจากผลทดสอบย้อนหลัง 3 ปี 6 เดือน และการเลื่อนช่วงเวลา 25 รูปแบบ ก่อนตรึงมาเป็นค่าพร้อมใช้ใน gdBasket v3.03</p>
+              </div>
+              <dl>
+                <div><dt>กำไรสุทธิย้อนหลัง</dt><dd>+250,351</dd></div>
+                <div><dt>รอบสำเร็จ</dt><dd>26</dd></div>
+                <div><dt>รอบชนเพดาน</dt><dd class="danger">4</dd></div>
+              </dl>
+            </section>
 
             <h2>กว่าจะมาเป็น VELOCE</h2>
             <ol class="readme-steps">
@@ -372,14 +376,8 @@ const engines = [
               ))}
             </ol>
 
-            <h2>ผ่านทดสอบเลื่อนช่วงเวลา</h2>
-            <p>ผมเอาเครื่องยนต์ไปรันย้อนหลังบนข้อมูลราคาทองจริงต่อเนื่องหลายปี — ตัวเลขข้างล่างคือผลรวมทั้งช่วง <strong>ไม่ใช่การรับประกันอนาคต</strong> (ช่วงเวลาที่ทดสอบระบุใต้แต่ละตาราง)</p>
-            <div class="proof-switch" role="tablist" aria-label="ผลทดสอบ">
-              <button type="button" id="btn-veloce" class="active" onclick="showTbl('veloce')">VELOCE</button>
-              <button type="button" id="btn-sport" onclick="showTbl('sport')">sport+</button>
-              <button type="button" id="btn-strada" onclick="showTbl('strada')">strada+</button>
-            </div>
-
+            <h2 id="results">ผลทดสอบย้อนหลัง</h2>
+            <p>ตัวเลขด้านล่างมีไว้ให้เห็นพฤติกรรมของ VELOCE บนข้อมูลในอดีต ไม่ใช่คำรับประกันผลตอบแทนในอนาคต</p>
             <div id="tbl-veloce" class="proof-table-wrap mb-4">
               <table class="proof-table">
                 <thead>
@@ -396,56 +394,9 @@ const engines = [
             <p class="fine-print">ช่วงข้อมูล: ธ.ค. 2022 – มิ.ย. 2026 (3 ปี 6 เดือน) · ทุนต่อรอบ $10,000</p>
             <p class="fine-print mb-6">เสียดิบต่อครั้งที่โดนล้างพอร์ตอยู่ราวทุนต่อรอบ (~9,400–9,900 จากทุนต่อรอบ $10,000) — ไม่มีเคสไหนเสียหนักเกินทุนที่ตั้งไว้</p>
 
-            <div id="tbl-sport" class="proof-table-wrap mb-4 hidden">
-              <table class="proof-table">
-                <thead>
-                  <tr><th>สรุปผล — sport+</th><th>จำนวน</th><th>ยอด USD</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>รอบสำเร็จ (ปั้นครบเป้า)</td><td>28 รอบ</td><td class="positive">+288,459.40</td></tr>
-                  <tr><td>กำไรที่แบงก์ไว้ก่อนชนเพดาน</td><td>(ใน 20 รอบที่ชน)</td><td class="positive">+99,329.10</td></tr>
-                  <tr><td>รอบกำลังปั้น (ยังไม่ครบเป้า ตอนจบเทส)</td><td>1 รอบ</td><td class="positive">+7,123.20</td></tr>
-                  <tr class="total"><td>รวมกำไรที่ทำได้จริง</td><td></td><td class="positive">+394,911.70</td></tr>
-                  <tr><td>หักส่วนที่เสียตอนชนเพดาน</td><td>20 รอบ (รอบละ ~9–10k)</td><td class="negative">−195,239.00</td></tr>
-                  <tr class="total"><td>กำไรสุทธิ</td><td></td><td class="positive">+199,672.70</td></tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div id="tbl-strada" class="proof-table-wrap mb-4 hidden">
-              <table class="proof-table">
-                <thead>
-                  <tr><th>สรุปผล — strada+</th><th>จำนวน</th><th>ยอด USD</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>รอบสำเร็จ (ปั้นครบเป้า)</td><td>10 รอบ</td><td class="positive">+100,690.40</td></tr>
-                  <tr><td>กำไรที่แบงก์ไว้ก่อนชนเพดาน</td><td>(ใน 3 รอบที่ชน)</td><td class="positive">+19,426.70</td></tr>
-                  <tr><td>รอบกำลังปั้น (ยังไม่ครบเป้า ตอนจบเทส)</td><td>1 รอบ</td><td class="negative">−280.20</td></tr>
-                  <tr class="total"><td>รวมกำไรที่ทำได้จริง</td><td></td><td class="positive">+119,836.90</td></tr>
-                  <tr><td>หักส่วนที่เสียตอนชนเพดาน</td><td>3 รอบ</td><td class="negative">−29,652.50</td></tr>
-                  <tr class="total"><td>กำไรสุทธิ</td><td></td><td class="positive">+90,184.40</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <p class="fine-print" id="fp-legacy">ช่วงข้อมูล: ม.ค. 2023 – พ.ค. 2026 · ทุนต่อรอบ $10,000 (ข้อมูลรุ่นก่อน — ยังไม่รันซ้ำช่วงเดียวกับ VELOCE)</p>
-
             <p class="fine-print"><strong>"รอบสำเร็จ"</strong> = รอบที่ปั้นครบเป้า (ในตารางคือ $10,000) โดยไม่ชนเพดานก่อน</p>
             <p class="fine-print mb-6"><strong>"ชนเพดาน" ไม่ได้แปลว่ารอบนั้นขาดทุนล้วน</strong> — ก่อนจะชนเพดาน หลายรอบแบงก์กำไรไปแล้ว กำไรส่วนนี้อยู่ในพอร์ตจริง การชนเพดานแค่ตัดตะกร้าไม้สุดท้ายที่ราคาไหลลงแรง เสียเท่า Capital ที่ตั้งไว้ <strong>ไม่ใช่ล้างพอร์ต</strong> แล้วขึ้นรอบใหม่ต่อ · ตัวเลขกำไรสุทธิหักส่วนที่เสียตอนชนเพดานทั้งหมดแล้ว</p>
             <p class="fine-print mb-6">ตัวเลขทั้งหมดคำนวณจากทุนตั้งต้น (buffer) 30,000 + ตั้งทุนต่อรอบ (capital) 10,000 → เป้าถอน 20,000/รอบ</p>
-
-            <script is:inline>
-              function showTbl(which){
-                ['veloce','sport','strada'].forEach(function(k){
-                  var t = document.getElementById('tbl-'+k);
-                  var b = document.getElementById('btn-'+k);
-                  if (t) t.classList.toggle('hidden', k !== which);
-                  if (b) b.classList.toggle('active', k === which);
-                });
-                var fp = document.getElementById('fp-legacy');
-                if (fp) fp.style.display = (which === 'veloce') ? 'none' : '';
-              }
-              showTbl('veloce');
-            </script>
 
             <p class="fine-print mb-6"><strong class="text-gray-light">VELOCE ทนทุกช่วงเวลาที่ทดสอบ รอด 100%</strong> — ทดสอบเลื่อนช่วงเวลา 25 รูปแบบ ไม่มีช่วงไหนหลุดเกณฑ์ (รายละเอียดเต็มอยู่ในปุ่ม "ดูสถิติเต็ม" ด้านล่าง)</p>
 
@@ -458,14 +409,24 @@ const engines = [
               </button>
             </div>
 
-            <div class="readme-callout" style="text-align:center;border-left-color:var(--color-secondary);">
-              <p style="margin:0 0 6px;color:var(--color-gray-light);font-size:15px;font-weight:700;">เห็นผลจริงย้อนหลังแล้ว อยากรู้ว่าเงินตัวเองจะโตแค่ไหน?</p>
-              <p style="margin:0 0 16px;">กรอกทุนของคุณ ลองวางแผนถอน/ทบทุนจากผลจริงย้อนหลัง เห็นตัวเลขทันทีในเบราว์เซอร์</p>
-              <a href="/ea/gdbasket/rolling-capital" class="repo-download rolling-cta" style="display:inline-flex;font-size:13.5px;min-height:46px;padding:0 26px;gap:9px;background:var(--color-secondary);border-color:var(--color-secondary-dark);">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 0v6m0-6L4 20"/></svg>
-                ลองวางแผนถอน/ทบทุนจากผลจริงย้อนหลัง →
-              </a>
-            </div>
+            <h2 id="risk">ความเสี่ยงที่ต้องรู้ก่อนใช้</h2>
+            <section class="gdb-risk-card">
+              <div class="gdb-risk-head">
+                <b>gdBasket มีระบบคุมความเสียหาย แต่ยังเป็น Buy Grid</b>
+                <p>ระบบช่วยจัดการความเสี่ยง ไม่ได้กำจัดความเสี่ยงจากตลาด</p>
+              </div>
+              <div class="gdb-risk-list">
+                <div><b>ซื้ออย่างเดียว และไม่ได้ทำนายทิศทาง</b><p>เปิด Buy ตามเวลาและสภาพตลาด ไม่ได้รอสัญญาณว่าราคาจะขึ้นแน่นอน</p></div>
+                <div><b>ราคาลงต่อ ระบบจะสะสมไม้</b><p>อาจเห็นขาดทุนค้างสูงก่อนตลาดเด้งกลับ หรือก่อนถึงจุดหยุดรวม</p></div>
+                <div><b>ไม่มี Stop Loss แยกรายไม้</b><p>ทุกไม้ถูกดูแลเป็นกองเดียว และใช้จุดหยุดรวมของทั้งรอบ</p></div>
+                <div><b>หนึ่งรอบอาจเสียใกล้เคียง Capital</b><p>Gap, Slippage หรือสภาพคล่องบางช่วง อาจทำให้ผลจริงเกินระดับที่ตั้งใจ</p></div>
+                <div><b>ผลย้อนหลังไม่รับประกันอนาคต</b><p>Spread, Swap, Slippage และตลาดจริงอาจทำให้ผลต่างจากการทดสอบ</p></div>
+                <div><b>Rolling Capital ทำให้เงินเสี่ยงโตตามทุน</b><p>เมื่อ Capital โต ขนาด Lot และจำนวนเงินที่ยอมเสี่ยงต่อรอบจะโตด้วย</p></div>
+                <div><b>ใช้เฉพาะ XM GOLD M15</b><p>ค่าของระบบออกแบบกับสัญญา XM ไม่ควรนำไปใช้กับโบรกหรือสินทรัพย์อื่น</p></div>
+                <div><b>EA ต้องทำงานต่อเนื่องเพื่อจัดการไม้ใหม่</b><p>TP/SL ที่โบรกยังอยู่ แต่การเปิดและปรับแผนใหม่ต้องให้ EA ทำงาน</p></div>
+              </div>
+              <div class="gdb-risk-rule"><strong>หลักที่ใช้:</strong> มีทุนเท่าไร เอามาหาร 3 แล้วใช้ผลลัพธ์เป็น Capital เพื่อไม่ให้รอบเดียวกินเงินทั้งบัญชี</div>
+            </section>
 
             <h2 id="install">วิธีติดตั้ง</h2>
             <a href={XM_AFF} target="_blank" rel="noopener noreferrer sponsored" class="flex items-start gap-3 bg-secondary/5 border border-secondary/30 rounded-lg p-3.5 mb-4 hover:border-secondary/60 transition-colors">
@@ -489,19 +450,7 @@ const engines = [
               <span class="text-sm text-gray-light pt-0.5">แนะนำรัน EA บน VPS จะได้ทำงาน 24/7 ไม่ต้องเปิดคอมฯทิ้งไว้ — <span class="text-primary font-semibold">VPS ที่ผมใช้</span></span>
             </a>
 
-            <h2>คำแนะนำ</h2>
-            <div class="readme-callout">
-              <p>มีทุนเท่าไหร่ เอามา <strong>หาร 3</strong> แล้วเอาเลขนั้นไปตั้ง Capital</p>
-              <p>เช่นมีทุน <strong>$300</strong> → หาร 3 = <strong>$100</strong> → ตั้ง Capital <strong>$100</strong></p>
-              <p>นี่คือหลักบริหารความเสี่ยงที่ผมใช้กับ gdBasket — กันไม่ให้รอบเดียวกินพอร์ตหมด</p>
-              <p>ผลจำลองยืนยัน: กันทุนไว้ <strong>3 เท่า</strong>ของทุนต่อรอบ ไม่เจอเคสทุนหมดเลยตลอดข้อมูลทดสอบ</p>
-            </div>
-
-            <div class="risk-note">
-              <span aria-hidden="true">⚠</span>
-              <p><strong>ข้อควรจำ</strong> บัญชี Standard ตั้ง Capital ขั้นต่ำ <strong>$1,000</strong> · บัญชี Micro ตั้ง Capital ขั้นต่ำ <strong>$100</strong></p>
-            </div>
-
+            <h2>Copy Trade VELOCE</h2>
             <div class="readme-callout" style="border-left-color:var(--color-green);">
               <p style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
                 <span style="display:inline-flex;padding:2px 8px;color:#0d1511;background:var(--color-green);font-size:9px;font-weight:800;letter-spacing:.08em;border-radius:999px;">ใหม่!</span>
@@ -526,13 +475,12 @@ const engines = [
           <p>v3.03 — ปรับสวอปให้ชดเชยที่เป้ากำไรอัตโนมัติเสมอ กันกำไรโดนกินตอนถือข้ามคืน</p>
           <ul>
             <li><span>+</span><span><strong>ชดเชยสวอปที่เป้ากำไรอัตโนมัติ</strong> — ถือไม้ข้ามคืนโดนหักสวอปทุกคืน EA ปรับเป้ากำไรชดเชยให้เองแล้ว ไม่ต้องตั้งอะไรเพิ่ม</span></li>
-            <li><span>+</span><span><strong>โหมดใหม่ VELOCE ค่าเริ่มต้น</strong> — เครื่องพีระมิด 2 บ้าน ค่าล็อกจากการพิสูจน์บนสนามทดสอบยาว 3 ปี 6 เดือน</span></li>
+            <li><span>+</span><span><strong>VELOCE เป็นค่าพร้อมใช้</strong> — เครื่องพีระมิด 2 บ้าน ถูกตรึงจากผลทดสอบยาว 3 ปี 6 เดือน และไม่ต้องเลือกโหมดเพิ่ม</span></li>
             <li><span>+</span><span><strong>แผงจัดการสดแม่นขึ้น</strong> — นับจากเหตุการณ์จริงของ EA เอง มีแถวกำไรรอบปัจจุบัน + บอกเหตุผลสดว่าทำไมยังไม่เปิดไม้</span></li>
             <li><span>+</span><span><strong>เวลาบนกล่องสถานะเป็นเวลาไทยแล้ว</strong> — ตั้งเองได้ + เรียงเวลาถูก ไม่กระโดดข้ามวัน</span></li>
             <li><span>+</span><span><strong>เห็นไม้พีระมิดบนจอแล้ว</strong> — ขึ้นบรรทัด "Spawn P" ให้เห็นตอนไม้เติมกำไรถูกวาง</span></li>
             <li><span>+</span><span><strong>นับรอบย้อนหลัง</strong> — ติดตั้งใหม่หรือรีสตาร์ทเครื่อง ไม่เริ่มนับรอบเป็นศูนย์อีกต่อไป</span></li>
             <li><span>+</span><span><strong>ป้ายเหตุปิดรอบถูกต้องขึ้น</strong> — "โดนล้างพอร์ต" นับเฉพาะที่โดนตัดจริงเท่านั้น</span></li>
-            <li><span>+</span><span><strong>ช่องเลือกโหมดเหลือ 3</strong> — strada+ / sport+ / VELOCE (ตัด CORSA ออกจากช่องเลือก)</span></li>
             <li><span>+</span><span><strong>อัปเกรดจากรุ่นเก่า</strong> — ลากขึ้นชาร์ตครั้งแรกกด Reset ที่หน้า Inputs หนึ่งครั้ง</span></li>
           </ul>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
@@ -617,9 +565,21 @@ const engines = [
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13"/></svg>
               README
             </a>
+            <a href="#features">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+              จุดเด่นของระบบ
+            </a>
             <a href="#modes">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-              Engine Profile
+              เครื่องยนต์ VELOCE
+            </a>
+            <a href="#risk">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.82 14A2 2 0 003.18 21h17.64a2 2 0 001.71-3.14l-8.82-14a2 2 0 00-3.42 0z"/></svg>
+              ความเสี่ยงที่ต้องรู้
+            </a>
+            <a href="#results">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              ผลทดสอบ VELOCE
             </a>
             <a href="#install">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -803,8 +763,64 @@ const engines = [
   .kpi-row dt { color: var(--color-gray-dark); font-size: 9.5px; line-height: 1.4; margin-top: 5px; }
   .kpi-row dd { margin: 0; color: var(--color-green); font-size: 18px; font-weight: 800; }
   .kpi-row dd.danger { color: var(--color-primary-light); }
+
+  .gdb-core-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 28px; }
+  .gdb-core-features section, .gdb-safety-grid section, .gdb-support-grid section { padding: 16px; border: 1px solid var(--color-dark-border); border-radius: 8px; background: var(--color-dark-card); }
+  .gdb-core-num { display: inline-grid; place-items: center; width: 25px; height: 25px; color: var(--color-primary-light); background: rgba(220,38,38,.09); border: 1px solid rgba(220,38,38,.22); border-radius: 6px; font-size: 9px; font-weight: 800; }
+  .gdb-core-features h3 { margin: 12px 0 6px; color: var(--color-gray-light); font-size: 13px; }
+  .gdb-core-features p { margin: 0; color: var(--color-gray); font-size: 11px; line-height: 1.65; }
+  .gdb-core-tag { display: inline-block; margin-top: 12px; padding: 4px 7px; color: var(--color-secondary); background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.2); border-radius: 999px; font-size: 8px; font-weight: 700; }
+
+  .gdb-safety-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 28px; }
+  .gdb-safety-grid b, .gdb-support-grid b { display: block; color: var(--color-gray-light); font-size: 12px; }
+  .gdb-safety-grid p, .gdb-support-grid p { margin: 7px 0 0; color: var(--color-gray); font-size: 10.5px; line-height: 1.65; }
+
+  .gdb-capital-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: hidden; margin: 14px 0 28px; border: 1px solid var(--color-dark-border); border-radius: 8px; }
+  .gdb-capital-grid > div { padding: 19px; background: var(--color-dark-card); }
+  .gdb-capital-grid > div + div { border-left: 1px solid var(--color-dark-border); background: rgba(255,255,255,.012); }
+  .gdb-capital-grid h3 { margin: 0; color: var(--color-gray-light); font-size: 14px; }
+  .gdb-capital-grid p { margin: 9px 0 0; color: var(--color-gray); font-size: 11px; line-height: 1.7; }
+  .gdb-formula { margin: 12px 0; color: var(--color-secondary); font-size: 18px; font-weight: 800; }
+  .gdb-wallets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 12px; }
+  .gdb-wallets > div { padding: 8px; border: 1px solid var(--color-dark-border); border-radius: 6px; color: var(--color-gray-dark); font-size: 9px; }
+  .gdb-wallets b { display: block; margin-bottom: 3px; color: var(--color-gray-light); font-size: 10px; }
+
+  .gdb-support-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 14px 0 28px; }
+  .gdb-support-grid section { padding: 13px; }
+  .gdb-support-grid p { font-size: 9.5px; }
+
+  .referral-strip { width: 100%; min-height: 48px; gap: 10px; padding: 10px 12px; }
+  .referral-strip strong { min-width: 92px; padding: 5px 10px; text-align: center; font-size: 12px; }
+  .referral-strip .copy-code { min-height: 30px; padding: 6px 10px; }
+
+  .veloce-panel { margin: 14px 0 28px; }
+  .veloce-panel .veloce-lead { color: var(--color-gray-light); font-size: 13px; line-height: 1.7; }
+  .veloce-panel .veloce-lead strong { color: var(--color-gray-light); }
+  .veloce-behavior { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; overflow: hidden; margin: 14px 0; border: 1px solid var(--color-dark-border); border-radius: 6px; background: var(--color-dark-border); }
+  .veloce-behavior > div { padding: 13px; background: var(--color-dark); }
+  .veloce-behavior b, .veloce-behavior span { display: block; }
+  .veloce-behavior b { color: var(--color-secondary); font-size: 11px; }
+  .veloce-behavior span { margin-top: 4px; color: var(--color-gray); font-size: 11px; line-height: 1.65; }
+
+  .gdb-risk-card { overflow: hidden; margin: 12px 0 28px; border: 1px solid var(--color-dark-border); border-radius: 8px; background: var(--color-dark-card); }
+  .gdb-risk-head { padding: 16px 18px; border-bottom: 1px solid var(--color-dark-border); background: rgba(255,255,255,.012); }
+  .gdb-risk-head b { color: var(--color-gray-light); font-size: 14px; }
+  .gdb-risk-head b::before { content: '⚠'; margin-right: 8px; color: var(--color-secondary); font-size: 12px; }
+  .gdb-risk-head p { margin: 3px 0 0; color: var(--color-gray-dark); font-size: 10px; }
+  .gdb-risk-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; padding: 10px 18px 16px; }
+  .gdb-risk-list > div { padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.055); }
+  .gdb-risk-list b { display: block; color: var(--color-gray-light); font-size: 11px; }
+  .gdb-risk-list p { margin: 3px 0 0; color: var(--color-gray-dark); font-size: 10px; line-height: 1.6; }
+  .gdb-risk-rule { margin: 0 18px 18px; padding: 11px 13px; border-left: 2px solid rgba(245,158,11,.6); border-radius: 6px; background: rgba(245,158,11,.035); color: var(--color-gray); font-size: 10.5px; line-height: 1.65; }
+  .gdb-risk-rule strong { color: var(--color-secondary); }
+
   @media (max-width: 600px) {
     .kpi-row { grid-template-columns: repeat(2, 1fr) !important; }
+    .referral-strip { align-items: center; }
+    .referral-strip .copy-code { margin-left: auto; }
+    .gdb-core-features, .gdb-safety-grid, .gdb-support-grid, .veloce-behavior, .gdb-risk-list { grid-template-columns: 1fr; }
+    .gdb-capital-grid { grid-template-columns: 1fr; }
+    .gdb-capital-grid > div + div { border-top: 1px solid var(--color-dark-border); border-left: 0; }
   }
 
   /* popup "ดูสถิติเต็ม" — overlay ใหม่ (backdrop-blur เดียวกับ .glass-dark) + กล่องเนื้อหายืมค่าจาก .readme-card/.course-preview */
@@ -997,11 +1013,33 @@ const engines = [
     })
     .catch(() => {});
   document.querySelectorAll('.copy-code').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const code = btn.getAttribute('data-copy') || '';
-      if (navigator.clipboard) navigator.clipboard.writeText(code);
+      const fallbackCopy = () => {
+        const input = document.createElement('textarea');
+        input.value = code;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        const copied = document.execCommand('copy');
+        input.remove();
+        return copied;
+      };
+      let copied = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(code);
+          copied = true;
+        } catch {
+          copied = fallbackCopy();
+        }
+      } else {
+        copied = fallbackCopy();
+      }
       const prev = btn.textContent;
-      btn.textContent = 'คัดลอกแล้ว!';
+      btn.textContent = copied ? 'คัดลอกแล้ว!' : 'คัดลอกไม่สำเร็จ';
       setTimeout(() => { btn.textContent = prev; }, 1500);
     });
   });

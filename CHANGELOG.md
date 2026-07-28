@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-07-28
+
+- [x] **เขียนหน้า gdBasket ใหม่ตามผลิตภัณฑ์ปัจจุบัน** - เหลือ VELOCE เครื่องยนต์เดียว, อธิบาย Adaptive Grid Behavior / Market Temperature / PPTS, เครื่องยนต์ 2 บ้าน, Capital/Rolling Capital, ผลทดสอบ และความเสี่ยงก่อนใช้ครบ
+- [x] **ปรับจุดสมัคร XM และสถิติเต็ม** - เพิ่มแถบรหัสผู้แนะนำ `KWASATI` แบบเต็มแนวกว้างพร้อมปุ่มคัดลอกที่ตรวจผลสำเร็จจริง, คงปุ่มและ popup สถิติเต็ม 7 กลุ่มเดิม
+- [x] **รักษาระบบสดเดิม** - Trading Journal, Myfxbook, ดาวน์โหลด, affiliate links, sidebar และ modal เดิมยังทำงาน พร้อมตรวจ desktop/mobile และ build ผ่าน
+
 ## 2026-07-10
 
 - [x] **หน้า gdBasket รื้อใหญ่ 3 ก้อน** - copy ทั้งหน้าเป็นภาษาผู้ใช้ตามเด็ค (tagline "Adaptive Buy Grid Behavior EA" / ชื่อฟีเจอร์ทับศัพท์ / ไม่มี logic ภายในหลุด) + Engine Profile กลับมา 3 การ์ด (SPORT+ พร้อมใช้·แนะนำ / STRADA+·CORSA เร็วๆ นี้) + ตารางผลสอบใหม่แยกกำไร-ชนเพดาน 6 แถว + PPTS legacy/pyramid + Myfxbook label ไทย + ตัดบล็อก Languages
