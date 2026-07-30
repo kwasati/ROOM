@@ -185,7 +185,7 @@ const installSteps = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v3.04 — ตัวนับรอบ/นับกำไรกลับมาสมบูรณ์ + ตัวจดรอบ</p>
+            <p>v3.04 — ตัวนับรอบ/กำไรบนจอ อ่านสดจากประวัติจริง เลิกเพี้ยนหลังรีสตาร์ท</p>
             <time>อัปเดต 30 ก.ค. 2026</time>
           </div>
           <div class="file-list">
@@ -472,14 +472,9 @@ const installSteps = [
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <strong>อัปเดตล่าสุด — v3.04</strong>
           </div>
-          <p>v3.04 — ตัวนับรอบ/นับกำไรกลับมาสมบูรณ์ + ตัวจดรอบ กันตัวเลขบนจอเพี้ยนหลังรีสตาร์ท</p>
+          <p>v3.03 ตัวนับรอบ/กำไรบนจอยังจำหมุดในเครื่อง พอปิด-เปิด/ย้ายเครื่องเลขเพี้ยน — v3.04 อ่านสดจากประวัติเทรดจริงทุกครั้งที่เปิด เลขบนจอตรงเสมอ ไม่แตะการเทรด</p>
           <ul>
-            <li><span>+</span><span><strong>ตัวนับรอบ/กำไรรอบกลับมาสมบูรณ์</strong> — EA นับสดจากประวัติเทรดจริงของบัญชีทุกครั้งที่เปิด เลิกพึ่ง "ความจำในเครื่อง" ที่หายหรือเพี้ยนได้</span></li>
-            <li><span>+</span><span><strong>เพิ่ม "ตัวจดรอบ"</strong> — จำประวัติการปรับทุนต่อรอบไว้ในไฟล์ กันบัญชีที่เคยเปลี่ยนทุนข้ามยุคนับรอบเพี้ยน</span></li>
-            <li><span>+</span><span><strong>ปุ่มล้างไฟล์จำทุน</strong> — ใช้ตอนอยากรีเซ็ตความจำทุนเริ่มนับใหม่มือ (เปิด true → restart EA 1 ครั้ง → ปิดกลับ false)</span></li>
-            <li><span>+</span><span><strong>ไม้จะโตขึ้นทันทีหลังอัป</strong> บนบัญชีที่เคยเห็นกำไรรอบเพี้ยน — ทุนคิดไม้กลับมาถูกต้อง (ของที่ควรเป็น ไม่ใช่บั๊กใหม่)</span></li>
-            <li><span>+</span><span><strong>การเทรดไม่เปลี่ยนแม้แต่บาทเดียว</strong> — รุ่นนี้แก้เฉพาะจอ/วิธีนับ พิสูจน์ผลเทรด 0-diff</span></li>
-            <li><span>+</span><span><strong>input เท่ารุ่นก่อน (v3.03)</strong> + เพิ่มปุ่มล้างไฟล์จำทุน 1 ช่องเท่านั้น</span></li>
+            <li><span>+</span><span><strong>ปุ่มล้างไฟล์จำทุน</strong> — อยากรีเซ็ตความจำทุนเริ่มนับใหม่ก็กดได้ (เปิด true → restart 1 ครั้ง → ปิดกลับ false)</span></li>
           </ul>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
         </section>
