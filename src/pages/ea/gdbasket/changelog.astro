@@ -103,8 +103,39 @@
 
 <div class="wrap releases">
 
-  <!-- v3.03 (ใหม่ — swap-adjust ชดเชยที่เป้ากำไร) -->
+  <!-- v3.04 (ใหม่ — ตัวนับรอบ/นับกำไรกลับมาสมบูรณ์ + ตัวจดรอบ) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.04</span></span>
+      <div class="date">30 ก.ค. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <img class="veloce-release-logo" src="/veloce-wordmark.png" alt="gdBasket VELOCE" width="718" height="271" loading="lazy" />
+        <div class="head">
+          <h2>ตัวนับรอบ/นับกำไรกลับมาสมบูรณ์ + ตัวจดรอบ — กันตัวเลขบนจอเพี้ยนหลังรีสตาร์ท</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.04 · 30 ก.ค. 2026</p>
+        <p class="lead">gdBasket v3.04 แก้ตัวนับรอบ/กำไรรอบ/จำนวนรอบสำเร็จ (W)/รอบแตก (SO) ให้คำนวณสดจากประวัติเทรดจริงของบัญชีทุกครั้งที่เปิด เลิกพึ่ง "ความจำในเครื่อง" ที่หายหรือเพี้ยนได้ พร้อมเพิ่มตัวจดรอบและปุ่มล้างไฟล์จำทุน</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>ตัวนับรอบ/กำไรรอบกลับมาสมบูรณ์</strong> — EA นับสดจากประวัติเทรดจริงของบัญชีทุกครั้งที่เปิด เลิกพึ่ง "ความจำในเครื่อง" ที่หายหรือเพี้ยนได้</span></li>
+          <li><span class="plus">+</span><span><strong>เพิ่ม "ตัวจดรอบ"</strong> — จำประวัติการปรับทุนต่อรอบไว้ในไฟล์ กันบัญชีที่เคยเปลี่ยนทุนข้ามยุคนับรอบเพี้ยน</span></li>
+          <li><span class="plus">+</span><span><strong>ปุ่มล้างไฟล์จำทุน</strong> — ใช้ตอนอยากรีเซ็ตความจำทุนเริ่มนับใหม่มือ (เปิด true → restart EA 1 ครั้ง → ปิดกลับ false)</span></li>
+          <li><span class="plus">+</span><span><strong>ไม้จะโตขึ้นทันทีหลังอัป</strong> บนบัญชีที่เคยเห็นกำไรรอบเพี้ยน — ทุนคิดไม้กลับมาถูกต้อง (ของที่ควรเป็น ไม่ใช่บั๊กใหม่)</span></li>
+          <li><span class="plus">+</span><span><strong>การเทรดไม่เปลี่ยนแม้แต่บาทเดียว</strong> — รุ่นนี้แก้เฉพาะจอ/วิธีนับ พิสูจน์ผลเทรด 0-diff</span></li>
+          <li><span class="plus">+</span><span><strong>input เท่ารุ่นก่อน (v3.03)</strong> + เพิ่มปุ่มล้างไฟล์จำทุน 1 ช่องเท่านั้น</span></li>
+        </ul>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.04
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.03 (ปิดดาวน์โหลด — owner สั่งปิด ไม่ demote) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.03</span></span>
       <div class="date">26 ก.ค. 2026</div>
@@ -114,7 +145,6 @@
         <img class="veloce-release-logo" src="/veloce-wordmark.png" alt="gdBasket VELOCE" width="718" height="271" loading="lazy" />
         <div class="head">
           <h2>Rolling Capital Mode มาแล้ว + ชดเชย Swap อัตโนมัติ — ปั้นทุนบนบัญชีจริง กันกำไรโดนกินข้ามคืน</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.03 · 26 ก.ค. 2026</p>
         <p class="lead">gdBasket v3.03 รวม 4 ของใหม่ในรุ่นเดียว — Rolling Capital Mode ปั้นทุนเป็นขั้นบนบัญชีจริง, ตัวนับรอบบนจอแม่นทุกบัญชี, ชดเชย Swap ที่โดนหักเข้าเป้ากำไรอัตโนมัติ, และยุบเหลือโหมด VELOCE ตัวเดียว</p>
@@ -124,10 +154,6 @@
           <li><span class="plus">+</span><span><strong>ชดเชย Swap ที่เป้ากำไรอัตโนมัติ</strong> — ถือข้ามคืนโดนหัก Swap สะสมเท่าไหร่ EA บวกเข้าเป้ากำไรให้เองเสมอ กำไรที่ตั้งใจได้จริงไม่โดน Swap แทะ (ทำงานเบื้องหลัง ไม่มีสวิตช์)</span></li>
           <li><span class="plus">+</span><span><strong>เหลือโหมด VELOCE ตัวเดียว</strong> — ยุบ strada+/sport+ ออกจากช่องเลือก เหลือ VELOCE ที่คัดมาแล้ว (ลาก v3.03 ทับชาร์ตเดิม กด Reset ในหน้า Inputs ครั้งเดียว)</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลด v3.03
-        </a>
       </div>
     </div>
   </section>
