@@ -4,6 +4,10 @@
 
 ---
 
+## 2026-07-31
+
+- [x] **การ์ดโบรก / VPS / Copytrade หน้า gdBasket** - ยกการ์ด affiliate XM เป็นชุด 3 ใบ IB/VPS/Copy โซนบน (IB แดง เต็มกว้าง + VPS ทอง/Copy เขียว คู่ล่าง สูงเท่ากัน + แถบคำเตือน copytrade เต็มกว้างใต้คู่), และชุด minimal 3 การ์ดเดียวกันซ้ำโซนล่างท้าย install + คำเตือน copytrade — สีต่อการ์ดผูก hue variable, ปุ่ม CTA แยกสี (IB "เปิดบัญชี XM ได้ที่นี่"), มือถือ stack, build ผ่าน
+
 ## 2026-07-28
 
 - [x] **เขียนหน้า gdBasket ใหม่ตามผลิตภัณฑ์ปัจจุบัน** - เหลือ VELOCE เครื่องยนต์เดียว, อธิบาย Adaptive Grid Behavior / Market Temperature / PPTS, เครื่องยนต์ 2 บ้าน, Capital/Rolling Capital, ผลทดสอบ และความเสี่ยงก่อนใช้ครบ

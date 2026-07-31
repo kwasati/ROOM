@@ -203,6 +203,53 @@
 .ref-code strong { padding: 2px 8px; color: white; background: var(--color-primary); border-radius: 4px; font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .06em; }
 .ref-code button { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; color: var(--color-gray-light); background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 5px; font-size: 10px; }
 .affiliate-note .disclosure { margin-top: 10px; color: var(--color-gray-dark); font-size: 9.5px; }
+
+/* ---- aff-card system (IB / VPS / Copytrade cards) — สูตรเดียวกันทุกใบ ผูก --hue-r/g/b ---- */
+.aff-card { --hue-r: 220; --hue-g: 38; --hue-b: 38; display: flex; flex-direction: column; margin-bottom: 20px; padding: 18px; border-radius: 9px; background: linear-gradient(155deg, rgba(var(--hue-r), var(--hue-g), var(--hue-b), .065), rgba(20,22,26,.7)); border: 1px solid rgba(var(--hue-r), var(--hue-g), var(--hue-b), .31); }
+.aff-card:last-child { margin-bottom: 0; }
+.aff-card small { display: block; color: rgb(var(--hue-r), var(--hue-g), var(--hue-b)); font-size: 10px; font-weight: 750; letter-spacing: .02em; }
+.aff-card h2 { margin: 3px 0 6px; color: var(--color-gray-light); font-size: 16px; line-height: 1.3; }
+.aff-card p { margin: 0; color: var(--color-gray); font-size: 12px; line-height: 1.65; }
+.aff-card .disclosure { margin-top: 10px; color: var(--color-gray-dark); font-size: 9.5px; line-height: 1.5; }
+.aff-card .ref-code { border-color: rgba(var(--hue-r), var(--hue-g), var(--hue-b), .45); }
+.aff-card .repo-download { margin-top: 13px; }
+
+.card-ib   { --hue-r: 220; --hue-g: 38;  --hue-b: 38;  } /* IB   = แดง  #DC2626 */
+.card-vps  { --hue-r: 245; --hue-g: 158; --hue-b: 11;  } /* VPS  = ทอง  #F59E0B */
+.card-copy { --hue-r: 34;  --hue-g: 197; --hue-b: 94;  } /* Copy = เขียว #22C55E */
+
+.pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.pill { padding: 6px 12px; background: var(--color-dark); border: 1px solid var(--color-dark-border); border-radius: 8px; color: var(--color-gray-light); font-size: 11px; font-weight: 600; }
+.pill b { color: #EF4444; font-weight: 750; }
+
+.aff-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.aff-list li { display: flex; align-items: flex-start; gap: 8px; color: var(--color-gray-light); font-size: 12px; line-height: 1.5; }
+.aff-list li::before { content: ""; flex-shrink: 0; width: 6px; height: 6px; margin-top: 5px; border-radius: 50%; background: rgb(var(--hue-r), var(--hue-g), var(--hue-b)); }
+
+.repo-download.btn-gold { background: #D97706; border-color: #F59E0B; }
+.repo-download.btn-gold:hover { background: #F59E0B; }
+.repo-download.btn-green { background: #16A34A; border-color: #22C55E; }
+.repo-download.btn-green:hover { background: #22C55E; }
+
+.card-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-bottom: 4px; }
+.card-icon svg { width: 18px; height: 18px; color: rgb(var(--hue-r), var(--hue-g), var(--hue-b)); }
+
+.cards-2col { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 16px; margin-top: 20px; }
+.cards-2col > .aff-card { margin-bottom: 0; }
+.cards-2col .aff-card .repo-download { margin-top: auto; }
+
+/* ---- mini-card system (โซนล่าง install — minimal 3 การ์ด IB/VPS/Copy, เบากว่า aff-card) — reuse .card-ib/.card-vps/.card-copy สำหรับ --hue-r/g/b ---- */
+.mini-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+.mini-card { --hue-r: 220; --hue-g: 38; --hue-b: 38; display: flex; flex-direction: column; gap: 6px; padding: 13px 14px; border-radius: 8px; background: linear-gradient(155deg, rgba(var(--hue-r), var(--hue-g), var(--hue-b), .035), rgba(20,22,26,.55)); border: 1px solid rgba(var(--hue-r), var(--hue-g), var(--hue-b), .22); }
+.mini-card .mini-icon { display: inline-flex; width: 15px; height: 15px; color: rgba(var(--hue-r), var(--hue-g), var(--hue-b), .85); margin-bottom: 1px; }
+.mini-card .mini-icon svg { width: 100%; height: 100%; }
+.mini-card h4 { margin: 0; color: var(--color-gray-light); font-size: 12.5px; font-weight: 700; line-height: 1.3; }
+.mini-card p { margin: 0; color: var(--color-gray-dark); font-size: 10.5px; line-height: 1.5; }
+.mini-card .mini-code { font-size: 9.5px; }
+.mini-card .mini-code strong { color: var(--color-gray-light); font-family: ui-monospace, monospace; letter-spacing: .04em; }
+.mini-cta { margin-top: 3px; align-self: flex-start; display: inline-flex; align-items: center; gap: 3px; color: rgb(var(--hue-r), var(--hue-g), var(--hue-b)); font-size: 10.5px; font-weight: 750; text-decoration: none; }
+.mini-cta:hover { text-decoration: underline; }
+
 .readme-card, .release-card { overflow: hidden; margin-bottom: 28px; background: var(--color-dark); border: 1px solid var(--color-dark-border); border-radius: 9px; }
 .readme-title { min-height: 43px; display: flex; align-items: center; gap: 7px; padding: 0 14px; color: var(--color-gray-light); background: var(--color-dark-card); border-bottom: 1px solid var(--color-dark-border); font-size: 12px; }
 .readme-title svg { color: var(--color-gray); }
@@ -345,6 +392,9 @@
   .file-list > a span { display: none; }
   .affiliate-note { padding: 15px; }
   .ref-code button { margin-left: 0; }
+  .aff-card { padding: 15px; }
+  .cards-2col { grid-template-columns: 1fr; }
+  .mini-row { grid-template-columns: 1fr; }
   .readme-body { padding: 18px 15px 27px; }
   .readme-chart { max-height: 270px; }
   .readme-two-col, .feature-list { grid-template-columns: 1fr; }
