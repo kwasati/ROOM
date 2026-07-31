@@ -103,8 +103,38 @@
 
 <div class="wrap releases">
 
-  <!-- v3.04 (ตัวนับรอบ/กำไรบนจอ อ่านสดจากประวัติจริง — เลิกเพี้ยนหลังรีสตาร์ท) -->
+  <!-- v3.05 (hotfix restart-state — syncing history ค้าง / รับไม้ค้าง / เป้ากำไรผิดตำแหน่ง / swap log / ล้างไฟล์จำทุนครั้งเดียว) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.05</span></span>
+      <div class="date">31 ก.ค. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <img class="veloce-release-logo" src="/veloce-wordmark.png" alt="gdBasket VELOCE" width="718" height="271" loading="lazy" />
+        <div class="head">
+          <h2>hotfix รีสตาร์ท — ไม่ค้างจอ ไม่ลืมไม้ที่ค้าง</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.05 · 31 ก.ค. 2026</p>
+        <p class="lead">hotfix แก้ปัญหาตอนรีสตาร์ท/เปิดโปรแกรมใหม่บนบัญชีจริง — พฤติกรรมการเทรดเดิมไม่เปลี่ยนแม้แต่นิดเดียว เทียบผลเทสก่อน/หลังตรงกันทุกไบต์</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>แก้เครื่องค้างจอ "syncing history"</strong> — เดิมไม่ยอมเทรดต่อหลังเปิดโปรแกรม/รีสตาร์ท/เปลี่ยนค่า</span></li>
+          <li><span class="plus">+</span><span><strong>รับไม้ที่ค้างอยู่กลับมาดูแลเอง</strong> วางกริดต่อได้ ไม่ลืมไม้เหมือนก่อน — จอโชว์สถานะใหม่ "Basket resumed"</span></li>
+          <li><span class="plus">+</span><span><strong>แก้เป้ากำไรรวมโผล่ผิดตำแหน่ง</strong> (ใต้ราคาเปิด) หลังรีสตาร์ท</span></li>
+          <li><span class="plus">+</span><span><strong>แก้ log ค่าถือข้ามคืน (swap)</strong> ที่เคยทำให้เข้าใจผิดว่าบัญชีแบบไม่คิดค่านี้ถูกหักจริง</span></li>
+          <li><span class="plus">+</span><span><strong>สวิตช์ล้างไฟล์จำทุนเป็นแบบทำครั้งเดียว</strong> เปิดค้างไว้ก็ล้างแค่ครั้งแรก</span></li>
+        </ul>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.05
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.04 (ปิดดาวน์โหลด — hotfix v3.05 supersede) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.04</span></span>
       <div class="date">30 ก.ค. 2026</div>
@@ -114,7 +144,6 @@
         <img class="veloce-release-logo" src="/veloce-wordmark.png" alt="gdBasket VELOCE" width="718" height="271" loading="lazy" />
         <div class="head">
           <h2>ตัวนับรอบ/กำไรบนจอ เลิกเพี้ยนหลังปิด-เปิด</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.04 · 30 ก.ค. 2026</p>
         <p class="lead">รุ่นก่อน (v3.03) ตัวเลขรอบ/กำไรบนจอยังจำหมุดไว้ในเครื่อง — พอปิด-เปิด อัปเวอร์ชัน หรือย้ายเครื่อง หมุดเพี้ยน เลขบนจอเลยผิด (เคยเห็นกำไรรอบ +9 ทั้งที่รอบจริง +950). v3.04 ให้ EA อ่านสดจากประวัติเทรดจริงทุกครั้งที่เปิด เลขบนจอตรงความจริงเสมอ ไม่ว่าปิด-เปิดกี่รอบ — ไม่แตะการเทรด</p>
@@ -125,10 +154,6 @@
           <li><span class="plus">+</span><span><strong>ถอด Rolling Capital Mode ออกชั่วคราว</strong> — รอปรับให้ใช้ได้จริงก่อนปล่อยกลับ</span></li>
           <li><span class="plus">+</span><span>ของเดิมจาก v3.03 ที่ยังทำงานปกติ — <strong>ชดเชย Swap ที่เป้ากำไรอัตโนมัติ</strong> · <strong>โหมด VELOCE ตัวเดียว</strong></span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลด v3.04
-        </a>
       </div>
     </div>
   </section>
