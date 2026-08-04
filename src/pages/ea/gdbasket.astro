@@ -187,7 +187,7 @@ const installSteps = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v3.06 — รอข้อมูลครบก่อนเปิดกอง + เกลาป้าย input ก่อนแจก ไม่แตะการเทรด</p>
+            <p>v3.06 — ปรับความแม่นยำหลายพอร์ต + แก้ SL วางผิดฝั่ง (ไม่แตะการเทรด)</p>
             <time>อัปเดต 4 ส.ค. 2026</time>
           </div>
           <div class="file-list">
@@ -528,10 +528,10 @@ const installSteps = [
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <strong>อัปเดตล่าสุด — v3.06</strong>
           </div>
-          <p>v3.06 = รอข้อมูลครบก่อนเปิดกอง + เกลาป้าย input ก่อนแจก — ไม่แตะการเทรดเลยแม้แต่นิดเดียว</p>
+          <p>v3.06 = อัปจาก v3.05 — เก็บกวาด 2 เคสหายาก ไม่แตะการเทรด</p>
           <ul>
-            <li><span>+</span><span><strong>รอข้อมูลครบก่อนเปิดกอง</strong> — กันกองเทรดคลาดกันข้ามบัญชี/ข้ามเครื่องตอนข้อมูลยังโหลดไม่ครบ</span></li>
-            <li><span>+</span><span><strong>เกลาป้าย input ให้อ่านง่ายขึ้นก่อนแจก</strong> — ไม่กระทบการตัดสินใจเทรดของ EA</span></li>
+            <li><span>+</span><span><strong>ปรับปรุงตัวคำนวณค่าให้แม่นยำยิ่งขึ้น</strong> — หมดปัญหาบางพอร์ตตัดสินใจไม่ตรงกัน (เคสหายากแต่กลบให้เรียบร้อยแล้ว)</span></li>
+            <li><span>+</span><span><strong>ปรับปรุงตัวคำนวณ SL ไม่ให้วางผิดฝั่ง</strong> — เคสหายากตอนทุนเหลือเบาะน้อย เส้นกันตายไปโผล่ผิดจุด ตอนนี้แก้ให้เรียบร้อยแล้ว</span></li>
             <li><span>+</span><span>ของเดิมจาก v3.05 ที่ยังทำงานปกติ — <strong>รับไม้ที่ค้างกลับมาดูแลเอง</strong> · <strong>เป้ากำไรไม่โผล่ผิดตำแหน่งหลังรีสตาร์ท</strong> · <strong>ชดเชย Swap ที่เป้ากำไรอัตโนมัติ</strong> · <strong>โหมด VELOCE ตัวเดียว</strong></span></li>
           </ul>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
