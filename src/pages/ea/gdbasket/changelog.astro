@@ -103,8 +103,35 @@
 
 <div class="wrap releases">
 
-  <!-- v3.05 (hotfix restart-state — syncing history ค้าง / รับไม้ค้าง / เป้ากำไรผิดตำแหน่ง / swap log / ล้างไฟล์จำทุนครั้งเดียว) -->
+  <!-- v3.06 (patch — รอข้อมูลครบก่อนเปิดกอง + เกลาป้าย input ก่อนแจก, behavior-neutral) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.06</span></span>
+      <div class="date">4 ส.ค. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <img class="veloce-release-logo" src="/veloce-wordmark.png" alt="gdBasket VELOCE" width="718" height="271" loading="lazy" />
+        <div class="head">
+          <h2>รอข้อมูลครบก่อนเปิดกอง + เกลาป้าย input ก่อนแจก</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.06 · 4 ส.ค. 2026</p>
+        <p class="lead">รอข้อมูลครบก่อนเปิดกอง + เกลาป้าย input ก่อนแจก — ไม่แตะการเทรด พฤติกรรมการเทรดเดิมไม่เปลี่ยนแม้แต่นิดเดียว</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>รอข้อมูลครบก่อนเปิดกอง</strong> — กันกองเทรดคลาดกันข้ามบัญชี/ข้ามเครื่องตอนข้อมูลยังโหลดไม่ครบ</span></li>
+          <li><span class="plus">+</span><span><strong>เกลาป้าย input ให้อ่านง่ายขึ้นก่อนแจก</strong> — ไม่กระทบการตัดสินใจเทรดของ EA</span></li>
+        </ul>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.06
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.05 (ปิดดาวน์โหลด — patch v3.06 supersede) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.05</span></span>
       <div class="date">31 ก.ค. 2026</div>
@@ -114,7 +141,6 @@
         <img class="veloce-release-logo" src="/veloce-wordmark.png" alt="gdBasket VELOCE" width="718" height="271" loading="lazy" />
         <div class="head">
           <h2>hotfix รีสตาร์ท — ไม่ค้างจอ ไม่ลืมไม้ที่ค้าง</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.05 · 31 ก.ค. 2026</p>
         <p class="lead">hotfix แก้ปัญหาตอนรีสตาร์ท/เปิดโปรแกรมใหม่บนบัญชีจริง — พฤติกรรมการเทรดเดิมไม่เปลี่ยนแม้แต่นิดเดียว เทียบผลเทสก่อน/หลังตรงกันทุกไบต์</p>
@@ -125,7 +151,7 @@
           <li><span class="plus">+</span><span><strong>แก้ log ค่าถือข้ามคืน (swap)</strong> ที่เคยทำให้เข้าใจผิดว่าบัญชีแบบไม่คิดค่านี้ถูกหักจริง</span></li>
           <li><span class="plus">+</span><span><strong>สวิตช์ล้างไฟล์จำทุนเป็นแบบทำครั้งเดียว</strong> เปิดค้างไว้ก็ล้างแค่ครั้งแรก</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v305" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด v3.05
         </a>
