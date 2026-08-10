@@ -4,7 +4,8 @@ import Layout from '../../layouts/Layout.astro';
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
-const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.06 (publish/releases/v3.06/gdBasket_v3.06.ex5)
+const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.07 (publish/releases/v3.07/gdBasket_v3.07.ex5)
+const DL_V306 = `${MAIN}/d/gdbasket-v306`;
 const DL_V305 = `${MAIN}/d/gdbasket-v305`;
 const DL_V302 = `${MAIN}/d/gdbasket-v302`;
 const DL_V202 = `${MAIN}/d/gdbasket-v202`;
@@ -81,7 +82,8 @@ const veloceSteps = [
 ];
 
 const releases = [
-  { version: 'v3.06', dateLabel: '4 ส.ค. 2026', latest: true, url: DL_LATEST },
+  { version: 'v3.07', dateLabel: '10 ส.ค. 2026', latest: true, url: DL_LATEST },
+  { version: 'v3.06', dateLabel: '4 ส.ค. 2026', latest: false, url: DL_V306 },
   { version: 'v3.05', dateLabel: '31 ก.ค. 2026', latest: false, url: DL_V305 },
   { version: 'v3.02', dateLabel: '23 ก.ค. 2026', latest: false, url: DL_V302 },
   { version: 'v2.02', dateLabel: '13 ก.ค. 2026', latest: false, url: DL_V202 },
@@ -98,14 +100,14 @@ const fileRows = [
   { icon: 'modes', name: 'เครื่องยนต์ VELOCE', note: 'ค่าพร้อมใช้ที่ผ่านการทดสอบมาแล้ว · ไม่ต้องเลือกโหมด', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
-  { icon: 'clock', name: 'Releases', note: 'v3.06 · v3.05 · v3.02 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '8 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
+  { icon: 'clock', name: 'Releases', note: 'v3.07 · v3.06 · v3.05 · v3.02 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '9 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
-  { icon: 'dl', name: 'gdBasket v3.06', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
+  { icon: 'dl', name: 'gdBasket v3.07', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
-  'ดาวน์โหลดไฟล์ <strong>gdBasket v3.06</strong> จากปุ่มด้านบน',
+  'ดาวน์โหลดไฟล์ <strong>gdBasket v3.07</strong> จากปุ่มด้านบน',
   'เปิด <strong>MetaTrader 5</strong> → <strong>File → Open Data Folder</strong>',
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
@@ -115,7 +117,7 @@ const installSteps = [
 
 ---
 
-<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — VELOCE ผ่านพิสูจน์ 3 ปี 6 เดือน — โหลดฟรี v3.06" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
+<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — VELOCE ผ่านพิสูจน์ 3 ปี 6 เดือน — โหลดฟรี v3.07" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
 <div id="main-content" class="repo-page">
   <div class="repo-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -137,7 +139,7 @@ const installSteps = [
           <p>Adaptive Buy Grid Behavior EA · GOLD M15</p>
         </div>
       </div>
-      <div class="repo-version"><span>เวอร์ชัน</span><strong>v3.06</strong></div>
+      <div class="repo-version"><span>เวอร์ชัน</span><strong>v3.07</strong></div>
     </header>
 
     <!-- (c) SUB-NAV TABS -->
@@ -156,7 +158,7 @@ const installSteps = [
       </a>
       <a href="/ea/gdbasket/changelog">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Releases <span>8</span>
+        Releases <span>9</span>
       </a>
       <a href={JOURNAL}>Trading Journal</a>
     </nav>
@@ -169,17 +171,17 @@ const installSteps = [
         <div class="repo-toolbar">
           <div class="branch-pill">
             <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
-            <strong>v3.06</strong>
+            <strong>v3.07</strong>
           </div>
           <span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-            <strong>8</strong> เวอร์ชัน
+            <strong>9</strong> เวอร์ชัน
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            ดาวน์โหลดฟรี <span>v3.06</span>
+            ดาวน์โหลดฟรี <span>v3.07</span>
           </a>
-          <p>ไฟล์รุ่น <strong>v3.06</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
+          <p>ไฟล์รุ่น <strong>v3.07</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
         </div>
 
         <!-- (e) FILE BROWSER -->
@@ -187,8 +189,8 @@ const installSteps = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v3.06 — ปรับความแม่นยำหลายพอร์ต + แก้ SL วางผิดฝั่ง (ไม่แตะการเทรด)</p>
-            <time>อัปเดต 4 ส.ค. 2026</time>
+            <p>v3.07 — กัน TP ต่ำกว่าทุน + เวลา session ตาม DST โดยไม่ต้อง restart</p>
+            <time>อัปเดต 10 ส.ค. 2026</time>
           </div>
           <div class="file-list">
             {fileRows.map((row) => (
@@ -526,13 +528,14 @@ const installSteps = [
         <section id="changelog" class="release-card scroll-mt-20">
           <div>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <strong>อัปเดตล่าสุด — v3.06</strong>
+            <strong>อัปเดตล่าสุด — v3.07</strong>
           </div>
-          <p>v3.06 = อัปจาก v3.05 — เก็บกวาด 2 เคสหายาก ไม่แตะการเทรด</p>
+          <p>v3.07 = แก้ 2 ปัญหาที่กระทบการใช้งาน โดยไม่เปลี่ยนสูตรเข้าไม้, lot, grid หรือ trail</p>
           <ul>
-            <li><span>+</span><span><strong>ปรับปรุงตัวคำนวณค่าให้แม่นยำยิ่งขึ้น</strong> — หมดปัญหาบางพอร์ตตัดสินใจไม่ตรงกัน (เคสหายากแต่กลบให้เรียบร้อยแล้ว)</span></li>
-            <li><span>+</span><span><strong>ปรับปรุงตัวคำนวณ SL ไม่ให้วางผิดฝั่ง</strong> — เคสหายากตอนทุนเหลือเบาะน้อย เส้นกันตายไปโผล่ผิดจุด ตอนนี้แก้ให้เรียบร้อยแล้ว</span></li>
-            <li><span>+</span><span>ของเดิมจาก v3.05 ที่ยังทำงานปกติ — <strong>รับไม้ที่ค้างกลับมาดูแลเอง</strong> · <strong>เป้ากำไรไม่โผล่ผิดตำแหน่งหลังรีสตาร์ท</strong> · <strong>ชดเชย Swap ที่เป้ากำไรอัตโนมัติ</strong> · <strong>โหมด VELOCE ตัวเดียว</strong></span></li>
+            <li><span>+</span><span><strong>กัน common TP ต่ำกว่าทุนเฉลี่ย</strong> — ค่า swap ผิดปกติหรือค่าค้างจะไม่ลากเป้าปิดให้กลายเป็นปิดขาดทุนเอง</span></li>
+            <li><span>+</span><span><strong>retry/restart ใช้ TP ที่คำนวณใหม่</strong> — ไม่ส่งราคาเก่าที่ค้างหลังตลาดปิด และรับไม้เดิมกลับมาดูแลพร้อมเขียน TP ใหม่ให้ broker</span></li>
+            <li><span>+</span><span><strong>เวลา session ตาม DST ได้เอง</strong> — EA ที่เปิดค้างตาม offset +2/+3 ของ broker โดยไม่ต้อง restart</span></li>
+            <li><span>+</span><span><strong>สูตรเทรดเดิมไม่เปลี่ยน</strong> — ไม่แตะ entry, lot, grid, trail หรือความถี่ every tick / per bar เดิม</span></li>
           </ul>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
         </section>
