@@ -112,17 +112,19 @@
     <div class="body">
       <div class="card">
         <div class="head">
-          <h2>แก้รากคำสั่งเทรด + Smart Anchor นับรอบ + ปุ่ม Rebuild ประวัติ</h2>
+          <h2>แก้ Root Bug จากตัวนับรอบเก่า + Smart Anchor + ปุ่ม Rebuild ประวัติ</h2>
           <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.08 · 13 ส.ค. 2026</p>
-        <p class="lead">ปิดรูรั่วคำสั่งเทรดที่สะสมมา + ตัวตรวจสุขภาพตัวนับรอบอัตโนมัติตอนติดตั้ง — ปิดปุ่มใหม่ทั้งหมด (ค่าเริ่มต้น) = เทรดเหมือนเดิมทุกอย่าง</p>
+        <p class="lead">ปิดรูรั่วคำสั่งเทรดที่สะสมมา + ตัวตรวจสุขภาพตัวนับรอบอัตโนมัติตอนติดตั้ง + เพิ่มฟังชั่นการคำนวน Lot ให้เลือกเปิด/ปิดใช้งานได้</p>
         <ul>
-          <li><span class="plus">+</span><span><strong>แก้รากคำสั่งเทรด (integrity)</strong> — ยึดสถานะไม้ที่โบรกยืนยันจริง + แก้ระบบแก้ไขเป้ากำไรให้รู้จัก error กันเวลาโบรกปฏิเสธคำสั่ง ปิดรูรั่วเป้ากำไรค้างแบบเก่า กันคำสั่งไม้ซ้อนชนกัน</span></li>
+          <li><span class="plus">+</span><span><strong>แก้ปัญหา Order ไม่มี TP/SL เรียบร้อย</strong> ปิดรูรั่วเป้ากำไรค้างแบบเก่า กันคำสั่งไม้ซ้อนชนกัน</span></li>
+          <li><span class="plus">+</span><span><strong>แก้ไข Bug เดิมจากรอบก่อน</strong> ที่ทำให้ตัวนับรอบทับซ้อนจน EA ออก Lot ใหญ่ผิดปกติ</span></li>
           <li><span class="plus">+</span><span><strong>Smart Anchor ตรวจสุขภาพตัวนับรอบอัตโนมัติ</strong> — เครื่องส่วนใหญ่ตัวเลขเดินต่อเหมือนเดิม เครื่องที่ตัวนับเคยเพี้ยนจะเริ่มนับใหม่ให้เอง ตรวจแค่ครั้งเดียวตอนติดตั้งเวอร์ชันนี้ ไม่ล้างซ้ำทุกอัปเดตเหมือนก่อน</span></li>
           <li><span class="plus">+</span><span><strong>ปุ่ม Rebuild ประวัติทั้งหมดใหม่</strong> — สำหรับพอร์ตทุนคงที่ กดครั้งเดียวอ่านประวัติทั้งพอร์ตขึ้นจอใหม่หมด นับรอบต่อให้ถูกต้อง</span></li>
-          <li><span class="plus">+</span><span><strong>ไม้ที่ถืออยู่ตอนติดตั้งไม่หาย</strong> — EA รับมาดูแลต่อทันที นับรวมเป็นส่วนหนึ่งของรอบที่กำลังทำอยู่</span></li>
-          <li><span class="plus">+</span><span><strong>สูตรอื่นเดิมไม่เปลี่ยน</strong> — ปิดปุ่มใหม่ทั้งหมด (ค่าเริ่มต้น) = เข้าไม้/วางกริด/เป้ากำไรเหมือนเดิมทุกอย่าง เงินจริงในบัญชีและไม้ที่ถืออยู่ไม่ถูกแตะไม่ว่าทางไหน</span></li>
+          <li><span class="plus">+</span><span>เลือกให้ EA สามารถคำนวน Lot แบบ <strong>FIX</strong> ไม่โตกลางรอบ (เลิกคำนวน Cap+Round) ได้แล้ว</span></li>
+          <li><span class="plus">+</span><span>เลือกให้ EA สามารถคำนวน <strong>Lot 2 บ้าน เท่ากัน</strong> ได้แล้ว (จากปกติที่บ้านบนออก Lot ใหญ่กว่า)</span></li>
+          <li><span class="plus">+</span><span>เลือกใช้กำไรรอบ (<strong>Round Profit</strong>) มาเป็นเบาะรองในรอบนั้นได้แล้ว</span></li>
         </ul>
         <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
