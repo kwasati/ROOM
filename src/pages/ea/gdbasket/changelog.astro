@@ -103,8 +103,36 @@
 
 <div class="wrap releases">
 
-  <!-- v3.08 (แก้รากคำสั่งเทรด integrity + Smart Anchor นับรอบ + ปุ่ม Rebuild ประวัติ) -->
+  <!-- v3.09 (EA คำนวณตัวเลขตัดสินใจเองจากกราฟ แทนขอจาก MT5) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.09</span></span>
+      <div class="date">14 ส.ค. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <div class="head">
+          <h2>EA คำนวณตัวเลขที่ใช้ตัดสินใจเองจากกราฟ แทนการขอจาก MT5</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.09 · 14 ส.ค. 2026</p>
+        <p class="lead">เดิม EA ขอค่าที่ใช้ตัดสินใจจากตัวคำนวณของ MT5 ซึ่งบางจังหวะตอบกลับว่า "ยังไม่พร้อม" ทั้งที่ข้อมูลพร้อมอยู่แล้ว — เวอร์ชันนี้ EA คิดเองจากแท่งราคาตรงๆ ไม่ต้องรอใครตอบ</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>เลิกพึ่งตัวคำนวณของ MT5</strong> — เดิม EA ขอค่า 4 อย่างที่ใช้ตัดสินใจ (ระยะตะแกรง / เส้นแบ่งโซน / ตัววัดความร้อนตลาด / ระยะไม้ต่อ) จากตัวคำนวณของ MT5 ซึ่งบางจังหวะตอบกลับว่า "ยังไม่พร้อม" ทั้งที่ข้อมูลพร้อมอยู่แล้ว ทำให้บางครั้ง EA ข้ามจังหวะที่ควรเปิด หรือเปิดทั้งที่ตัวกรองควรบล็อก</span></li>
+          <li><span class="plus">+</span><span><strong>เวอร์ชันนี้ EA คิดเองจากแท่งราคาตรงๆ</strong> — ไม่ต้องรอใครตอบ อาการนั้นหมดไป</span></li>
+          <li><span class="plus">+</span><span><strong>การเทรดเหมือนเดิมทุกอย่าง ไม่มีการปรับค่าใดๆ</strong> — ทดสอบย้อนหลัง 6 ปีครึ่งแล้วผลตรงกับรุ่นเดิมทุกตัวเลข ต่างเฉพาะจังหวะที่รุ่นเดิมอ่านค่าไม่ได้ ซึ่งคือสิ่งที่ตั้งใจแก้</span></li>
+          <li><span class="plus">+</span><span><strong>อัปเดตยังไง</strong> — วางทับตัวเก่าได้เลย ช่องตั้งค่าทุกช่องอยู่ที่เดิม ค่าที่ตั้งไว้ไม่หาย ตะกร้าที่เปิดค้างอยู่ EA รับมาดูแลต่อทันที</span></li>
+        </ul>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.09
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.08 (demoted — แก้รากคำสั่งเทรด integrity + Smart Anchor นับรอบ + ปุ่ม Rebuild ประวัติ) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.08</span></span>
       <div class="date">13 ส.ค. 2026</div>
@@ -113,7 +141,6 @@
       <div class="card">
         <div class="head">
           <h2>แก้ Root Bug จากตัวนับรอบเก่า + Smart Anchor + ปุ่ม Rebuild ประวัติ</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.08 · 13 ส.ค. 2026</p>
         <p class="lead">ปิดรูรั่วคำสั่งเทรดที่สะสมมา + ตัวตรวจสุขภาพตัวนับรอบอัตโนมัติตอนติดตั้ง + เพิ่มฟังชั่นการคำนวน Lot ให้เลือกเปิด/ปิดใช้งานได้</p>
@@ -126,7 +153,7 @@
           <li><span class="plus">+</span><span>เลือกให้ EA สามารถคำนวน <strong>Lot 2 บ้าน เท่ากัน</strong> ได้แล้ว (จากปกติที่บ้านบนออก Lot ใหญ่กว่า)</span></li>
           <li><span class="plus">+</span><span>เลือกใช้กำไรรอบ (<strong>Round Profit</strong>) มาเป็นเบาะรองในรอบนั้นได้แล้ว</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v308" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด v3.08
         </a>

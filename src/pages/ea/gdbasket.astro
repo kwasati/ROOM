@@ -4,7 +4,8 @@ import Layout from '../../layouts/Layout.astro';
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
-const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.08 (publish/releases/v3.08/gdBasket_v3.08.ex5)
+const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.09 (publish/releases/v3.09/gdBasket_v3.09.ex5)
+const DL_V308 = `${MAIN}/d/gdbasket-v308`;
 const DL_V307 = `${MAIN}/d/gdbasket-v307`;
 const DL_V306 = `${MAIN}/d/gdbasket-v306`;
 const DL_V305 = `${MAIN}/d/gdbasket-v305`;
@@ -83,7 +84,8 @@ const veloceSteps = [
 ];
 
 const releases = [
-  { version: 'v3.08', dateLabel: '13 ส.ค. 2026', latest: true, url: DL_LATEST },
+  { version: 'v3.09', dateLabel: '14 ส.ค. 2026', latest: true, url: DL_LATEST },
+  { version: 'v3.08', dateLabel: '13 ส.ค. 2026', latest: false, url: DL_V308 },
   { version: 'v3.07', dateLabel: '10 ส.ค. 2026', latest: false, url: DL_V307 },
   { version: 'v3.06', dateLabel: '4 ส.ค. 2026', latest: false, url: DL_V306 },
   { version: 'v3.05', dateLabel: '31 ก.ค. 2026', latest: false, url: DL_V305 },
@@ -102,14 +104,14 @@ const fileRows = [
   { icon: 'modes', name: 'เครื่องยนต์ VELOCE', note: 'ค่าพร้อมใช้ที่ผ่านการทดสอบมาแล้ว · ไม่ต้องเลือกโหมด', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
-  { icon: 'clock', name: 'Releases', note: 'v3.08 · v3.07 · v3.06 · v3.05 · v3.02 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '10 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
+  { icon: 'clock', name: 'Releases', note: 'v3.09 · v3.08 · v3.07 · v3.06 · v3.05 · v3.02 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '11 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
-  { icon: 'dl', name: 'gdBasket v3.08', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
+  { icon: 'dl', name: 'gdBasket v3.09', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
-  'ดาวน์โหลดไฟล์ <strong>gdBasket v3.08</strong> จากปุ่มด้านบน',
+  'ดาวน์โหลดไฟล์ <strong>gdBasket v3.09</strong> จากปุ่มด้านบน',
   'เปิด <strong>MetaTrader 5</strong> → <strong>File → Open Data Folder</strong>',
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
@@ -119,7 +121,7 @@ const installSteps = [
 
 ---
 
-<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — VELOCE ผ่านพิสูจน์ 3 ปี 6 เดือน — โหลดฟรี v3.08" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
+<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — VELOCE ผ่านพิสูจน์ 3 ปี 6 เดือน — โหลดฟรี v3.09" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
 <div id="main-content" class="repo-page">
   <div class="repo-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -141,7 +143,7 @@ const installSteps = [
           <p>Adaptive Buy Grid Behavior EA · GOLD M15</p>
         </div>
       </div>
-      <div class="repo-version"><span>เวอร์ชัน</span><strong>v3.08</strong></div>
+      <div class="repo-version"><span>เวอร์ชัน</span><strong>v3.09</strong></div>
     </header>
 
     <!-- (c) SUB-NAV TABS -->
@@ -160,7 +162,7 @@ const installSteps = [
       </a>
       <a href="/ea/gdbasket/changelog">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Releases <span>10</span>
+        Releases <span>11</span>
       </a>
       <a href={JOURNAL}>Trading Journal</a>
     </nav>
@@ -173,17 +175,17 @@ const installSteps = [
         <div class="repo-toolbar">
           <div class="branch-pill">
             <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
-            <strong>v3.08</strong>
+            <strong>v3.09</strong>
           </div>
           <span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-            <strong>10</strong> เวอร์ชัน
+            <strong>11</strong> เวอร์ชัน
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            ดาวน์โหลดฟรี <span>v3.08</span>
+            ดาวน์โหลดฟรี <span>v3.09</span>
           </a>
-          <p>ไฟล์รุ่น <strong>v3.08</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
+          <p>ไฟล์รุ่น <strong>v3.09</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
         </div>
 
         <!-- (e) FILE BROWSER -->
@@ -191,8 +193,8 @@ const installSteps = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v3.08 — แก้รากคำสั่งเทรด (integrity) + Smart Anchor นับรอบ + ปุ่ม Rebuild ประวัติ</p>
-            <time>อัปเดต 13 ส.ค. 2026</time>
+            <p>v3.09 — EA คำนวณตัวเลขที่ใช้ตัดสินใจเองจากกราฟ แทนการขอจาก MT5</p>
+            <time>อัปเดต 14 ส.ค. 2026</time>
           </div>
           <div class="file-list">
             {fileRows.map((row) => (
@@ -530,15 +532,14 @@ const installSteps = [
         <section id="changelog" class="release-card scroll-mt-20">
           <div>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <strong>อัปเดตล่าสุด — v3.08</strong>
+            <strong>อัปเดตล่าสุด — v3.09</strong>
           </div>
-          <p>v3.08 = แก้รากคำสั่งเทรด (integrity) + ตัวตรวจสุขภาพตัวนับรอบอัตโนมัติ (Smart Anchor) + ปุ่ม Rebuild ประวัติ — ปิดปุ่มใหม่ทั้งหมด (ค่าเริ่มต้น) = เทรดเหมือนเดิมทุกอย่าง</p>
+          <p>v3.09 = EA คำนวณตัวเลขที่ใช้ตัดสินใจเองจากกราฟ แทนการขอจาก MT5 — การเทรดเหมือนเดิมทุกอย่าง ไม่มีการปรับค่าใดๆ</p>
           <ul>
-            <li><span>+</span><span><strong>แก้รากคำสั่งเทรด (integrity)</strong> — ยึดสถานะไม้ที่โบรกยืนยันจริง + แก้ระบบแก้ไขเป้ากำไรให้รู้จัก error กันเวลาโบรกปฏิเสธคำสั่ง ปิดรูรั่วเป้ากำไรค้างแบบเก่า กันคำสั่งไม้ซ้อนชนกัน</span></li>
-            <li><span>+</span><span><strong>Smart Anchor ตรวจสุขภาพตัวนับรอบอัตโนมัติ</strong> — เครื่องส่วนใหญ่ตัวเลขเดินต่อเหมือนเดิม เครื่องที่ตัวนับเคยเพี้ยนจะเริ่มนับใหม่ให้เอง ตรวจแค่ครั้งเดียวตอนติดตั้ง ไม่ล้างซ้ำทุกอัปเดตเหมือนก่อน</span></li>
-            <li><span>+</span><span><strong>ปุ่ม Rebuild ประวัติทั้งหมดใหม่</strong> — สำหรับพอร์ตทุนคงที่ กดครั้งเดียวอ่านประวัติทั้งพอร์ตขึ้นจอใหม่หมด นับรอบต่อให้ถูกต้อง</span></li>
-            <li><span>+</span><span><strong>ไม้ที่ถืออยู่ตอนติดตั้งไม่หาย</strong> — EA รับมาดูแลต่อทันที นับรวมเป็นส่วนหนึ่งของรอบที่กำลังทำอยู่</span></li>
-            <li><span>+</span><span><strong>สูตรอื่นเดิมไม่เปลี่ยน</strong> — ปิดปุ่มใหม่ทั้งหมด (ค่าเริ่มต้น) = เข้าไม้/วางกริด/เป้ากำไรเหมือนเดิมทุกอย่าง เงินจริงในบัญชีและไม้ที่ถืออยู่ไม่ถูกแตะไม่ว่าทางไหน</span></li>
+            <li><span>+</span><span><strong>เลิกพึ่งตัวคำนวณของ MT5</strong> — เดิม EA ขอค่า 4 อย่างที่ใช้ตัดสินใจ (ระยะตะแกรง / เส้นแบ่งโซน / ตัววัดความร้อนตลาด / ระยะไม้ต่อ) จากตัวคำนวณของ MT5 ซึ่งบางจังหวะตอบกลับว่า "ยังไม่พร้อม" ทั้งที่ข้อมูลพร้อมอยู่แล้ว ทำให้บางครั้ง EA ข้ามจังหวะที่ควรเปิด หรือเปิดทั้งที่ตัวกรองควรบล็อก</span></li>
+            <li><span>+</span><span><strong>เวอร์ชันนี้ EA คิดเองจากแท่งราคาตรงๆ</strong> — ไม่ต้องรอใครตอบ อาการนั้นหมดไป</span></li>
+            <li><span>+</span><span><strong>ทดสอบย้อนหลัง 6 ปีครึ่ง</strong> — ผลตรงกับรุ่นเดิมทุกตัวเลข ต่างเฉพาะจังหวะที่รุ่นเดิมอ่านค่าไม่ได้ ซึ่งคือสิ่งที่ตั้งใจแก้</span></li>
+            <li><span>+</span><span><strong>อัปเดตยังไง</strong> — วางทับตัวเก่าได้เลย ช่องตั้งค่าทุกช่องอยู่ที่เดิม ค่าที่ตั้งไว้ไม่หาย ตะกร้าที่เปิดค้างอยู่ EA รับมาดูแลต่อทันที</span></li>
           </ul>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
         </section>
