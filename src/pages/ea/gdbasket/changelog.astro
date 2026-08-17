@@ -103,8 +103,37 @@
 
 <div class="wrap releases">
 
-  <!-- v3.09 (EA คำนวณตัวเลขตัดสินใจเองจากกราฟ แทนขอจาก MT5) -->
+  <!-- v3.091 (hotfix: แก้รากคำสั่งเทรดกรณีเปิดออเดอร์ซ้ำรัวไม่หยุด) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.091</span></span>
+      <div class="date">17 ส.ค. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <div class="head">
+          <h2>แก้บั๊กเปิดออเดอร์ซ้ำรัวไม่หยุด — เจาะรากที่ชั้นตีความคำตอบจากโบรกเกอร์</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.091 · 17 ส.ค. 2026</p>
+        <p class="lead">แก้บั๊กที่ EA เปิดออเดอร์ซ้ำรัวติดกันไม่หยุด (เคสจริง: ไม้ล็อตเท่ากันเปิดถี่ภายในไม่กี่วินาที) — เจาะรากที่ชั้นตีความคำตอบจากโบรกเกอร์ ไม่ใช่แปะปะอาการ</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>EA ยึดสถานะไม้ตามที่โบรกเกอร์ยืนยันจริงเท่านั้น</strong> — เดิมเวลาโบรกเกอร์ตอบแบบ "ไม่รู้ผล" (เช่น หมดเวลา/หลุดการเชื่อมต่อ/คำตอบไม่ครบ) EA เข้าใจผิดว่าเท่ากับ "ไม่เกิดไม้แน่นอน" แล้วยิงคำสั่งใหม่ซ้ำทุกจังหวะ — ตอนนี้แยก "ไม่รู้ผล" ออกจาก "ไม่เกิดแน่" ชัดเจน ไม่ยิงซ้ำจนกว่าจะเช็คสถานะจริงกับโบรกเกอร์ก่อน</span></li>
+          <li><span class="plus">+</span><span><strong>เพิ่มตัวกวาดคำสั่งที่ค้างเกินเวลาแล้วยังไม่รู้ผล</strong> ให้หมดอายุและเคลียร์ตัวเองอัตโนมัติ กันไม้ผีค้างเงียบๆ ในระบบ</span></li>
+          <li><span class="plus">+</span><span><strong>แก้ป้ายที่มาของไม้กู้กอง (rescue leg) ให้ตรงตามจริง</strong> ทั้งสองทาง (ไม่ใช่ตีเหมาว่ามาจากทางเดียวเสมอ)</span></li>
+          <li><span class="plus">+</span><span><strong>พิสูจน์ผลเทรดไม่เปลี่ยนแม้แต่จุดเดียว</strong> — เทียบไฟล์บันทึกผลก่อน/หลังแก้ เต็มเส้น 6.5 ปี (2020-2026) ตรงกันทุกตัวอักษรครบ 4 ชั้นทุน (ทองมาตรฐานทุน 1,000/10,000 + ทองไมโครทุน 100/1,000) ทั้งฝั่งพัฒนาและฝั่งใช้จริง เทียบฐานอ้างอิงเดิม</span></li>
+          <li><span class="plus">+</span><span><strong>ไม้พีระมิดยังส่งเปล่าเหมือนเดิม (ไม่ใช่ตกหล่น — รอทำต่อรุ่นถัดไป)</strong> — ยังไม่มีกลไกเขียนทับค่ารองพื้นให้ปลอดภัยตอนไม้พีระมิดชนจังหวะสลับเฟส</span></li>
+        </ul>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.091
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.09 (ปิดดาวน์โหลด — v3.091 hotfix supersede, มติเจ้าของปิด v3 รุ่นเก่าทั้งหมด 17 ส.ค. 2026) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.09</span></span>
       <div class="date">14 ส.ค. 2026</div>
@@ -113,7 +142,6 @@
       <div class="card">
         <div class="head">
           <h2>EA คำนวณตัวเลขที่ใช้ตัดสินใจเองจากกราฟ แทนการขอจาก MT5</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.09 · 14 ส.ค. 2026 · <strong>อัปเดตไฟล์ 14 ส.ค. 2026 (รอบเย็น)</strong></p>
         <p class="lead"><strong>ไฟล์ v3.09 ถูกอัปเดตในวันเดียวกัน โดยไม่ขึ้นเลขรุ่นใหม่ — ถ้าท่านโหลดไปแล้วช่วงเช้า กรุณาโหลดใหม่อีกครั้ง</strong> รอบเย็นเพิ่มการคุ้มครองไม้ให้แน่นขึ้น (จุดปิดกำไรและจุดตัดขาดทุนติดไปกับคำสั่งตั้งแต่วินาทีแรก) ส่วนรอบเช้าคือการเปลี่ยนมาให้ EA คำนวณตัวเลขที่ใช้ตัดสินใจเองจากกราฟ — ทั้งสองรอบ<strong>ไม่แตะการเทรด</strong> ผลทดสอบย้อนหลังตรงกับของเดิมทุกตัวเลข</p>
@@ -126,15 +154,11 @@
           <li><span class="plus">+</span><span><strong>การเทรดเหมือนเดิมทุกอย่าง ไม่มีการปรับค่าใดๆ</strong> — ทดสอบย้อนหลัง 6 ปีครึ่งแล้วผลตรงกับรุ่นเดิมทุกตัวเลข ต่างเฉพาะจังหวะที่รุ่นเดิมอ่านค่าไม่ได้ ซึ่งคือสิ่งที่ตั้งใจแก้</span></li>
           <li><span class="plus">+</span><span><strong>อัปเดตยังไง</strong> — วางทับตัวเก่าได้เลย ช่องตั้งค่าทุกช่องอยู่ที่เดิม ค่าที่ตั้งไว้ไม่หาย ตะกร้าที่เปิดค้างอยู่ EA รับมาดูแลต่อทันที</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลด v3.09
-        </a>
       </div>
     </div>
   </section>
 
-  <!-- v3.08 (demoted — แก้รากคำสั่งเทรด integrity + Smart Anchor นับรอบ + ปุ่ม Rebuild ประวัติ) -->
+  <!-- v3.08 (ปิดดาวน์โหลด — มติเจ้าของปิด v3 รุ่นเก่าทั้งหมด 17 ส.ค. 2026) -->
   <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.08</span></span>
@@ -156,15 +180,11 @@
           <li><span class="plus">+</span><span>เลือกให้ EA สามารถคำนวน <strong>Lot 2 บ้าน เท่ากัน</strong> ได้แล้ว (จากปกติที่บ้านบนออก Lot ใหญ่กว่า)</span></li>
           <li><span class="plus">+</span><span>เลือกใช้กำไรรอบ (<strong>Round Profit</strong>) มาเป็นเบาะรองในรอบนั้นได้แล้ว</span></li>
         </ul>
-        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v308" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลด v3.08
-        </a>
       </div>
     </div>
   </section>
 
-  <!-- v3.07 (patch — กัน common TP ต่ำกว่าทุน + เวลา session ตาม DST โดยไม่ restart) -->
+  <!-- v3.07 (ปิดดาวน์โหลด — มติเจ้าของปิด v3 รุ่นเก่าทั้งหมด 17 ส.ค. 2026) -->
   <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.07</span></span>
@@ -184,15 +204,11 @@
           <li><span class="plus">+</span><span><strong>เวลา broker ใช้ไม่ได้ = ไม่เปิดตะกร้าใหม่</strong> — ไม่เดาเวลาเพื่อเปิด G1 และเวลาเก่าบน panel ไม่เลื่อนย้อนหลัง</span></li>
           <li><span class="plus">+</span><span><strong>สูตรอื่นเดิมไม่เปลี่ยน</strong> — Hour/EMA, lot, grid, trail และความถี่ every tick / per bar คงเดิม; เปลี่ยนเฉพาะ session gate ให้ใช้เวลาถูกต้อง</span></li>
         </ul>
-        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v307" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลด v3.07
-        </a>
       </div>
     </div>
   </section>
 
-  <!-- v3.06 (รุ่นก่อนหน้า — เปิดหลายพอร์ตตัดสินใจตรงกัน + กันเส้นกันตายวางผิดฝั่ง) -->
+  <!-- v3.06 (ปิดดาวน์โหลด — มติเจ้าของปิด v3 รุ่นเก่าทั้งหมด 17 ส.ค. 2026) -->
   <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.06</span></span>
@@ -210,15 +226,11 @@
           <li><span class="plus">+</span><span><strong>ปรับปรุงตัวคำนวณ SL ไม่ให้วางผิดฝั่ง</strong> — เคสหายากตอนทุนเหลือเบาะน้อย เส้นกันตายไปโผล่ผิดจุด ตอนนี้แก้ให้เรียบร้อยแล้ว</span></li>
           <li><span class="plus">+</span><span><strong>การเทรดเหมือน v3.05 ทุกอย่าง</strong> — ปรับเฉพาะจังหวะเปิดกองใหม่ กองที่เปิดอยู่ไม่กระทบ</span></li>
         </ul>
-        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v306" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลด v3.06
-        </a>
       </div>
     </div>
   </section>
 
-  <!-- v3.05 (ปิดดาวน์โหลด — patch v3.06 supersede) -->
+  <!-- v3.05 (ปิดดาวน์โหลด — มติเจ้าของปิด v3 รุ่นเก่าทั้งหมด 17 ส.ค. 2026) -->
   <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.05</span></span>
@@ -238,10 +250,6 @@
           <li><span class="plus">+</span><span><strong>แก้ log ค่าถือข้ามคืน (swap)</strong> ที่เคยทำให้เข้าใจผิดว่าบัญชีแบบไม่คิดค่านี้ถูกหักจริง</span></li>
           <li><span class="plus">+</span><span><strong>สวิตช์ล้างไฟล์จำทุนเป็นแบบทำครั้งเดียว</strong> เปิดค้างไว้ก็ล้างแค่ครั้งแรก</span></li>
         </ul>
-        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v305" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลด v3.05
-        </a>
       </div>
     </div>
   </section>
@@ -293,7 +301,7 @@
     </div>
   </section>
 
-  <!-- v3.02 (demoted — VELOCE) -->
+  <!-- v3.02 (ปิดดาวน์โหลด — มติเจ้าของปิด v3 รุ่นเก่าทั้งหมด 17 ส.ค. 2026) -->
   <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.02</span></span>
@@ -319,10 +327,6 @@
           <li><span class="plus">+</span><span><strong>การเทรดไม่เปลี่ยนแม้แต่บาทเดียว</strong> — ของใหม่ทั้งหมดในรุ่นนี้เป็นแค่การแสดงผลบนจอ ไม่แตะการตัดสินใจเปิด/ปิดไม้เลย</span></li>
           <li><span class="plus">+</span><span><strong>ผลพิสูจน์เต็มเส้น 3 ปี 6 เดือน</strong> — กำไรสุทธิ +250,351.30 · โดนล้าง 4 จาก 31 รอบ · ทนทุกช่วงเวลาที่ทดสอบ 100%</span></li>
         </ul>
-        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v302" download>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          ดาวน์โหลด v3.02
-        </a>
       </div>
     </div>
   </section>
