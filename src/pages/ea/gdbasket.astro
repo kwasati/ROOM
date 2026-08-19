@@ -5,7 +5,6 @@ import Layout from '../../layouts/Layout.astro';
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
 const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.092 (publish/releases/v3.092/gdBasket_v3.092.ex5)
-const DL_V3091 = `${MAIN}/d/gdbasket-v3091`;
 const DL_V202 = `${MAIN}/d/gdbasket-v202`;
 const DL_V201 = `${MAIN}/d/gdbasket-v201`;
 const DL_V200 = `${MAIN}/d/gdbasket-v200`;
@@ -81,7 +80,6 @@ const veloceSteps = [
 
 const releases = [
   { version: 'v3.092', dateLabel: '19 ส.ค. 2026', latest: true, url: DL_LATEST },
-  { version: 'v3.091', dateLabel: '17 ส.ค. 2026', latest: false, url: DL_V3091 },
   { version: 'v2.02', dateLabel: '13 ก.ค. 2026', latest: false, url: DL_V202 },
   { version: 'v2.01', dateLabel: '10 ก.ค. 2026', latest: false, url: DL_V201 },
   { version: 'v2.00', dateLabel: '8 ก.ค. 2026', latest: false, url: DL_V200 },
@@ -96,7 +94,7 @@ const fileRows = [
   { icon: 'modes', name: 'เครื่องยนต์ VELOCE', note: 'ค่าพร้อมใช้ที่ผ่านการทดสอบมาแล้ว · ไม่ต้องเลือกโหมด', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
-  { icon: 'clock', name: 'Releases', note: 'v3.092 · v3.091 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '7 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
+  { icon: 'clock', name: 'Releases', note: 'v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '6 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
   { icon: 'dl', name: 'gdBasket v3.092', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
@@ -154,7 +152,7 @@ const installSteps = [
       </a>
       <a href="/ea/gdbasket/changelog">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Releases <span>7</span>
+        Releases <span>6</span>
       </a>
       <a href={JOURNAL}>Trading Journal</a>
     </nav>
@@ -171,7 +169,7 @@ const installSteps = [
           </div>
           <span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-            <strong>7</strong> เวอร์ชัน
+            <strong>6</strong> เวอร์ชัน
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -185,7 +183,7 @@ const installSteps = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v3.092 — แก้อาการยิงคำสั่งรัวตอนตลาดปิด ผลเทรดเหมือนเดิมทุกอย่าง</p>
+            <p>v3.092 — ช่วงพักหลังล้างพอร์ตนับถูกต้องแล้ว + เก็บจุดเล็กๆ น้อยๆ ที่ค้างอยู่ ผลเทรดเหมือนเดิมทุกอย่าง</p>
             <time>อัปเดตไฟล์ 19 ส.ค. 2026</time>
           </div>
           <div class="file-list">
@@ -526,7 +524,7 @@ const installSteps = [
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <strong>อัปเดตล่าสุด — v3.092</strong>
           </div>
-          <p><strong>hotfix</strong> — แก้อาการ EA ยิงคำสั่งรัวตอนตลาดปิดแล้วโดนโบรกเกอร์ปฏิเสธ ผลเทรดเหมือนเดิมทุกอย่าง</p>
+          <p><strong>hotfix</strong> — แก้การนับช่วงพักหลังล้างพอร์ตที่เคยนับผิด (เดิมบางพอร์ตเข้าช่วงพัก บางพอร์ตไม่เข้า ตอนนี้ทุกพอร์ตเข้าช่วงพักถูกต้องเหมือนกันหมด) + เก็บงานแก้จุดเล็กๆ น้อยๆ ที่ค้างอยู่ให้สะอาดเรียบร้อย ผลเทรดเหมือนเดิมทุกอย่าง</p>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
         </section>
       </div>
