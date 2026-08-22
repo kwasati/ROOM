@@ -103,8 +103,37 @@
 
 <div class="wrap releases">
 
-  <!-- v3.092 (hotfix: ช่วงพักหลังล้างพอร์ตนับถูกต้องแล้ว + เก็บงานจุดเล็กๆ น้อยๆ ที่ค้างอยู่) -->
+  <!-- v3.10 (เปลี่ยนระบบการคำนวณ Lot แบบเร่งรอบ — ทุกทุนได้ lot แรกเท่ากัน + คันโยกเร่งรอบที่กำไร 44%) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.10</span></span>
+      <div class="date">22 ส.ค. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <div class="head">
+          <h2>เปลี่ยนระบบการคำนวณ Lot แบบเร่งรอบ</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.10 · 22 ส.ค. 2026</p>
+        <p class="lead">เปลี่ยนระบบการคำนวณ lot ใหม่ — แก้เคสทุนบางก้อน (เช่น 300) ที่เคยได้ lot แรกใหญ่กว่าปกติ ต่อไปนี้ทุกขนาดทุนจะได้ lot แรกเท่ากันหมด</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>ทุกขนาดทุนได้ lot แรกเท่ากันหมดแล้ว</strong> — ไม่มีเคส lot ใหญ่กว่าปกติอีกต่อไป</span></li>
+          <li><span class="plus">+</span><span><strong>EA ปรับไปใช้ระบบคันโยกแบบเร่งรอบ</strong> — เมื่อกำไรของรอบครบ 44% จะเพิ่ม lot ให้อัตโนมัติแล้วเร่งรอบต่อ</span></li>
+          <li><span class="plus">+</span><span><strong>มีปุ่มเปิด/ปิดระบบเร่งรอบ</strong> — ไม่อยากให้เร่ง ปิดได้ที่ช่องตั้งค่าในตัว EA</span></li>
+          <li><span class="plus">+</span><span><strong>ผลที่วัดได้ เคสทุน 300</strong> — ล้างพอร์ตจาก 22 ครั้ง เหลือ 13 ครั้ง · ติดลบลอยลึกสุดจาก 1.43 เท่าของทุน เหลือ 1.03 เท่า</span></li>
+          <li><span class="plus">+</span><span><strong>แลกมาด้วย</strong> — กำไรที่ทุนก้อนนั้นลดลงเล็กน้อย จาก 7,701 เหลือ 7,413</span></li>
+        </ul>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.10
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.092 (demoted — supersede โดย v3.10, ยังกดโหลดได้ที่ลิงก์เฉพาะรุ่น) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.092</span></span>
       <div class="date">19 ส.ค. 2026</div>
@@ -113,7 +142,6 @@
       <div class="card">
         <div class="head">
           <h2>ช่วงพักหลังล้างพอร์ตนับถูกต้องแล้ว</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.092 · 19 ส.ค. 2026</p>
         <p class="lead">hotfix — แก้จุดที่ยังไม่เรียบร้อยจากรุ่นก่อน ผลเทรดเหมือนเดิมทุกอย่าง</p>
@@ -121,7 +149,7 @@
           <li><span class="plus">+</span><span><strong>แก้การนับช่วงพักหลังล้างพอร์ต (SO cooldown) ที่เคยนับผิด</strong> — เดิมบางพอร์ตเข้าช่วงพัก บางพอร์ตไม่เข้า รุ่นนี้ทุกพอร์ตเข้าช่วงพักได้ถูกต้องเหมือนกันหมด</span></li>
           <li><span class="plus">+</span><span><strong>เก็บงานแก้จุดเล็กๆ น้อยๆ ที่ค้างอยู่ทั้งหมด</strong> (ไม่ใช่อาการร้ายแรง) ให้สะอาดเรียบร้อย</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v3092" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด v3.092
         </a>
