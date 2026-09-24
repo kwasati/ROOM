@@ -103,8 +103,38 @@
 
 <div class="wrap releases">
 
-  <!-- v3.11 (ปิดจุดเสี่ยงสะสมครบ 10 รายการ — ไม่แตะการเทรด ผลเท่า v3.10) -->
+  <!-- v3.20 (โปรไฟล์ใหม่ VELOCE26 — ชุดจูนจากเทสก่อนใช้จริง 2020–2026) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.20</span></span>
+      <div class="date">24 ก.ย. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <div class="head">
+          <h2>โปรไฟล์ใหม่ VELOCE26: ชุดจูนจากการเทสก่อนใช้จริง 2020–2026</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.20 · 24 ก.ย. 2026</p>
+        <p class="lead">โปรไฟล์ในช่อง Mode เปลี่ยนชื่อเป็น VELOCE26 — โหมดเดิม VELOCE ไม่มีให้เลือกแล้ว (หลังอัปให้ตรวจช่อง Mode)</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>บ้านบนใช้ไม้ใหญ่ขึ้น</strong> — ช่วงตลาดแกว่งแรง ใช้ไม้ 5%→25% ต่อชั้น และ TP สั้นลง 1.8→1.0 เท่า ATR — ผลย้อนหลัง 2020–2026 ล้างพอร์ตลดจาก 12 เหลือ 6 ครั้ง กำไรรอบจบเพิ่ม</span></li>
+          <li><span class="plus">+</span><span><strong>กฎเท่าทุน 75 นาที</strong> — ไม้ที่เปิดเกิน 75 นาทีแล้วยังไม่ถึง TP จะย้าย TP มาที่จุดเท่าทุน+30 จุด (โบรกยังเป็นคนปิด EA ไม่ปิดเอง) — ล้างพอร์ต 2024–2026 ลด 8→4 ครั้ง</span></li>
+          <li><span class="plus">+</span><span><strong>ช่องตั้งค่าใหม่ Swap-Adjust Common TP</strong> — ค่าเริ่มต้น OFF; เปิด ON = TP เลื่อนชดเชย swap เหมือนรุ่นก่อน แต่จากการเทสด้วย swap จริงจะทำให้ล้างพอร์ตเพิ่มเท่าตัวในวันตลาดดิ่ง</span></li>
+          <li><span class="plus">+</span><span><strong>แก้บั๊ก 2 จุด</strong> — ไม้พีระมิดกำพร้าหลัง commit (EA เงียบไม่ดูแลไม้ที่เหลือ) และตัวปิดกองมือยิงซ้ำตอนตลาดปิดรายวัน</span></li>
+          <li><span class="plus">+</span><span><strong>ต้องรู้ก่อนใช้</strong> — ทดสอบที่ดีเลย์ 100 ms (ดีเลย์ ≥150 ms ล้างพอร์ตเพิ่มเท่าตัว · แนะนำ VPS ใกล้โบรก) · ควรมีทุน 2 เท่าของทุนต่อรอบ · ปีที่ตลาดนิ่งแทบไม่มีรอบและ swap ข้ามคืนกินกำไร — EA ทำงานได้ดีในตลาดแกว่ง</span></li>
+          <li><span class="plus">+</span><span><strong>ไม่ต้อง Reset input ตอนอัป</strong> — ช่องใหม่ต่อท้าย แต่ควรตรวจ Swap-Adjust = OFF และ Mode = VELOCE26</span></li>
+        </ul>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.20
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.11 (demoted — supersede โดย v3.20, ยังกดโหลดได้ที่ลิงก์เฉพาะรุ่น) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.11</span></span>
       <div class="date">10 ก.ย. 2026</div>
@@ -113,7 +143,6 @@
       <div class="card">
         <div class="head">
           <h2>ปิดจุดเสี่ยงสะสมครบ 10 รายการ</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.11 · 10 ก.ย. 2026</p>
         <p class="lead">ปรับปรุงความปลอดภัยและความถูกต้องของระบบภายใน — ผลเทรดที่ค่าตั้งต้นเท่ากับ v3.10 ทุกตัวเลข (ทดสอบเต็มเส้น 2020-2026 ตรงทุกแถว)</p>
@@ -126,7 +155,7 @@
           <li><span class="plus">+</span><span><strong>ลบคอลัมน์ log ที่ไม่ได้ใช้แล้วออก</strong> — ไฟล์บันทึกเรียบขึ้น</span></li>
           <li><span class="plus">+</span><span><strong>การเทรดเหมือน v3.10 ทุกอย่าง</strong> — ทดสอบย้อนหลังเต็มเส้น 2020-2026 ผลตรงกันทุกแถว</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v311" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด v3.11
         </a>
