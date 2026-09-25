@@ -5,7 +5,6 @@ import Layout from '../../layouts/Layout.astro';
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
 const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.21 (publish/releases/v3.21/gdBasket_v3.21.ex5)
-const DL_V320 = `${MAIN}/d/gdbasket-v320`;
 const DL_V311 = `${MAIN}/d/gdbasket-v311`;
 const DL_V310 = `${MAIN}/d/gdbasket-v310`;
 const DL_V3092 = `${MAIN}/d/gdbasket-v3092`;
@@ -84,7 +83,6 @@ const veloceSteps = [
 
 const releases = [
   { version: 'v3.21', dateLabel: '25 ก.ย. 2026', latest: true, url: DL_LATEST },
-  { version: 'v3.20', dateLabel: '24 ก.ย. 2026', latest: false, url: DL_V320 },
   { version: 'v3.11', dateLabel: '10 ก.ย. 2026', latest: false, url: DL_V311 },
   { version: 'v3.10', dateLabel: '22 ส.ค. 2026', latest: false, url: DL_V310 },
   { version: 'v3.092', dateLabel: '19 ส.ค. 2026', latest: false, url: DL_V3092 },
@@ -102,7 +100,7 @@ const fileRows = [
   { icon: 'modes', name: 'เครื่องยนต์ VELOCE26', note: 'ค่าพร้อมใช้ที่ผ่านการทดสอบมาแล้ว · ไม่ต้องเลือกโหมด', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
-  { icon: 'clock', name: 'Releases', note: 'v3.21 · v3.20 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '10 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
+  { icon: 'clock', name: 'Releases', note: 'v3.21 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '9 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
   { icon: 'dl', name: 'gdBasket v3.21', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
@@ -160,7 +158,7 @@ const installSteps = [
       </a>
       <a href="/ea/gdbasket/changelog">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Releases <span>10</span>
+        Releases <span>9</span>
       </a>
       <a href={JOURNAL}>Trading Journal</a>
     </nav>
@@ -177,7 +175,7 @@ const installSteps = [
           </div>
           <span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-            <strong>10</strong> เวอร์ชัน
+            <strong>9</strong> เวอร์ชัน
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -480,7 +478,7 @@ const installSteps = [
             <p class="fine-print mb-6">ผลทุกตัวเป็นสัดส่วนตรงตามระดับทุน — สัดส่วน 1 : 10 กันไว้ให้เทียบเข้าใจง่าย ก่อนเริ่มควรมีทุน 2 เท่าของทุนต่อรอบ รอด 100% ตลอดชุดข้อมูล</p>
             <p class="fine-print mb-6">ตัวเลขทั้งหมดคำนวณจากตั้งทุนต่อรอบ (capital) 10,000 → เป้าถอน 20,000/รอบ</p>
 
-            <p class="fine-print mb-6"><strong class="text-gray-light">VELOCE26 ทนทุกช่วงเวลาที่ทดสอบ รอด 100%</strong> — ทดสอบเลื่อนช่วงเวลา 25 รูปแบบ ไม่มีช่วงไหนหลุดเกณฑ์ (รายละเอียดเต็มอยู่ในปุ่ม "ดูสถิติเต็ม" ด้านล่าง)</p>
+            <p class="fine-print mb-6"><strong class="text-gray-light">VELOCE26 ทนทุกช่วงเวลาที่ทดสอบ รอด 100%</strong> — รอด 100% จากทุน 2 เท่าของรอบในทุกช่วงที่ทดสอบ ไม่มีช่วงไหนหลุดเกณฑ์ (รายละเอียดเต็มอยู่ในปุ่ม "ดูสถิติเต็ม" ด้านล่าง)</p>
 
             <div class="readme-callout" style="text-align:center;margin:6px 0 28px;">
               <p style="margin:0 0 6px;color:var(--color-gray-light);font-size:15px;font-weight:700;">อยากรู้ตัวเลขทุกตัวแบบไม่มีย่อ?</p>
@@ -567,9 +565,9 @@ const installSteps = [
         <section id="changelog" class="release-card scroll-mt-20">
           <div>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <strong>อัปเดตล่าสุด — v3.21</strong>
+            <strong>BIG UPDATE! VELOCE26 มาแล้ว</strong>
           </div>
-          <p><strong>กฎเท่าทุน 75 นาทีทำงานต่อหลัง restart + ตัวซ่อม TP/SL รู้จักกฎแล้ว</strong> — เดิมถ้าปิด/เปิด MT5 หรือเปลี่ยนค่าระหว่างมีกองค้าง กองนั้นกลับไปใช้ TP เต็ม/SL ปกติ ตอนนี้ EA นับอายุกองจากไม้แรกและย้าย TP มาที่เท่าทุนทันทีที่เปิดขึ้นมา · ตัวซ่อมรายแท่งเห็นค่าเลื่อนของกฎเป็น "ค่าผิด" แล้วเขียนทับกลับเป็น TP เต็ม ตอนนี้ซ่อมด้วยค่าของกฎเอง · เทส 2020–2026 ดีขึ้นเล็กน้อย: ปั้นสำเร็จ 26 : 6 กำไรรวม +23,544/ทุน 1,000 (v3.20 = 23,168) · อัปได้ทันทีไม่ต้อง Reset input</p>
+          <p><strong>ปรับปรุงกลไกการเทรดใหม่</strong> — ให้สอดคล้องกับความผันผวนของปี 2026 · <strong>พิสูจน์แล้ว</strong> — ล้างพอร์ต (SO) เหลือ 2 จาก 9 ในปี 2026 · <strong>Robustness Test ผ่าน</strong> — ผลปีย้อนหลัง 2020–2025 ไม่เสียไป และยังทำกำไรได้ดีขึ้น · <strong>โปรไฟล์ใหม่ VELOCE26</strong> — ช่อง Mode เหลือตัวเดียว หลังอัปตรวจให้ตรง · <strong>อัปทับได้เลย</strong> — ไม่ต้อง Reset input</p>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
         </section>
       </div>
@@ -707,14 +705,14 @@ const installSteps = [
   </div>
 </div>
 
-<!-- popup "ดูสถิติเต็ม" — 7 กลุ่มสถิติ + WFA 25 รูปแบบ + survival สุ่มจุดเริ่ม -->
+<!-- popup "ดูสถิติเต็ม" — ผลทดสอบย้อนหลัง 2020–2026 + survival -->
 <div id="stats-modal-overlay" class="stats-modal-overlay" onclick="if(event.target===this) closeStatsModal()">
   <div class="stats-modal" role="dialog" aria-modal="true" aria-labelledby="stats-modal-title">
     <div class="stats-modal-head">
       <div>
         <span class="eyebrow pixel" style="font-size:8px;">VELOCE26 · FULL REPORT</span>
-        <h2 id="stats-modal-title">สถิติเต็ม — ผ่านทดสอบเลื่อนช่วงเวลา + 7 กลุ่ม</h2>
-        <p>ทุกตัวเลขไม่ย่อ — สรุปจากบันทึกวัดผลทางเทคนิคของ VELOCE26</p>
+        <h2 id="stats-modal-title">สถิติเต็ม — ผลทดสอบย้อนหลัง 2020–2026</h2>
+        <p>สรุปจาก Strategy Tester ทุน 10,000 · ม.ค. 2020 – ส.ค. 2026</p>
       </div>
       <button type="button" class="stats-modal-close" onclick="closeStatsModal()" aria-label="ปิด">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
