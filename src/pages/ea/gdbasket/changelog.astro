@@ -103,8 +103,38 @@
 
 <div class="wrap releases">
 
-  <!-- v3.20 (โปรไฟล์ใหม่ VELOCE26 — ชุดจูนจากเทสก่อนใช้จริง 2020–2026) -->
+  <!-- v3.21 (โปรไฟล์ใหม่ VELOCE26 — ชุดจูนจากเทสก่อนใช้จริง 2020–2026) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.21</span></span>
+      <div class="date">25 ก.ย. 2026</div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <div class="head">
+          <h2>กฎเท่าทุนทำงานต่อหลัง restart + ตัวซ่อม TP/SL รู้จักกฎแล้ว</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v3.21 · 25 ก.ย. 2026</p>
+        <p class="lead">แก้จุดเดียวที่เจอจากการไล่อ่านโค้ดทั้งตัวก่อนปล่อยใช้จริง: กฎเท่าทุน 75 นาทีหลุดได้หลัง restart และถูกตัวซ่อม TP/SL เขียนทับ — ไม่เปลี่ยนค่าเทรดใด ๆ ผลเทสดีขึ้นเล็กน้อย</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>กฎเท่าทุน 75 นาทีทำงานต่อหลัง restart</strong> — เดิมถ้าปิด/เปิด MT5 หรือเปลี่ยนค่าระหว่างมีกองค้าง กองนั้นจะกลับไปใช้ TP เต็มและ SL ปกติจนกว่าจะมีไม้ใหม่เข้า ตอนนี้ EA นับอายุกองจากไม้แรกเดิมและย้าย TP มาที่เท่าทุนให้ทันทีที่เปิดขึ้นมา</span></li>
+          <li><span class="plus">+</span><span><strong>ตัวซ่อม TP/SL รู้จักกฎเท่าทุนแล้ว</strong> — เดิมตัวซ่อมรายแท่งเห็น TP เท่าทุนหรือ SL ที่กฎเลื่อนตามเป็น "ค่าผิด" แล้วเขียนทับกลับเป็น TP เต็ม/SL ปกติ ตอนนี้ซ่อมด้วยค่าของกฎเอง</span></li>
+          <li><span class="plus">+</span><span><strong>ทำไมเทสไม่เคยเห็น</strong> — Strategy Tester ไม่มีการ restart กลางกอง เคสนี้เกิดเฉพาะบัญชีจริง (VPS reboot / อัป MT5 / เปลี่ยน input) จึงเจอจากการอ่านโค้ด ไม่ใช่จากผลเทส</span></li>
+          <li><span class="plus">+</span><span><strong>ผลเทส 2020–2026 ดีขึ้นเล็กน้อย</strong> — ปั้นสำเร็จ 26 รอบ ล้าง 6 รอบ (v3.20 = 25 : 6) กำไรรวม +23,544 ต่อทุนรอบ 1,000 (v3.20 = 23,168) เพราะกองที่กฎเท่าทุนดูแลอยู่ไม่ถูกตัวซ่อมดันกลับไปใช้ SL ปกติอีก — ที่เหลือตรงกันทุกไม้</span></li>
+          <li><span class="plus">+</span><span><strong>อัปได้ทันที ไม่ต้อง Reset input</strong> — ไม่มีช่องใหม่ ค่าเดิมใช้ต่อได้ แนะนำอัปตอนไม่มีกองค้าง หรือถ้ามีกองค้างให้ปล่อย EA ดูแลต่อได้เลย (นี่คือเคสที่รุ่นนี้แก้)</span></li>
+        </ul>
+        <p style="font-size:13px;color:var(--gray);margin:0 0 16px;">รุ่นนี้ไม่แตะโปรไฟล์ VELOCE26, ขนาดไม้, ระยะ grid/TP หรือ swap-adjust — ทุกอย่างเท่ากับ v3.20</p>
+        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v3.21
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.20 (demoted — supersede โดย v3.21, ยังกดโหลดได้ที่ลิงก์เฉพาะรุ่น) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.20</span></span>
       <div class="date">24 ก.ย. 2026</div>
@@ -112,20 +142,20 @@
     <div class="body">
       <div class="card">
         <div class="head">
-          <h2>โปรไฟล์ใหม่ VELOCE26: ชุดจูนจากการเทสก่อนใช้จริง 2020–2026</h2>
-          <span class="badge latest">ล่าสุด</span>
+          <h2>โปรไฟล์ใหม่ VELOCE26: ชุดค่าที่ได้จากการเทสย้อนหลัง 2020–2026 ก่อนใช้จริง</h2>
         </div>
         <p class="vdate">gdBasket v3.20 · 24 ก.ย. 2026</p>
-        <p class="lead">โปรไฟล์ในช่อง Mode เปลี่ยนชื่อเป็น VELOCE26 — โหมดเดิม VELOCE ไม่มีให้เลือกแล้ว (หลังอัปให้ตรวจช่อง Mode)</p>
+        <p class="lead">โปรไฟล์ใหม่ VELOCE26 — ชุดค่าที่ได้จากการเทสย้อนหลัง 2020–2026 ก่อนใช้จริง เปลี่ยนพฤติกรรมการเทรดโดยตั้งใจ ผู้ใช้เดิมควรอ่านทั้งหมดก่อนอัป</p>
         <ul>
-          <li><span class="plus">+</span><span><strong>บ้านบนใช้ไม้ใหญ่ขึ้น</strong> — ช่วงตลาดแกว่งแรง ใช้ไม้ 5%→25% ต่อชั้น และ TP สั้นลง 1.8→1.0 เท่า ATR — ผลย้อนหลัง 2020–2026 ล้างพอร์ตลดจาก 12 เหลือ 6 ครั้ง กำไรรอบจบเพิ่ม</span></li>
-          <li><span class="plus">+</span><span><strong>กฎเท่าทุน 75 นาที</strong> — ไม้ที่เปิดเกิน 75 นาทีแล้วยังไม่ถึง TP จะย้าย TP มาที่จุดเท่าทุน+30 จุด (โบรกยังเป็นคนปิด EA ไม่ปิดเอง) — ล้างพอร์ต 2024–2026 ลด 8→4 ครั้ง</span></li>
-          <li><span class="plus">+</span><span><strong>ช่องตั้งค่าใหม่ Swap-Adjust Common TP</strong> — ค่าเริ่มต้น OFF; เปิด ON = TP เลื่อนชดเชย swap เหมือนรุ่นก่อน แต่จากการเทสด้วย swap จริงจะทำให้ล้างพอร์ตเพิ่มเท่าตัวในวันตลาดดิ่ง</span></li>
-          <li><span class="plus">+</span><span><strong>แก้บั๊ก 2 จุด</strong> — ไม้พีระมิดกำพร้าหลัง commit (EA เงียบไม่ดูแลไม้ที่เหลือ) และตัวปิดกองมือยิงซ้ำตอนตลาดปิดรายวัน</span></li>
-          <li><span class="plus">+</span><span><strong>ต้องรู้ก่อนใช้</strong> — ทดสอบที่ดีเลย์ 100 ms (ดีเลย์ ≥150 ms ล้างพอร์ตเพิ่มเท่าตัว · แนะนำ VPS ใกล้โบรก) · ควรมีทุน 2 เท่าของทุนต่อรอบ · ปีที่ตลาดนิ่งแทบไม่มีรอบและ swap ข้ามคืนกินกำไร — EA ทำงานได้ดีในตลาดแกว่ง</span></li>
-          <li><span class="plus">+</span><span><strong>ไม่ต้อง Reset input ตอนอัป</strong> — ช่องใหม่ต่อท้าย แต่ควรตรวจ Swap-Adjust = OFF และ Mode = VELOCE26</span></li>
+          <li><span class="plus">+</span><span><strong>ชื่อโปรไฟล์เปลี่ยนเป็น VELOCE26</strong> — ช่อง Mode เหลือตัวเดียว โหมด VELOCE เดิมไม่มีให้เลือกอีก หลังอัปให้ตรวจช่อง Mode บนชาร์ตเก่า</span></li>
+          <li><span class="plus">+</span><span><strong>ช่วงตลาดแกว่งแรงใช้ไม้ใหญ่ขึ้นและปิดกองเร็วขึ้น</strong> — ไม้ที่เพิ่มต่อชั้นจาก 5% เป็น 25% ของไม้ฐาน และเป้าปิดกองจาก 1.8 เหลือ 1.0 เท่า ATR ผลคือกองไม่ลึกเท่าเดิม (ลึกเกิน 20 ไม้จาก 53 ครั้งเหลือ 6 ครั้งใน 6 ปี) และล้างพอร์ตน้อยลงจาก 22 เหลือ 10 ครั้ง</span></li>
+          <li><span class="plus">+</span><span><strong>กฎเท่าทุน 75 นาที</strong> — กองที่เปิดเกิน 75 นาทีแล้วยังไม่ถึงเป้า EA จะย้าย TP ลงมา�ที่จุดเท่าทุน +30 จุด (ถ้ากองกำไรอยู่จะเปลี่ยนเป็นเลื่อน SL ตามแทน) ลดการล้างพอร์ตต่ออีกจาก 10 เหลือ 6 ครั้ง — โบรกยังเป็นคนปิดที่ TP/SL เหมือนเดิม</span></li>
+          <li><span class="plus">+</span><span><strong>ช่องใหม่ Swap-Adjust Common TP ค่าเริ่มต้น OFF</strong> — รุ่นก่อนเปิดตายตัว การเลื่อน TP ตาม swap ทำให้กองบนวันดิ่งพลาดจังหวะเด้ง บัญชีที่ไม่มี swap ไม่ต้องเปิด</span></li>
+          <li><span class="plus">+</span><span><strong>แก้บั๊ก 2 จุด</strong> — ไม้พีระมิดกำพร้าหลัง commit ที่ EA เลิกดูแล และตัวปิดกองมือที่ยิงซ้ำตอนตลาดปิดโดยไม่ทำอะไร</span></li>
+          <li><span class="plus">+</span><span><strong>ตัวเลขที่ต้องรู้ก่อนใช้ (2020-01 ถึง 2026-08, ทุนต่อรอบ 1,000 ปั้นเป็น 2,000, ดีเลย์ 100 ms)</strong> — ปั้นสำเร็จ 25 รอบ ล้าง 6 รอบ (81%) กำไรรวม 23,168 ทุน 2 เท่าของรอบรอดทุกจังหวะ · ปีตลาดนิ่ง (2021–2023) ได้ 0–1 รอบต่อปีและอาจค้างกองนานเกินปี · ปีแกว่งแรง (2026) ได้ 11 รอบใน 8 เดือน · โบรกที่ดีเลย์แกว่งมาก ผลแย่กว่านี้ได้ถึงครึ่ง</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+        <p style="font-size:13px;color:var(--gray);margin:0 0 16px;">ตัวเลขข้างบนคือ Strategy Tester บนข้อมูล tick จริง — ไม่ใช่การรับประกันผลในอนาคต</p>
+        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v320" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด v3.20
         </a>
