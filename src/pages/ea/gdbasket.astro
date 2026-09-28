@@ -5,7 +5,6 @@ import Layout from '../../layouts/Layout.astro';
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
 const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.22 (publish/releases/v3.22/gdBasket_v3.22.ex5)
-const DL_V321 = `${MAIN}/d/gdbasket-v321`;
 const DL_V311 = `${MAIN}/d/gdbasket-v311`;
 const DL_V310 = `${MAIN}/d/gdbasket-v310`;
 const DL_V3092 = `${MAIN}/d/gdbasket-v3092`;
@@ -84,7 +83,6 @@ const veloceSteps = [
 
 const releases = [
   { version: 'v3.22', dateLabel: '28 ก.ย. 2026', latest: true, url: DL_LATEST },
-  { version: 'v3.21', dateLabel: '25 ก.ย. 2026', latest: false, url: DL_V321 },
   { version: 'v3.11', dateLabel: '10 ก.ย. 2026', latest: false, url: DL_V311 },
   { version: 'v3.10', dateLabel: '22 ส.ค. 2026', latest: false, url: DL_V310 },
   { version: 'v3.092', dateLabel: '19 ส.ค. 2026', latest: false, url: DL_V3092 },
@@ -102,7 +100,7 @@ const fileRows = [
   { icon: 'modes', name: 'เครื่องยนต์ VELOCE26', note: 'ค่าพร้อมใช้ที่ผ่านการทดสอบมาแล้ว · ไม่ต้องเลือกโหมด', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
-  { icon: 'clock', name: 'Releases', note: 'v3.22 · v3.21 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '10 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
+  { icon: 'clock', name: 'Releases', note: 'v3.22 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '9 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
   { icon: 'dl', name: 'gdBasket v3.22', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
@@ -160,7 +158,7 @@ const installSteps = [
       </a>
       <a href="/ea/gdbasket/changelog">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Releases <span>10</span>
+        Releases <span>9</span>
       </a>
       <a href={JOURNAL}>Trading Journal</a>
     </nav>
@@ -177,7 +175,7 @@ const installSteps = [
           </div>
           <span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-            <strong>10</strong> เวอร์ชัน
+            <strong>9</strong> เวอร์ชัน
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -191,7 +189,7 @@ const installSteps = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v3.21 — กฎเท่าทุนทำงานต่อหลัง restart + ตัวซ่อม TP/SL รู้กฎแล้ว · ผลเทสดีขึ้น กำไรรวม +23,544 / ทุน 1,000</p>
+            <p>v3.22 — กฎเท่าทุนทำงานต่อหลัง restart + ตัวซ่อม TP/SL รู้กฎแล้ว · ผลเทสดีขึ้น กำไรรวม +23,544 / ทุน 1,000</p>
             <time>อัปเดตไฟล์ 28 ก.ย. 2026</time>
           </div>
           <div class="file-list">
@@ -405,7 +403,7 @@ const installSteps = [
                   <div><b>เมื่อตลาดเป็นใจ</b><span>PPTS จะเติมไม้ตามทางและไล่ล็อกกำไรรวมขึ้นไป เพื่อใช้ช่วงที่ราคาวิ่งดีให้คุ้มที่สุด</span></div>
                   <div><b>เมื่อตลาดไม่เป็นใจ</b><span>ระบบจะปรับระยะ Grid และน้ำหนัก Lot ให้เหมาะกับโซนราคา พร้อมกรองจังหวะอันตรายก่อนเปิดรอบใหม่</span></div>
                 </div>
-                <p>ค่าหลักของ VELOCE26 ถูกคัดจากผลทดสอบย้อนหลัง 6 ปี 8 เดือน (2020–2026) และการเลื่อนช่วงเวลา 25 รูปแบบ ก่อนตรึงมาเป็นค่าพร้อมใช้ใน gdBasket v3.21</p>
+                <p>ค่าหลักของ VELOCE26 ถูกคัดจากผลทดสอบย้อนหลัง 6 ปี 8 เดือน (2020–2026) และการเลื่อนช่วงเวลา 25 รูปแบบ ก่อนตรึงมาเป็นค่าพร้อมใช้ใน gdBasket v3.22</p>
               </div>
               <dl>
                 <div><dt>กำไรสุทธิย้อนหลัง</dt><dd>+235,281</dd></div>
