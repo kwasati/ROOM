@@ -21,5 +21,9 @@
 - `src\content\courses\` + `src\content\lessons\` — คอร์สเป็น MDX collection
 - `src\lib\rolling-sim.mjs` + `rolling-chart.mjs` — engine ของ planner
 - `src\data\gdbasket-rolling-cycles.json` — data ของ planner (export จาก EAfactory)
+- `src\pages\ea\gdbasket\changelog.astro` — changelog route ของ gdBasket (hardcode · แก้ทุก release)
+- `src\pages\items.json.ts` — list item ทั้งหมดของ room ให้ admin เว็บหลักทำ pin manager
 - `CHANGELOG.md`
-- `docs\` — สเปกหน้าและ copy
+- `_archive\2026-10\` — แผน / mockup / design direction ที่ปิดแล้ว อ่านย้อนรอยเท่านั้น
+- `C:\WORKSPACE\projects\1-intensivetrader.com\ROADMAP.md` — SSOT สถานะ/คิวของ intensivetrader ทั้ง 3 ระบบ (เปิดเมื่อวางแผน/ต่องาน)
+- `C:\WORKSPACE\projects\2-EAfactory\ea\gdBasket\publish\web\RELEASE-RUNBOOK.md` — ขั้น release gdBasket ขึ้น room (STEP B · deploy branch master)
