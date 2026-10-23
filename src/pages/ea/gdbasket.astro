@@ -60,17 +60,24 @@ try {
 } catch (e) { /* ใช้ fallback */ }
 
 const features = [
-  { title: 'Adaptive Grid Behavior', desc: 'ตรวจจับว่าราคาอยู่โซนไหน แล้วปรับระยะ Grid และขนาด Lot ให้เหมาะกับสถานการณ์ ตลาดเป็นใจจะเปิดโอกาสให้กำไรโตขึ้น ตลาดไม่เป็นใจจะเปลี่ยนมาเล่นอย่างระมัดระวังมากขึ้น', tag: 'ปรับ Grid + Lot ตามโซนราคา' },
-  { title: 'Market Temperature', desc: 'วัดความร้อนของตลาดก่อนเปิดรอบใหม่ ถ้าความผันผวนอันตรายเกินเกณฑ์ ระบบจะงดเข้าเทรดและรอให้ตลาดกลับมาเหมาะสมกว่า', tag: 'กรองอันตรายก่อนเริ่มกอง' },
-  { title: 'PPTS', desc: 'เมื่อราคาเดินถูกทาง ระบบจะค่อยๆ เติมไม้เพื่อเพิ่มโอกาสทำกำไร พร้อมไล่ล็อกกำไรรวมของทั้งชุด ให้กำไรวิ่งต่อโดยไม่ปล่อยของที่เก็บมาแล้วไหลกลับมากเกินไป', tag: 'เติมไม้ขาขึ้น + ไล่ล็อกกำไร' },
+  { title: 'อ่านตลาด 3 ชั้น', desc: 'ก่อนเปิดตะกร้า ระบบวัด 3 อย่างจากแท่งที่ปิดล่าสุด: ตลาดผันผวนแค่ไหน (Gear) · ร้อนกว่าปกติแค่ไหน (V-Lane) · ราคาอยู่โซนไหน (House)', tag: 'Gear · V-Lane · House' },
+  { title: '28 ชุดค่า ล็อกต่อตะกร้า', desc: '2 เกียร์ × 7 ช่วงความร้อน × 2 บ้าน = 28 ชุดค่า (ขนาดไม้ · ระยะกริด · TP) ตะกร้าเปิดด้วยชุดไหน ใช้ชุดนั้นจนปิด ไม่เปลี่ยนกลางทาง', tag: 'ล็อกชุดค่าตั้งแต่ไม้แรก' },
+  { title: 'ข้ามตลาดที่ไม่คุ้ม', desc: 'ตลาดร้อนเกิน (ความร้อน ≥ 1.20) หรือราคาอยู่โซนกลางระหว่างเส้นบ้าน — ระบบไม่เปิดตะกร้า รอจังหวะถัดไป', tag: 'ไม่เปิดเมื่อไม่คุ้ม' },
+];
+
+const engineSteps = [
+  { label: 'Gear', title: 'ความผันผวน', desc: 'วัด ATR14 (M15) เป็นจุด · ต่ำกว่า 300 จุด = เกียร์ต่ำ (ตลาดเงียบ ใช้ชุดที่จูนจากยุคตลาดนิ่ง) · ตั้งแต่ 300 จุด = เกียร์สูง (ตลาดวิ่งแรง ใช้ชุดที่จูนจากยุคทองผันผวน)' },
+  { label: 'V-Lane', title: 'ความร้อนของตลาด', desc: 'เทียบ ATR ตอนนี้กับค่าเฉลี่ย 5 วัน แบ่ง 7 ช่วง (ต่ำกว่า 0.60 ไปจนถึง 1.10–1.20) · ร้อนเกิน 1.20 = ข้าม' },
+  { label: 'House', title: 'โซนราคา', desc: 'ราคาเหนือเส้นบ้านบน = บ้านบน (ซื้อตามเทรนด์) · ต่ำกว่าเส้นบ้านล่าง = บ้านล่าง (ซื้อตอนย่อ) · อยู่ระหว่างเส้น = ข้าม' },
+  { label: 'ชุดค่า', title: '', desc: 'ได้ 1 ใน 28 ชุด แล้วล็อกกับตะกร้านั้น · ชุดค่าถูกเก็บไว้ในไม้แรกที่โบรก ปิด / เปิด MT5 กลางรอบก็ใช้ชุดเดิมต่อ' },
 ];
 
 const howSteps = [
-  '<strong class="text-gray-light">เริ่มรอบเมื่อสภาพตลาดเหมาะ</strong> ระบบดูอุณหภูมิตลาดก่อน ไม่รีบเปิดกองในจังหวะที่อันตรายเกินเกณฑ์',
-  '<strong class="text-gray-light">อ่านโซนราคา</strong> ปรับวิธีวาง Grid และขนาด Lot ตามตำแหน่งราคาและความเหวี่ยงของตลาด',
-  '<strong class="text-gray-light">ราคาลง ระบบทยอยซื้อ</strong> วางไม้เพิ่มตามระยะที่คำนวณไว้ เพื่อขยับราคาเฉลี่ยของทั้งกอง',
-  '<strong class="text-gray-light">ราคาขึ้น ระบบเติมกำไร</strong> PPTS เติมไม้ตามทาง พร้อมไล่ล็อกกำไรรวมขึ้นไป',
-  '<strong class="text-gray-light">ปิดทั้งชุด</strong> เมื่อราคาแตะ Common-TP โบรกจะปิดทุกไม้ในรอบพร้อมกัน',
+  '<strong class="text-gray-light">เช็กตลาด</strong> — ทุกต้นชั่วโมงระบบอ่าน Gear · V-Lane · House ถ้าเข้าเงื่อนไขข้าม = ยังไม่เปิด',
+  '<strong class="text-gray-light">เลือกชุดค่า</strong> — หยิบชุดที่ตรงกับตลาดตอนนั้น แล้วล็อกกับตะกร้า',
+  '<strong class="text-gray-light">ราคาลง ระบบทยอยซื้อ</strong> — วางไม้ตามระยะกริดของชุดนั้น และจำกัดไม้ต่อแท่งไม่ให้รัวตอนราคาดิ่ง (Drip)',
+  '<strong class="text-gray-light">ราคาขึ้น ระบบเติมกำไร</strong> — PPTS เติมไม้ตามทางพร้อมไล่ล็อกกำไร',
+  '<strong class="text-gray-light">ปิดทั้งชุด</strong> — ทุกไม้ปิดพร้อมกันที่ TP เดียวของตะกร้า · ตะกร้าค้างนานเกิน 75 นาที ระบบลดเป้ากำไรลง (กฎเท่าทุน) เพื่อออกให้ไว',
 ];
 
 const releases = [
@@ -300,7 +307,7 @@ const installSteps = [
             <p class="fine-print mb-6">ผลทดสอบย้อนหลัง AGILE · ทุนบัญชี 100,000 · Capital / round 1,000 · GOLD#.xm M15 · 2018.01.01 → 2026.10.16 · leverage 500 · Model 4 · execution-mode 50 · ตัวเลขเป็นของ dev 0.39 — public 4.00 ให้ผลเท่ากันไหม <span class="tbc">[ต้องยืนยัน]</span></p>
 
             <h2 id="features">จุดเด่นของระบบ</h2>
-            <p>แกนของ gdBasket คือการรู้ว่าเมื่อไรควรบุก เมื่อไรควรระวัง และใช้จังหวะที่ถูกทางให้คุ้มที่สุด</p>
+            <p>AGILE อ่านตลาด 3 ชั้นก่อนเปิดทุกรอบ แล้วเลือกชุดค่าที่เข้ากับตลาดตอนนั้น — ไม่ใช้ชุดเดียวตลอดปี</p>
             <div class="gdb-core-features">
               {features.map((f, i) => (
                 <section>
@@ -308,6 +315,18 @@ const installSteps = [
                   <h3>{f.title}</h3>
                   <p>{f.desc}</p>
                   <span class="gdb-core-tag">{f.tag}</span>
+                </section>
+              ))}
+            </div>
+
+            <h2>เครื่องยนต์ AGILE</h2>
+            <p>ทุกครั้งที่จะเปิดรอบใหม่ AGILE ตัดสิน 4 ขั้นตามลำดับนี้</p>
+            <div class="gdb-engine-steps">
+              {engineSteps.map((s, i) => (
+                <section>
+                  <span class="gdb-core-num">{i + 1}</span>
+                  <h3>{s.label}{s.title ? ` — ${s.title}` : ''}</h3>
+                  <p>{s.desc}</p>
                 </section>
               ))}
             </div>
@@ -320,24 +339,9 @@ const installSteps = [
             </ol>
 
             <div class="readme-callout">
-              <p>gdBasket ทำงานเป็น<strong>รอบๆ</strong> — แต่ละรอบมันตั้งเป้าทำกำไรจาก <strong>Capital</strong> (ทุนต่อรอบ) ที่คุณกรอกไว้ แล้วบริหารทุกอย่างเองเพื่อไปให้ถึงเป้านั้น</p>
-              <p>คุณบอกมันแค่ตัวเลขเดียว — <strong>Capital</strong> ที่เหลือมันคิดให้หมด ทั้งขนาดไม้ ระยะซื้อ และจังหวะเก็บกำไรด้วย <strong>PPTS</strong></p>
-              <p>เช่นตั้ง Capital <strong>$1,000</strong> → มันจะพยายามปั้นให้ได้กำไร <strong>$1,000</strong> ต่อรอบ และถ้าพลาดจริงๆ ก็ยอมเสียไม่เกิน <strong>$1,000</strong> ต่อรอบเช่นกัน — เพดานได้/เสียชัดตั้งแต่ต้น</p>
-            </div>
-
-            <h2>เครื่องยนต์ 2 บ้าน</h2>
-            <p>หัวใจของ gdBasket คือระบบเปิดไม้ 2 จังหวะคู่กัน — ทั้ง 2 บ้านใช้วิธี<strong>ทบไม้ไล่ล็อกกำไรแบบเดียวกัน</strong>ด้วย <strong>PPTS</strong> (Peak Profit Trail System) พอราคาวิ่งเข้าทาง มันไม่รีบปิด แต่ไล่ล็อกกำไรตามขึ้นไป ให้กำไรวิ่งต่อได้เต็มที่โดยไม่เสี่ยงคืนกำไรที่ได้มาแล้ว</p>
-            <div class="readme-two-col">
-              <div>
-                <small class="pixel">uptrend</small>
-                <h3>บ้านบน</h3>
-                <p>ซื้อตอนราคาวิ่งขึ้นตามเทรนด์ ไล่ทบไม้เป็นชั้นๆ ยิ่งราคาวิ่งดีเท่าไหร่ยิ่งเก็บได้มากขึ้นเท่านั้น</p>
-              </div>
-              <div>
-                <small class="pixel">dip-buy</small>
-                <h3>บ้านล่าง</h3>
-                <p>ซื้อตอนราคาตกลงมา — เครื่องทำเงินหลักของทั้งระบบ เพราะราคาที่ตกแล้วเด้งกลับคือจังหวะทำกำไรได้หนักที่สุด แต่คุมไม่ให้ "อมกอง" ไว้นานเกินไป</p>
-              </div>
+              <p>gdBasket ทำงานเป็นรอบ ๆ — แต่ละรอบตั้งเป้ากำไรเท่ากับ <strong>Capital</strong> (ทุนต่อรอบ) ที่คุณกรอก</p>
+              <p>ตั้ง Capital <strong>$1,000</strong> → รอบนี้พยายามปั้นให้ได้ <strong>$1,000</strong> และถ้าพลาดจริงก็เสียไม่เกิน <strong>$1,000</strong> ต่อรอบ — เพดานได้ / เสียชัดตั้งแต่ต้น</p>
+              <p>Mode AGILE: ช่องเดียวที่ต้องกรอกคือ <strong>Capital</strong></p>
             </div>
 
             <h2>จัดการกำไรและความเสียหายเป็นชุดเดียวกัน</h2>
@@ -385,41 +389,26 @@ const installSteps = [
               <section><b>Live Management Panel</b><p>เห็นกำไรรอบปัจจุบัน สถานะ และเหตุผลที่ยังไม่เปิดไม้บนกราฟ</p></section>
             </div>
 
-            <h2 id="modes">Mode AGILE (ค่าตั้งต้น) · Mode CUSTOM 27 ช่อง · VELOCE26 มาเป็นไฟล์ .set</h2>
-            <p>AGILE เลือกชุดค่าเองตามความร้อนของตลาด</p>
-            <section class="engine-readout veloce-panel" id="engine-agile">
-              <div>
-                <span class="status-dot"></span><small>ค่าตั้งต้น · ผลย้อนหลัง 8 ปี 2018–2026</small>
-                <h3 class="pixel">AGILE</h3>
-                <p class="veloce-lead">AGILE เลือกชุดค่าเองตามความร้อนของตลาด — ผลย้อนหลัง 8 ปี <strong>34 รอบสำเร็จ / 5 SO</strong></p>
-                <div class="veloce-behavior">
-                  <div><b>Mode AGILE (ค่าตั้งต้น)</b><span>แบ่งตลาด 7 ช่วงความร้อน × 2 เกียร์ตาม ATR14 × 2 บ้าน ล็อกชุดค่าให้ทุกตะกร้า ไม่ต้องตั้งเอง</span></div>
-                  <div><b>ตัวกรองตลาดร้อน</b><span>ratio ≥ 1.20 ไม่เปิดตะกร้า</span></div>
-                </div>
-              </div>
-              <dl>
-                <div><dt>net (รอบจบ)</dt><dd>+32,949</dd></div>
-                <div><dt>รอบสำเร็จ</dt><dd>34</dd></div>
-                <div><dt>รอบชนเพดาน</dt><dd class="danger">5</dd></div>
-              </dl>
-            </section>
-
+            <h2 id="modes">เลือกใช้ได้ 2 แบบ</h2>
             <div class="gdb-safety-grid">
-              <section>
-                <b>Mode AGILE</b>
-                <p>แบ่งตลาด 7 ช่วงความร้อน × 2 เกียร์ตาม ATR14 × 2 บ้าน</p>
+              <section id="engine-agile">
+                <b>AGILE (ค่าตั้งต้น)</b>
+                <p>ไม่ต้องตั้งอะไร กรอกแค่ Capital · 28 ชุดค่าที่จูนแล้วล็อกในตัว EA · ผลย้อนหลัง 2018.01 – 2026.10: 34 รอบสำเร็จ / 5 SO · กำไร +32,949 (ทุนต่อรอบ 1,000 · กำไรบวกทุกปี)</p>
+                <dl class="gdb-mode-tiles">
+                  <div><dt>net (รอบจบ)</dt><dd>+32,949</dd></div>
+                  <div><dt>รอบสำเร็จ</dt><dd>34</dd></div>
+                  <div><dt>รอบชนเพดาน</dt><dd class="danger">5</dd></div>
+                </dl>
               </section>
               <section>
-                <b>Mode CUSTOM 27 ช่อง</b>
-                <p>เลือกบ้าน · เส้นแบ่งบ้าน · Drip เลือกบ้าน · กฎเท่าทุน · PPTS Legacy / Pyramid · ตัวกรองตลาดร้อน · ตัวเร่งรอบ (ค่าที่ปรับเองไม่มีผลย้อนหลังรองรับ)</p>
+                <b>CUSTOM</b>
+                <p>ตั้งเองได้ 27 ช่อง (บ้าน · ไม้ / กริด / TP ของแต่ละบ้าน · Drip · กฎเท่าทุน · PPTS แบบ Legacy / Pyramid · ตัวกรองตลาดร้อน · ตัวเร่งรอบ) · ค่าที่ปรับเองไม่มีผลย้อนหลังรองรับ</p>
               </section>
               <section>
-                <b>VELOCE26 มาเป็นไฟล์ .set</b>
-                <p>โหลดไฟล์แล้วได้ชุด VELOCE26 บน Mode CUSTOM</p>
+                <b>VELOCE26 .set</b>
+                <p>ชุด VELOCE26 แจกเป็นไฟล์ .set — โหลดในหน้า Inputs แล้ว EA ทำงานแบบ VELOCE26 บน Mode CUSTOM</p>
               </section>
             </div>
-
-            <p><strong>restart กลางตะกร้าปลอดภัยขึ้น</strong> — ชุดค่าของตะกร้าเก็บไว้ที่โบรก ปิดเปิด MT5 หรือย้ายเครื่องแล้วใช้ชุดเดิมต่อ · อ่านชุดไม่ได้ = ไม่เปิดไม้เพิ่มจนตะกร้าปิด <span class="tbc">[ต้องยืนยัน]</span></p>
 
             <h2 id="results">ผลทดสอบย้อนหลัง</h2>
             <p>ตัวเลขด้านล่างมีไว้ให้เห็นพฤติกรรมของ AGILE บนข้อมูลในอดีต ไม่ใช่คำรับประกันผลตอบแทนในอนาคต</p>
@@ -784,6 +773,11 @@ const installSteps = [
   .kpi-row dd.danger { color: var(--color-primary-light); }
 
   .gdb-core-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 28px; }
+  .gdb-engine-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; margin: 14px 0 28px; }
+  .gdb-engine-steps section { position: relative; padding: 16px; border: 1px solid var(--color-dark-border); border-radius: 8px; background: var(--color-dark-card); }
+  .gdb-engine-steps section + section::before { content: "→"; position: absolute; left: -17px; top: 50%; transform: translateY(-50%); color: var(--color-secondary); font-size: 14px; font-weight: 800; }
+  .gdb-engine-steps h3 { margin: 12px 0 6px; color: var(--color-gray-light); font-size: 13px; }
+  .gdb-engine-steps p { margin: 0; color: var(--color-gray); font-size: 11px; line-height: 1.65; }
   .gdb-core-features section, .gdb-safety-grid section, .gdb-support-grid section { padding: 16px; border: 1px solid var(--color-dark-border); border-radius: 8px; background: var(--color-dark-card); }
   .gdb-core-num { display: inline-grid; place-items: center; width: 25px; height: 25px; color: var(--color-primary-light); background: rgba(220,38,38,.09); border: 1px solid rgba(220,38,38,.22); border-radius: 6px; font-size: 9px; font-weight: 800; }
   .gdb-core-features h3 { margin: 12px 0 6px; color: var(--color-gray-light); font-size: 13px; }
@@ -794,6 +788,11 @@ const installSteps = [
   .gdb-safety-grid b, .gdb-support-grid b { display: block; color: var(--color-gray-light); font-size: 12px; }
   .gdb-safety-grid p, .gdb-support-grid p { margin: 7px 0 0; color: var(--color-gray); font-size: 10.5px; line-height: 1.65; }
 
+  .gdb-mode-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 12px 0 0; }
+  .gdb-mode-tiles > div { display: flex; flex-direction: column-reverse; padding: 10px 6px; border: 1px solid var(--color-dark-border); border-radius: 6px; text-align: center; background: var(--color-dark); }
+  .gdb-mode-tiles dt { margin-top: 4px; color: var(--color-gray-dark); font-size: 9px; line-height: 1.4; }
+  .gdb-mode-tiles dd { margin: 0; color: var(--color-green); font-size: 15px; font-weight: 800; }
+  .gdb-mode-tiles dd.danger { color: var(--color-primary-light); }
   .gdb-capital-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: hidden; margin: 14px 0 28px; border: 1px solid var(--color-dark-border); border-radius: 8px; }
   .gdb-capital-grid > div { padding: 19px; background: var(--color-dark-card); }
   .gdb-capital-grid > div + div { border-left: 1px solid var(--color-dark-border); background: rgba(255,255,255,.012); }
@@ -838,6 +837,8 @@ const installSteps = [
     .referral-strip { align-items: center; }
     .referral-strip .copy-code { margin-left: auto; }
     .gdb-core-features, .gdb-safety-grid, .gdb-support-grid, .veloce-behavior, .gdb-risk-list { grid-template-columns: 1fr; }
+    .gdb-engine-steps { grid-template-columns: 1fr; gap: 24px; }
+    .gdb-engine-steps section + section::before { content: "↓"; left: 50%; top: -19px; transform: translateX(-50%); }
     .gdb-capital-grid { grid-template-columns: 1fr; }
     .gdb-capital-grid > div + div { border-top: 1px solid var(--color-dark-border); border-left: 0; }
   }
