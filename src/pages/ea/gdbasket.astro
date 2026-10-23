@@ -4,7 +4,8 @@ import Layout from '../../layouts/Layout.astro';
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
-const DL_LATEST = `${MAIN}/d/gdbasket`; // ปุ่มหลัก — redirect ชี้ไฟล์รุ่นล่าสุด v3.22 (publish/releases/v3.22/gdBasket_v3.22.ex5)
+const DL_LATEST = '#'; // MOCKUP v4.00: placeholder link (real value = `${MAIN}/d/gdbasket` at release)
+const DL_V322 = `${MAIN}/d/gdbasket-v322`;
 const DL_V311 = `${MAIN}/d/gdbasket-v311`;
 const DL_V310 = `${MAIN}/d/gdbasket-v310`;
 const DL_V3092 = `${MAIN}/d/gdbasket-v3092`;
@@ -72,17 +73,9 @@ const howSteps = [
   '<strong class="text-gray-light">ปิดทั้งชุด</strong> เมื่อราคาแตะ Common-TP โบรกจะปิดทุกไม้ในรอบพร้อมกัน',
 ];
 
-// "กว่าจะมาเป็น VELOCE26" — 5 ขั้น (ย่อ story 5 บท)
-const veloceSteps = [
-  'ลองมาแล้วแทบทุกทาง — ปรับขนาดไม้ตามความผันผวน / อ่านอารมณ์ตลาดสลับโหมด / กรองก่อนเข้าไม้ / กู้กองตอนราคาไหลแรง — <strong class="text-gray-light">ตัดทิ้งทุกอันที่พิสูจน์แล้วว่าไม่ช่วยจริง</strong>',
-  'เหลือ <strong class="text-gray-light">2 บ้าน</strong>ที่พิสูจน์แล้วว่าคุ้ม — เคยลองตัดบ้านล่างทิ้งเพราะกลัวมันทำให้ล้างพอร์ตบ่อย พอลองจริงกำไรหายไปเกินสามในสี่ส่วน จึงรู้ว่าตัดออกไม่ได้',
-  'จุดเปลี่ยนสำคัญที่สุด: คุม <strong class="text-gray-light">"เวลาอมกอง"</strong> ไม่ใช่เดาวันร้าย — วันตลาดดิ่งแรงจนไม่เด้งเป็นสิ่งที่คุมไม่ได้ แต่ปิดรอบให้ไวที่สุดคุมได้ ยิ่งมือว่างมาก ยิ่งรอด',
-  'เคาะแชมป์บนสนามทดสอบยาว 6 ปี 8 เดือน — สูตรที่ชนะทุกด้านพร้อมกัน กำไรมากกว่าสูตรก่อนหน้า และจำนวนครั้งที่ล้างพอร์ตน้อยกว่าเกือบครึ่ง',
-  'ตรึงเป็นค่าตั้งต้น = <strong class="text-gray-light">VELOCE26</strong> — เปิดมาก็เจอค่าที่ผ่านการพิสูจน์มาแล้วทันที ไม่ต้องมานั่งเดาว่าจะตั้งค่ายังไงให้ดี',
-];
-
 const releases = [
-  { version: 'v3.22', dateLabel: '28 ก.ย. 2026', latest: true, url: DL_LATEST },
+  { version: 'v4.00', dateLabel: '__ 2026 [ต้องยืนยัน]', latest: true, url: DL_LATEST },
+  { version: 'v3.22', dateLabel: '28 ก.ย. 2026', latest: false, url: DL_V322 },
   { version: 'v3.11', dateLabel: '10 ก.ย. 2026', latest: false, url: DL_V311 },
   { version: 'v3.10', dateLabel: '22 ส.ค. 2026', latest: false, url: DL_V310 },
   { version: 'v3.092', dateLabel: '19 ส.ค. 2026', latest: false, url: DL_V3092 },
@@ -97,27 +90,27 @@ const releases = [
 const fileRows = [
   { icon: 'doc', name: 'ภาพรวม gdBasket', note: 'Adaptive Buy Grid Behavior EA · ทยอยซื้อเป็นชุด ปิดรับกำไรทั้งชุด', meta: 'อ่าน', href: '#readme', color: 'text-gray' },
   { icon: 'gear', name: 'วิธีติดตั้ง', note: 'ลงใน MT5 · ลากใส่กราฟ GOLD M15 · 6 ขั้นจบ', meta: '6 ขั้น', href: '#install', color: 'text-secondary' },
-  { icon: 'modes', name: 'เครื่องยนต์ VELOCE26', note: 'ค่าพร้อมใช้ที่ผ่านการทดสอบมาแล้ว · ไม่ต้องเลือกโหมด', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
+  { icon: 'modes', name: 'Mode AGILE (ค่าตั้งต้น)', note: 'ล็อกชุดค่าให้ทุกตะกร้า ไม่ต้องตั้งเอง · Mode CUSTOM 27 ช่อง', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
-  { icon: 'clock', name: 'Releases', note: 'v3.22 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '9 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
+  { icon: 'clock', name: 'Releases', note: 'v4.00 · v3.22 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '10 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
-  { icon: 'dl', name: 'gdBasket v3.22', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
+  { icon: 'dl', name: 'gdBasket v4.00 (mockup)', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
-  'ดาวน์โหลดไฟล์ <strong>gdBasket v3.22</strong> จากปุ่มด้านบน',
+  'ดาวน์โหลดไฟล์ <strong>gdBasket v4.00 (mockup)</strong> จากปุ่มด้านบน',
   'เปิด <strong>MetaTrader 5</strong> → <strong>File → Open Data Folder</strong>',
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
   'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊กอนุญาตเทรดอัตโนมัติ → กดปุ่ม <strong>Algo Trading</strong> ให้ขึ้น<strong class="text-green">สีเขียว</strong>',
-  'ตั้ง <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — Standard ขั้นต่ำ <strong>$1,000</strong> · Micro ขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) และใช้ <strong>VELOCE26</strong> ที่ตั้งมาให้พร้อมใช้ได้เลย',
+  'ตั้ง <strong>Capital</strong> = เงินที่ยอมเสียได้ต่อรอบ — Standard ขั้นต่ำ <strong>$1,000</strong> · Micro ขั้นต่ำ <strong>$100</strong> (ต่ำกว่านี้ EA จะไม่เปิดออเดอร์) และใช้ <strong>AGILE</strong> ที่ตั้งมาให้พร้อมใช้ได้เลย',
 ];
 
 ---
 
-<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — VELOCE26 ผ่านพิสูจน์ 6 ปี 8 เดือน 2020–2026 — โหลดฟรี v3.22" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
+<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — Mode AGILE ผลย้อนหลัง 8 ปี 2018–2026 — โหลดฟรี v4.00" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
 <div id="main-content" class="repo-page">
   <div class="repo-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -139,7 +132,7 @@ const installSteps = [
           <p>Adaptive Buy Grid Behavior EA · GOLD M15</p>
         </div>
       </div>
-      <div class="repo-version"><span>เวอร์ชัน</span><strong>v3.22</strong></div>
+      <div class="repo-version"><span>เวอร์ชัน</span><strong>v4.00</strong></div>
     </header>
 
     <!-- (c) SUB-NAV TABS -->
@@ -158,7 +151,7 @@ const installSteps = [
       </a>
       <a href="/ea/gdbasket/changelog">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Releases <span>9</span>
+        Releases <span>10</span>
       </a>
       <a href={JOURNAL}>Trading Journal</a>
     </nav>
@@ -171,17 +164,17 @@ const installSteps = [
         <div class="repo-toolbar">
           <div class="branch-pill">
             <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
-            <strong>v3.22</strong>
+            <strong>v4.00</strong>
           </div>
           <span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
-            <strong>9</strong> เวอร์ชัน
+            <strong>10</strong> เวอร์ชัน
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            ดาวน์โหลดฟรี <span>v3.22</span>
+            ดาวน์โหลดฟรี <span>v4.00 (mockup)</span>
           </a>
-          <p>ไฟล์รุ่น <strong>v3.22</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
+          <p>ไฟล์รุ่น <strong>v4.00</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
         </div>
 
         <!-- (e) FILE BROWSER -->
@@ -189,8 +182,8 @@ const installSteps = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v3.22 — กฎเท่าทุนทำงานต่อหลัง restart + ตัวซ่อม TP/SL รู้กฎแล้ว · ผลเทสดีขึ้น กำไรรวม +23,544 / ทุน 1,000</p>
-            <time>อัปเดตไฟล์ 28 ก.ย. 2026</time>
+            <p>v4.00 — AGILE เลือกชุดค่าเองตามความร้อนของตลาด — ผลย้อนหลัง 8 ปี 34 รอบสำเร็จ / 5 SO</p>
+            <time>อัปเดตไฟล์ __ 2026 <span class="tbc">[ต้องยืนยัน]</span></time>
           </div>
           <div class="file-list">
             {fileRows.map((row) => (
@@ -216,9 +209,9 @@ const installSteps = [
           </div>
         </section>
 
-        <!-- (e2) VELOCE26 brand mark -->
+        <!-- (e2) AGILE brand mark -->
         <div style="text-align:center;margin:30px 0 32px;">
-          <img src="/veloce-wordmark.png" alt="gdBasket VELOCE26" width="718" height="271" loading="lazy" style="width:100%;max-width:340px;height:auto;" />
+          <img src="/agile-wordmark.png" alt="gdBasket AGILE" width="2132" height="916" loading="lazy" style="width:100%;max-width:340px;height:auto;" />
         </div>
 
         <!-- (f) AFFILIATE CARDS — IB / VPS / Copytrade (แบบ A: IB เต็มกว้าง + VPS/Copy คู่ล่าง) -->
@@ -291,20 +284,20 @@ const installSteps = [
             <strong>README</strong>
           </div>
           <div class="readme-body">
-            <img class="readme-chart" src="/gdbasket-chart-v302.png" alt="gdBasket VELOCE26 รันจริงบนกราฟ GOLD M15 — เห็นแผง Live Management ใหม่" />
+            <img class="readme-chart" src="/gdbasket-chart-v302.png" alt="gdBasket VELOCE26 รันจริงบนกราฟ GOLD M15 — เห็นแผง Live Management ใหม่" /><p class="fine-print"><span class="tbc">[ต้องยืนยัน]</span> gdbasket-chart-v302.png</p>
             <h1 class="pixel">gdBasket</h1>
             <p class="readme-subtitle">Adaptive Buy Grid Behavior EA</p>
             <p>EA เทรดทองคำด้วยระบบ <strong>Adaptive Grid Behavior</strong> ปรับพฤติกรรมการวาง Grid ตามสภาวะความผันผวนของตลาดแบบอัตโนมัติ และเสริมความแกร่งในการทำกำไรด้วยระบบ <strong>Peak Profit Trail System</strong> เก็บกำไรเก่ง เติมไม้ทำกำไรในช่วงตลาดพุ่ง — ใช้ระบบ Safety แบบ <strong>Common-TP/SL</strong> ที่วางจริงไว้ที่โบรก — ถึงเป้าปิดให้เองแม้คุณไม่ได้เปิดเครื่อง</p>
-            <p>รุ่นล่าสุดใช้ <strong>VELOCE26</strong> เป็นค่าพร้อมใช้ — เครื่องพีระมิด 2 บ้าน ผ่านการพิสูจน์ยาว 6 ปี 8 เดือน (2020–2026) มาพร้อม<strong>แผงจัดการสด</strong>บนจอที่บอกเหตุผลแบบเรียลไทม์ว่าทำไมมันยังไม่เปิดไม้</p>
+            <p>รุ่นล่าสุดใช้ <strong>Mode AGILE</strong> เป็นค่าตั้งต้น — แบ่งตลาด 7 ช่วงความร้อน × 2 เกียร์ตาม ATR14 × 2 บ้าน ล็อกชุดค่าให้ทุกตะกร้า ไม่ต้องตั้งเอง · ผลย้อนหลัง 8 ปี (2018–2026) มาพร้อม<strong>แผงจัดการสด</strong>บนจอที่บอกเหตุผลแบบเรียลไทม์ว่าทำไมมันยังไม่เปิดไม้</p>
 
-            <!-- KPI row เด่น — สรุปผล VELOCE26 -->
-            <dl class="kpi-row" aria-label="สรุปผล VELOCE26">
-              <div><dt>กำไรสุทธิสะสม (USD)</dt><dd class="positive">+235,281</dd></div>
-              <div><dt>สำเร็จ : โดนล้าง (จาก 32 รอบ)</dt><dd>26 : 6</dd></div>
-              <div><dt>กำไรจากรอบสำเร็จ</dt><dd class="positive">+261,327</dd></div>
-              <div><dt>ทุน 2 เท่ารอด</dt><dd>100%</dd></div>
+            <!-- KPI row เด่น — สรุปผล AGILE -->
+            <dl class="kpi-row" aria-label="สรุปผล AGILE">
+              <div><dt>net (รอบจบ) (USD)</dt><dd class="positive">+32,949</dd></div>
+              <div><dt>สำเร็จ : โดนล้าง (จาก 39 รอบ · 1 ค้าง)</dt><dd>34 : 5</dd></div>
+              <div><dt>กำไรจากรอบสำเร็จ</dt><dd class="positive">+34,139</dd></div>
+              <div><dt>PF (รอบจบ)</dt><dd>28.70</dd></div>
             </dl>
-            <p class="fine-print mb-6">ตัวเลขทั้งหมดคำนวณจากตั้งทุนต่อรอบ (capital) 10,000 → เป้าถอน 20,000/รอบ · ช่วง ม.ค. 2020 – ส.ค. 2026</p>
+            <p class="fine-print mb-6">ผลทดสอบย้อนหลัง AGILE · ทุนบัญชี 100,000 · Capital / round 1,000 · GOLD#.xm M15 · 2018.01.01 → 2026.10.16 · leverage 500 · Model 4 · execution-mode 50 · ตัวเลขเป็นของ dev 0.39 — public 4.00 ให้ผลเท่ากันไหม <span class="tbc">[ต้องยืนยัน]</span></p>
 
             <h2 id="features">จุดเด่นของระบบ</h2>
             <p>แกนของ gdBasket คือการรู้ว่าเมื่อไรควรบุก เมื่อไรควรระวัง และใช้จังหวะที่ถูกทางให้คุ้มที่สุด</p>
@@ -392,49 +385,58 @@ const installSteps = [
               <section><b>Live Management Panel</b><p>เห็นกำไรรอบปัจจุบัน สถานะ และเหตุผลที่ยังไม่เปิดไม้บนกราฟ</p></section>
             </div>
 
-            <h2 id="modes">VELOCE26 · เครื่องยนต์ 2 บ้านที่รู้จังหวะบุกและระวัง</h2>
-            <p>VELOCE26 คือสูตรเรือธงของ gdBasket ที่ให้บ้านบนและบ้านล่างทำงานคู่กัน ระบบอ่านโซนราคาและอุณหภูมิตลาดก่อนเลือกวิธีวาง Grid กับขนาด Lot จึงไม่ใช้แรงเท่ากันทุกสถานการณ์</p>
-            <section class="engine-readout veloce-panel" id="engine-veloce">
+            <h2 id="modes">Mode AGILE (ค่าตั้งต้น) · Mode CUSTOM 27 ช่อง · VELOCE26 มาเป็นไฟล์ .set</h2>
+            <p>AGILE เลือกชุดค่าเองตามความร้อนของตลาด</p>
+            <section class="engine-readout veloce-panel" id="engine-agile">
               <div>
-                <span class="status-dot"></span><small>ค่าพร้อมใช้ · ผ่านพิสูจน์ 6 ปี 8 เดือน 2020–2026</small>
-                <h3 class="pixel">VELOCE26</h3>
-                <p class="veloce-lead">เป้าหมายของ VELOCE26 ไม่ใช่แค่ปิดรอบให้ได้ แต่คือ<strong>เร่งเก็บกำไรเมื่อได้ทาง และลดแรงปะทะเมื่อตลาดไม่เป็นใจ</strong></p>
+                <span class="status-dot"></span><small>ค่าตั้งต้น · ผลย้อนหลัง 8 ปี 2018–2026</small>
+                <h3 class="pixel">AGILE</h3>
+                <p class="veloce-lead">AGILE เลือกชุดค่าเองตามความร้อนของตลาด — ผลย้อนหลัง 8 ปี <strong>34 รอบสำเร็จ / 5 SO</strong></p>
                 <div class="veloce-behavior">
-                  <div><b>เมื่อตลาดเป็นใจ</b><span>PPTS จะเติมไม้ตามทางและไล่ล็อกกำไรรวมขึ้นไป เพื่อใช้ช่วงที่ราคาวิ่งดีให้คุ้มที่สุด</span></div>
-                  <div><b>เมื่อตลาดไม่เป็นใจ</b><span>ระบบจะปรับระยะ Grid และน้ำหนัก Lot ให้เหมาะกับโซนราคา พร้อมกรองจังหวะอันตรายก่อนเปิดรอบใหม่</span></div>
+                  <div><b>Mode AGILE (ค่าตั้งต้น)</b><span>แบ่งตลาด 7 ช่วงความร้อน × 2 เกียร์ตาม ATR14 × 2 บ้าน ล็อกชุดค่าให้ทุกตะกร้า ไม่ต้องตั้งเอง</span></div>
+                  <div><b>ตัวกรองตลาดร้อน</b><span>ratio ≥ 1.20 ไม่เปิดตะกร้า</span></div>
                 </div>
-                <p>ค่าหลักของ VELOCE26 ถูกคัดจากผลทดสอบย้อนหลัง 6 ปี 8 เดือน (2020–2026) และการเลื่อนช่วงเวลา 25 รูปแบบ ก่อนตรึงมาเป็นค่าพร้อมใช้ใน gdBasket v3.22</p>
               </div>
               <dl>
-                <div><dt>กำไรสุทธิย้อนหลัง</dt><dd>+235,281</dd></div>
-                <div><dt>รอบสำเร็จ</dt><dd>26</dd></div>
-                <div><dt>รอบชนเพดาน</dt><dd class="danger">6</dd></div>
+                <div><dt>net (รอบจบ)</dt><dd>+32,949</dd></div>
+                <div><dt>รอบสำเร็จ</dt><dd>34</dd></div>
+                <div><dt>รอบชนเพดาน</dt><dd class="danger">5</dd></div>
               </dl>
             </section>
 
-            <h2>กว่าจะมาเป็น VELOCE26</h2>
-            <ol class="readme-steps">
-              {veloceSteps.map((step, i) => (
-                <li><span>{i + 1}</span><p set:html={step} /></li>
-              ))}
-            </ol>
+            <div class="gdb-safety-grid">
+              <section>
+                <b>Mode AGILE</b>
+                <p>แบ่งตลาด 7 ช่วงความร้อน × 2 เกียร์ตาม ATR14 × 2 บ้าน</p>
+              </section>
+              <section>
+                <b>Mode CUSTOM 27 ช่อง</b>
+                <p>เลือกบ้าน · เส้นแบ่งบ้าน · Drip เลือกบ้าน · กฎเท่าทุน · PPTS Legacy / Pyramid · ตัวกรองตลาดร้อน · ตัวเร่งรอบ (ค่าที่ปรับเองไม่มีผลย้อนหลังรองรับ)</p>
+              </section>
+              <section>
+                <b>VELOCE26 มาเป็นไฟล์ .set</b>
+                <p>โหลดไฟล์แล้วได้ชุด VELOCE26 บน Mode CUSTOM</p>
+              </section>
+            </div>
+
+            <p><strong>restart กลางตะกร้าปลอดภัยขึ้น</strong> — ชุดค่าของตะกร้าเก็บไว้ที่โบรก ปิดเปิด MT5 หรือย้ายเครื่องแล้วใช้ชุดเดิมต่อ · อ่านชุดไม่ได้ = ไม่เปิดไม้เพิ่มจนตะกร้าปิด <span class="tbc">[ต้องยืนยัน]</span></p>
 
             <h2 id="results">ผลทดสอบย้อนหลัง</h2>
-            <p>ตัวเลขด้านล่างมีไว้ให้เห็นพฤติกรรมของ VELOCE26 บนข้อมูลในอดีต ไม่ใช่คำรับประกันผลตอบแทนในอนาคต</p>
-            <div id="tbl-veloce" class="proof-table-wrap mb-4">
+            <p>ตัวเลขด้านล่างมีไว้ให้เห็นพฤติกรรมของ AGILE บนข้อมูลในอดีต ไม่ใช่คำรับประกันผลตอบแทนในอนาคต</p>
+            <div id="tbl-agile" class="proof-table-wrap mb-4">
               <table class="proof-table">
                 <thead>
-                  <tr><th>สรุปผล — VELOCE26</th><th>จำนวน</th><th>ยอด USD</th></tr>
+                  <tr><th>สรุปผล — AGILE</th><th>จำนวน</th><th>ยอด USD</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>รอบสำเร็จ (ปั้นครบเป้า)</td><td>26 รอบ</td><td class="positive">+261,327</td></tr>
-                  <tr><td>หักรอบโดนล้างพอร์ต</td><td>6 รอบ</td><td class="negative">−26,046</td></tr>
-                  <tr class="total"><td>กำไรสุทธิ</td><td></td><td class="positive">+235,281</td></tr>
+                  <tr><td>รอบสำเร็จ (ปั้นครบเป้า)</td><td>34 รอบ</td><td class="positive">+34,139</td></tr>
+                  <tr><td>หักรอบโดนล้างพอร์ต</td><td>5 รอบ</td><td class="negative">−1,190</td></tr>
+                  <tr class="total"><td>net (รอบจบ)</td><td></td><td class="positive">+32,949</td></tr>
                 </tbody>
               </table>
             </div>
-            <p class="fine-print">ช่วงข้อมูล: ม.ค. 2020 – ส.ค. 2026 (6 ปี 8 เดือน) · ทุนต่อรอบ $10,000 · เทสบน GOLD M15 tick จริง ดีเลย์ 100 ms</p>
-            <p class="fine-print mb-6">สำเร็จ:ล้าง 26 : 6 จาก 32 รอบ (81%) · กำไรจากรอบสำเร็จ +261,327 · เสียจากล้าง −26,046 · วันต่อรอบสำเร็จ เฉลี่ย 84 / median 31 · floating ลึกสุด −14,324 · basket ลึกสุด 57 ไม้</p>
+            <p class="fine-print">ช่วงข้อมูล: 2018.01.01 → 2026.10.16 · ทุนบัญชี 100,000 · Capital / round 1,000 · GOLD#.xm M15 · leverage 500 · Model 4 · execution-mode 50</p>
+            <p class="fine-print mb-6">สำเร็จ:ล้าง 34 : 5 จาก 39 รอบ · 1 ค้าง · กำไรเฉลี่ย/รอบสำเร็จ +1,004 · ขาดทุนเฉลี่ย/รอบล้าง −237 · ลอยไม่ SO สูงสุด 92.7% ของทุนรอบ (2021) · PF (รอบจบ) 28.70</p>
 
             <h3>ผลรายปี</h3>
             <div class="proof-table-wrap mb-4">
@@ -443,42 +445,36 @@ const installSteps = [
                   <tr><th>ปี</th><th>สำเร็จ : โดนล้าง</th><th>กำไรปี (USD)</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>2020</td><td>2 : 2</td><td class="positive">+10,305</td></tr>
-                  <tr><td>2021</td><td>0 : 0</td><td class="positive">+9,092</td></tr>
-                  <tr><td>2022</td><td>1 : 0</td><td class="positive">+3,610</td></tr>
-                  <tr><td>2023</td><td>1 : 0</td><td class="positive">+9,584</td></tr>
-                  <tr><td>2024</td><td>3 : 1</td><td class="positive">+20,699</td></tr>
-                  <tr><td>2025</td><td>8 : 1</td><td class="positive">+80,708</td></tr>
-                  <tr><td>2026 (8 เดือน)</td><td>11 : 2</td><td class="positive">+106,084</td></tr>
+                  <tr><td>2018</td><td>1 : 0</td><td class="positive">+1,040</td></tr>
+                  <tr><td>2019</td><td>1 : 0</td><td class="positive">+1,347</td></tr>
+                  <tr><td>2020</td><td>3 : 1</td><td class="positive">+2,361</td></tr>
+                  <tr><td>2021</td><td>2 : 0</td><td class="positive">+2,218</td></tr>
+                  <tr><td>2022</td><td>2 : 0</td><td class="positive">+2,339</td></tr>
+                  <tr><td>2023</td><td>2 : 0</td><td class="positive">+2,072</td></tr>
+                  <tr><td>2024</td><td>3 : 1</td><td class="positive">+2,371</td></tr>
+                  <tr><td>2025</td><td>8 : 1</td><td class="positive">+8,198</td></tr>
+                  <tr><td>2026 (ถึง 2026.10.16)</td><td>12 : 2</td><td class="positive">+11,693</td></tr>
                 </tbody>
               </table>
             </div>
-            <p class="fine-print mb-6">ทุนต่อรอบ 10,000 · ปีที่ตลาดนิ่ง (2021–2023) ได้ 0–1 รอบต่อปี — ปีแกว่งแรง (2026) ทำกำไรได้เยอะที่สุด</p>
+            <p class="fine-print mb-6">Capital / round 1,000 · SO รายปี 2018 → 2026 = 0 / 0 / 1 / 0 / 0 / 0 / 1 / 1 / 2 · กำไรบวกทุกปี · รวม 33,638 = net (รวมลอยค้าง) · net (รอบจบ) 32,949</p>
 
-            <p class="fine-print"><strong>"รอบสำเร็จ"</strong> = รอบที่ปั้นครบเป้า (ในตารางคือ $10,000) โดยไม่ชนเพดานก่อน</p>
+            <p class="fine-print"><strong>"รอบสำเร็จ"</strong> = รอบที่ปั้นครบเป้า (ในตารางคือ $1,000) โดยไม่ชนเพดานก่อน</p>
             <p class="fine-print mb-6"><strong>"ชนเพดาน" ไม่ได้แปลว่ารอบนั้นขาดทุนล้วน</strong> — ก่อนจะชนเพดาน หลายรอบแบงก์กำไรไปแล้ว กำไรส่วนนี้อยู่ในพอร์ตจริง การชนเพดานแค่ตัดตะกร้าไม้สุดท้ายที่ราคาไหลลงแรง เสียเท่า Capital ที่ตั้งไว้ <strong>ไม่ใช่ล้างพอร์ต</strong> แล้วขึ้นรอบใหม่ต่อ · ตัวเลขกำไรสุทธิหักส่วนที่เสียตอนชนเพดานทั้งหมดแล้ว</p>
-            <p class="fine-print mb-6">ตัวเลขหลักทั้งหมดคำนวณจากตั้งทุนต่อรอบ (capital) 10,000 → เป้าถอน 20,000/รอบ, ช่วง ม.ค. 2020 – ส.ค. 2026, GOLD M15 tick จริง ดีเลย์ 100 ms</p>
 
-            <h3>เทียบระดับทุน 1,000 / 10,000</h3>
+            <h3>เทียบในเฟรมเดียวกัน</h3>
             <div class="proof-table-wrap mb-4">
               <table class="proof-table">
                 <thead>
-                  <tr><th>ตัวชี้วัด</th><th>ทุนต่อรอบ $1,000</th><th>ทุนต่อรอบ $10,000</th></tr>
+                  <tr><th>ชุด</th><th>สำเร็จ</th><th>SO</th><th>net (รอบจบ)</th><th>PF</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>กำไรสุทธิ</td><td class="positive">+23,544</td><td class="positive">+235,281</td></tr>
-                  <tr><td>สำเร็จ : โดนล้าง</td><td>26 : 6</td><td>26 : 6</td></tr>
-                  <tr><td>กำไรเฉลี่ย/รอบสำเร็จ (โดยประมาณ)</td><td class="positive">≈ +1,005</td><td class="positive">≈ +10,051</td></tr>
-                  <tr><td>floating ลึกสุดที่เคยเจอ</td><td class="negative">−1,432</td><td class="negative">−14,324</td></tr>
-                  <tr><td>รอด ทุน 1 เท่า</td><td>78%</td><td>78%</td></tr>
-                  <tr class="total"><td>รอด ทุน 2 เท่า</td><td>100%</td><td>100%</td></tr>
+                  <tr class="total"><td>AGILE</td><td>34</td><td>5</td><td class="positive">+32,949</td><td>28.70</td></tr>
+                  <tr><td>VELOCE26 (.set · Mode CUSTOM)</td><td>23</td><td>19</td><td class="positive">+13,614</td><td>2.43</td></tr>
                 </tbody>
               </table>
             </div>
-            <p class="fine-print mb-6">ผลทุกตัวเป็นสัดส่วนตรงตามระดับทุน — สัดส่วน 1 : 10 กันไว้ให้เทียบเข้าใจง่าย ก่อนเริ่มควรมีทุน 2 เท่าของทุนต่อรอบ รอด 100% ตลอดชุดข้อมูล</p>
-            <p class="fine-print mb-6">ตัวเลขทั้งหมดคำนวณจากตั้งทุนต่อรอบ (capital) 10,000 → เป้าถอน 20,000/รอบ</p>
-
-            <p class="fine-print mb-6"><strong class="text-gray-light">VELOCE26 ทนทุกช่วงเวลาที่ทดสอบ รอด 100%</strong> — รอด 100% จากทุน 2 เท่าของรอบในทุกช่วงที่ทดสอบ ไม่มีช่วงไหนหลุดเกณฑ์ (รายละเอียดเต็มอยู่ในปุ่ม "ดูสถิติเต็ม" ด้านล่าง)</p>
+            <p class="fine-print mb-6">ทุน 100,000 · Capital / round 1,000 · 2018.01.01 → 2026.09.29 · GOLD#.xm M15 · ผลทดสอบย้อนหลัง ไม่ใช่คำรับประกัน</p>
 
             <div class="readme-callout" style="text-align:center;margin:6px 0 28px;">
               <p style="margin:0 0 6px;color:var(--color-gray-light);font-size:15px;font-weight:700;">อยากรู้ตัวเลขทุกตัวแบบไม่มีย่อ?</p>
@@ -565,9 +561,9 @@ const installSteps = [
         <section id="changelog" class="release-card scroll-mt-20">
           <div>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <strong>BIG UPDATE! VELOCE26 มาแล้ว</strong>
+            <strong>BIG UPDATE v4.00 AGILE</strong>
           </div>
-          <p><strong>ปรับปรุงกลไกการเทรดใหม่</strong> — ให้สอดคล้องกับความผันผวนของปี 2026 · <strong>พิสูจน์แล้ว</strong> — ล้างพอร์ต (SO) เหลือ 2 จาก 9 ในปี 2026 · <strong>Robustness Test ผ่าน</strong> — ผลปีย้อนหลัง 2020–2025 ไม่เสียไป และยังทำกำไรได้ดีขึ้น · <strong>โปรไฟล์ใหม่ VELOCE26</strong> — ช่อง Mode เหลือตัวเดียว หลังอัปตรวจให้ตรง · <strong>อัปทับได้เลย</strong> — ไม่ต้อง Reset input</p>
+          <p><strong>Mode AGILE (ค่าตั้งต้น)</strong> — แบ่งตลาด 7 ช่วงความร้อน × 2 เกียร์ตาม ATR14 × 2 บ้าน ล็อกชุดค่าให้ทุกตะกร้า ไม่ต้องตั้งเอง · <strong>Mode CUSTOM 27 ช่อง</strong> — เลือกบ้าน · เส้นแบ่งบ้าน · Drip เลือกบ้าน · กฎเท่าทุน · PPTS Legacy / Pyramid · ตัวกรองตลาดร้อน · ตัวเร่งรอบ · <strong>VELOCE26 มาเป็นไฟล์ .set</strong> — โหลดไฟล์แล้วได้ชุด VELOCE26 บน Mode CUSTOM · <strong>ผลย้อนหลัง AGILE 2018–2026</strong> — 34 รอบสำเร็จ / 5 SO · กำไรบวกทุกปี (ทุนต่อรอบ 1,000) · <strong>ก่อนอัป — รอตะกร้าปิด แล้ว Reset</strong> — ลำดับช่องเปลี่ยน ลาก EA ขึ้นชาร์ตแล้วกด Reset ที่หน้า Inputs หนึ่งครั้ง · GOLD 1 symbol ใช้ gdBasket 1 กราฟ</p>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
         </section>
       </div>
@@ -656,7 +652,7 @@ const installSteps = [
             </a>
             <a href="#modes">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-              เครื่องยนต์ VELOCE26
+              Mode AGILE
             </a>
             <a href="#risk">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.82 14A2 2 0 003.18 21h17.64a2 2 0 001.71-3.14l-8.82-14a2 2 0 00-3.42 0z"/></svg>
@@ -664,7 +660,7 @@ const installSteps = [
             </a>
             <a href="#results">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              ผลทดสอบ VELOCE26
+              ผลทดสอบ AGILE
             </a>
             <a href="#install">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -705,14 +701,14 @@ const installSteps = [
   </div>
 </div>
 
-<!-- popup "ดูสถิติเต็ม" — ผลทดสอบย้อนหลัง 2020–2026 + survival -->
+<!-- popup "ดูสถิติเต็ม" — ผลทดสอบย้อนหลัง AGILE 2018–2026 -->
 <div id="stats-modal-overlay" class="stats-modal-overlay" onclick="if(event.target===this) closeStatsModal()">
   <div class="stats-modal" role="dialog" aria-modal="true" aria-labelledby="stats-modal-title">
     <div class="stats-modal-head">
       <div>
-        <span class="eyebrow pixel" style="font-size:8px;">VELOCE26 · FULL REPORT</span>
-        <h2 id="stats-modal-title">สถิติเต็ม — ผลทดสอบย้อนหลัง 2020–2026</h2>
-        <p>สรุปจาก Strategy Tester ทุน 10,000 · ม.ค. 2020 – ส.ค. 2026</p>
+        <span class="eyebrow pixel" style="font-size:8px;">AGILE · FULL REPORT</span>
+        <h2 id="stats-modal-title">สถิติเต็ม — ผลทดสอบย้อนหลัง 2018–2026</h2>
+        <p>สรุปจาก Strategy Tester ทุนบัญชี 100,000 · Capital / round 1,000 · 2018.01.01 → 2026.10.16</p>
       </div>
       <button type="button" class="stats-modal-close" onclick="closeStatsModal()" aria-label="ปิด">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -720,70 +716,48 @@ const installSteps = [
     </div>
     <div class="stats-modal-body">
 
-      <h3>ผลรวม — ชุดทุน 10,000</h3>
+      <h3>ผลรวม — Capital / round 1,000</h3>
       <div class="proof-table-wrap mb-4">
         <table class="proof-table">
-          <thead><tr><th>สำเร็จ</th><th>โดนล้าง (SO)</th><th>จาก 32 รอบ</th><th>สำเร็จอัตรา</th><th>กำไรสุทธิ</th></tr></thead>
-          <tbody><tr><td>26</td><td>6</td><td>32 รอบ</td><td>81%</td><td class="positive">+235,281</td></tr></tbody>
+          <thead><tr><th>สำเร็จ</th><th>โดนล้าง (SO)</th><th>ค้าง</th><th>สำเร็จอัตรา</th><th>net (รอบจบ)</th></tr></thead>
+          <tbody><tr><td>34</td><td>5</td><td>1</td><td>87.2%</td><td class="positive">+32,949</td></tr></tbody>
         </table>
       </div>
-      <p>กำไรจากรอบสำเร็จ <strong class="positive">+261,327</strong> · เสียจากล้าง <strong class="negative">−26,046</strong> · ช่วง ม.ค. 2020 – ส.ค. 2026 (6 ปี 8 เดือน) · GOLD M15 tick จริง ดีเลย์ 100 ms</p>
-
-      <h3>ความเร็วปั้นสำเร็จ (วันต่อรอบสำเร็จ)</h3>
-      <div class="proof-table-wrap mb-4">
-        <table class="proof-table">
-          <thead><tr><th>เฉลี่ย</th><th>กลาง (median)</th></tr></thead>
-          <tbody><tr><td>84 วัน</td><td>31 วัน</td></tr></tbody>
-        </table>
-      </div>
+      <p>กำไรจากรอบสำเร็จ <strong class="positive">+34,139</strong> · เสียจากล้าง <strong class="negative">−1,190</strong> · 2018.01.01 → 2026.10.16 · GOLD#.xm M15 · ทุนบัญชี 100,000 · leverage 500 · Model 4 · execution-mode 50</p>
 
       <h3>ผลรายปี (สำเร็จ : โดนล้าง · กำไรปี)</h3>
       <div class="proof-table-wrap mb-4">
         <table class="proof-table">
           <thead><tr><th>ปี</th><th>สำเร็จ : โดนล้าง</th><th>กำไรปี (USD)</th></tr></thead>
           <tbody>
-            <tr><td>2020</td><td>2 : 2</td><td class="positive">+10,305</td></tr>
-            <tr><td>2021</td><td>0 : 0</td><td class="positive">+9,092</td></tr>
-            <tr><td>2022</td><td>1 : 0</td><td class="positive">+3,610</td></tr>
-            <tr><td>2023</td><td>1 : 0</td><td class="positive">+9,584</td></tr>
-            <tr><td>2024</td><td>3 : 1</td><td class="positive">+20,699</td></tr>
-            <tr><td>2025</td><td>8 : 1</td><td class="positive">+80,708</td></tr>
-            <tr><td>2026 (8 เดือน)</td><td>11 : 2</td><td class="positive">+106,084</td></tr>
+            <tr><td>2018</td><td>1 : 0</td><td class="positive">+1,040</td></tr>
+            <tr><td>2019</td><td>1 : 0</td><td class="positive">+1,347</td></tr>
+            <tr><td>2020</td><td>3 : 1</td><td class="positive">+2,361</td></tr>
+            <tr><td>2021</td><td>2 : 0</td><td class="positive">+2,218</td></tr>
+            <tr><td>2022</td><td>2 : 0</td><td class="positive">+2,339</td></tr>
+            <tr><td>2023</td><td>2 : 0</td><td class="positive">+2,072</td></tr>
+            <tr><td>2024</td><td>3 : 1</td><td class="positive">+2,371</td></tr>
+            <tr><td>2025</td><td>8 : 1</td><td class="positive">+8,198</td></tr>
+            <tr><td>2026 (ถึง 2026.10.16)</td><td>12 : 2</td><td class="positive">+11,693</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="fine-print mb-6">รวมสำเร็จ 26 · รวมโดนล้าง 6 — ตรงกับผลรวมข้างบน · ปีที่ตลาดนิ่ง (2021–2023) ได้ 0–1 รอบต่อปี ปีแกว่งแรง (2026) ทำกำไรได้เยอะที่สุด</p>
+      <p class="fine-print mb-6">รวมสำเร็จ 34 · รวมโดนล้าง 5 — ตรงกับผลรวมข้างบน · กำไรบวกทุกปี</p>
 
       <h3>คุณภาพกำไร</h3>
       <div class="proof-table-wrap mb-4">
         <table class="proof-table">
-          <thead><tr><th>กำไรจากรอบสำเร็จ</th><th>เสียจากล้าง (SO)</th></tr></thead>
-          <tbody><tr><td class="positive">+261,327</td><td class="negative">−26,046</td></tr></tbody>
+          <thead><tr><th>net (รอบจบ)</th><th>PF (รอบจบ)</th><th>กำไรเฉลี่ย/รอบสำเร็จ</th><th>ขาดทุนเฉลี่ย/รอบล้าง</th></tr></thead>
+          <tbody><tr><td class="positive">+32,949</td><td>28.70</td><td class="positive">+1,004</td><td class="negative">−237</td></tr></tbody>
         </table>
       </div>
-      <p class="fine-print mb-6">กำไรจากรอบสำเร็จ +261,327 เทียบกับเสียจากล้าง −26,046 — กำไรที่ได้จากรอบที่ปั้นครบเป้าเยอะกว่ารวมที่เสียจากล้างชัดเจน · ถือว่าคุ้มมาก</p>
 
       <h3>ก้อนขาดทุน / ความลึกที่เคยเจอ</h3>
       <div class="proof-table-wrap mb-4">
         <table class="proof-table">
-          <thead><tr><th>floating ลึกสุดที่เคยเจอ</th><th>basket ลึกสุด (ไม้เปิดพร้อมกันมากสุด)</th></tr></thead>
-          <tbody><tr><td class="negative">−14,324</td><td>57 ไม้</td></tr></tbody>
+          <thead><tr><th>ลอยไม่ SO สูงสุด (% ของทุนรอบ)</th><th>basket ลึกสุด (ไม้เปิดพร้อมกันมากสุด)</th><th>เวลาอมกองของรอบที่ล้าง (วันเทรด)</th></tr></thead>
+          <tbody><tr><td class="negative">92.7% (2021)</td><td>27 ไม้ (2018)</td><td>เฉลี่ย 43.6 / นานสุด 104.4</td></tr></tbody>
         </table>
-      </div>
-
-      <div class="readme-callout" style="border-left-color:var(--color-green);margin-top:30px;">
-        <h3 style="margin:0 0 4px;border:0;padding:0;">กลุ่ม 7 — การทดสอบ "สุ่มจุดเริ่ม" (Survival)</h3>
-        <p style="margin:0 0 12px;"><strong>นี่คือการทดสอบสุ่มจุดเริ่ม</strong> — จำลองเอา VELOCE26 ไปเริ่มรันที่จุดไหนของเส้นเวลาก็ได้ (สุ่มจังหวะ ไม่เลือกจังหวะที่ดูดี) แล้วดูว่าทุนระดับที่ใช้จริงจะรอดจนปั้นสำเร็จก่อนหรือตายก่อน (ทุนหมดกลางทาง)</p>
-        <div class="proof-table-wrap mb-4">
-          <table class="proof-table">
-            <thead><tr><th>ทุนที่ใช้</th><th>รอด %</th></tr></thead>
-            <tbody>
-              <tr><td>1 เท่าของทุนต่อรอบ (10,000)</td><td class="negative">78%</td></tr>
-              <tr><td>2 เท่าของทุนต่อรอบ (20,000)</td><td class="positive">100%</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p style="margin:0;">ถ้ากันทุนไว้ <strong class="positive">2 เท่าของทุนต่อรอบ (20,000) ขึ้นไป ไม่เคยตายเลยในข้อมูลทั้งหมด</strong> ไม่ว่าจะเริ่มจังหวะไหน — แนะนำกันทุนสำรองอย่างน้อย 2 เท่าของทุนต่อรอบ</p>
       </div>
 
     </div>
@@ -791,6 +765,7 @@ const installSteps = [
 </div>
 
 <style>
+  .tbc { color: var(--color-secondary); font-weight: 700; }
   .install-path {
     display: inline-block;
     background: var(--color-dark);
@@ -801,7 +776,7 @@ const installSteps = [
     color: var(--color-secondary);
   }
 
-  /* KPI row VELOCE26 — adapt จาก .engine-readout dl (4 คอลัมน์ ยืนเดี่ยวได้) */
+  /* KPI row AGILE — adapt จาก .engine-readout dl (4 คอลัมน์ ยืนเดี่ยวได้) */
   .kpi-row { margin: 6px 0 27px; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--color-dark-border); border-left: 1px solid var(--color-dark-border); border-radius: 8px; overflow: hidden; }
   .kpi-row > div { min-width: 0; display: flex; flex-direction: column-reverse; justify-content: center; padding: 16px 10px; border-right: 1px solid var(--color-dark-border); border-bottom: 1px solid var(--color-dark-border); text-align: center; background: var(--color-dark-card); }
   .kpi-row dt { color: var(--color-gray-dark); font-size: 9.5px; line-height: 1.4; margin-top: 5px; }

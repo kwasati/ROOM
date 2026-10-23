@@ -53,7 +53,7 @@
   .release.latest .body::before{background:var(--green)}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
   .release.latest .card{border-color:rgba(34,197,94,.45)}
-  .veloce-release-logo{display:block;width:100%;max-width:300px;height:auto;margin:0 0 20px}
+  .veloce-release-logo,.agile-release-logo{display:block;width:100%;max-width:300px;height:auto;margin:0 0 20px}
   .card .head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
   .card h2{font-size:19px;font-weight:800;color:var(--gray-light)}
   .badge{font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px}
@@ -64,6 +64,7 @@
   .card li{display:flex;gap:10px;font-size:14px;color:var(--gray);line-height:1.6}
   .card li .plus{color:var(--green);font-weight:800;flex-shrink:0}
   .card li strong{color:var(--gray-light)}
+  .tbc{color:var(--secondary);font-weight:700}
   .dl{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;
     font-weight:700;font-size:14px;padding:9px 18px;border-radius:10px;transition:.15s}
   .dl:hover{background:var(--primary-dark)}
@@ -83,7 +84,7 @@
     .body{border-left:none;padding-left:0}
     .body::before{display:none}
     .card{padding:18px 16px}
-    .veloce-release-logo{max-width:260px;margin-bottom:18px}
+    .veloce-release-logo,.agile-release-logo{max-width:260px;margin-bottom:18px}
   }
 </style>
 </head>
@@ -103,8 +104,39 @@
 
 <div class="wrap releases">
 
-  <!-- v3.22 (BIG UPDATE! VELOCE26 มาแล้ว — ชุดจูนใหม่จากเทสย้อนหลัง 2020–2026) -->
+  <!-- v4.00 (MOCKUP — Mode AGILE ค่าตั้งต้นใหม่) -->
   <section class="release latest">
+    <div class="meta">
+      <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v4.00</span></span>
+      <div class="date">__ 2026 <span class="tbc">[ต้องยืนยัน]</span></div>
+    </div>
+    <div class="body">
+      <div class="card">
+        <img class="agile-release-logo" src="/agile-wordmark.png" alt="gdBasket AGILE" width="2132" height="916" loading="lazy" />
+        <div class="head">
+          <h2>BIG UPDATE! Mode AGILE ปรับตัวตามตลาดเอง</h2>
+          <span class="badge latest">ล่าสุด</span>
+        </div>
+        <p class="vdate">gdBasket v4.00 · __ 2026 <span class="tbc">[ต้องยืนยัน]</span></p>
+        <p class="lead">AGILE เลือกชุดค่าเองตามความร้อนของตลาด — ผลย้อนหลัง 8 ปี 34 รอบสำเร็จ / 5 SO</p>
+        <ul>
+          <li><span class="plus">+</span><span><strong>Mode AGILE (ค่าตั้งต้น)</strong> — แบ่งตลาด 7 ช่วงความร้อน × 2 เกียร์ตาม ATR14 × 2 บ้าน ล็อกชุดค่าให้ทุกตะกร้า ไม่ต้องตั้งเอง</span></li>
+          <li><span class="plus">+</span><span><strong>Mode CUSTOM 27 ช่อง</strong> — เลือกบ้าน · เส้นแบ่งบ้าน · Drip เลือกบ้าน · กฎเท่าทุน · PPTS Legacy / Pyramid · ตัวกรองตลาดร้อน · ตัวเร่งรอบ (ค่าที่ปรับเองไม่มีผลย้อนหลังรองรับ)</span></li>
+          <li><span class="plus">+</span><span><strong>VELOCE26 มาเป็นไฟล์ .set</strong> — โหลดไฟล์แล้วได้ชุด VELOCE26 บน Mode CUSTOM</span></li>
+          <li><span class="plus">+</span><span><strong>restart กลางตะกร้าปลอดภัยขึ้น</strong> — ชุดค่าของตะกร้าเก็บไว้ที่โบรก ปิดเปิด MT5 หรือย้ายเครื่องแล้วใช้ชุดเดิมต่อ · อ่านชุดไม่ได้ = ไม่เปิดไม้เพิ่มจนตะกร้าปิด <span class="tbc">[ต้องยืนยัน]</span></span></li>
+          <li><span class="plus">+</span><span><strong>ผลย้อนหลัง AGILE 2018–2026</strong> — 34 รอบสำเร็จ / 5 SO · กำไรบวกทุกปี (ทุนต่อรอบ 1,000)</span></li>
+          <li><span class="plus">+</span><span><strong>ก่อนอัป — รอตะกร้าปิด แล้ว Reset</strong> — ลำดับช่องเปลี่ยน ลาก EA ขึ้นชาร์ตแล้วกด Reset ที่หน้า Inputs หนึ่งครั้ง · GOLD 1 symbol ใช้ gdBasket 1 กราฟ</span></li>
+        </ul>
+        <a class="dl" href="#">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          ดาวน์โหลด v4.00 (mockup)
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- v3.22 (BIG UPDATE! VELOCE26 มาแล้ว — ชุดจูนใหม่จากเทสย้อนหลัง 2020–2026) -->
+  <section class="release">
     <div class="meta">
       <span class="ver"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg><span class="pixel">v3.22</span></span>
       <div class="date">28 ก.ย. 2026</div>
@@ -113,7 +145,6 @@
       <div class="card">
         <div class="head">
           <h2>BIG UPDATE! VELOCE26 มาแล้ว</h2>
-          <span class="badge latest">ล่าสุด</span>
         </div>
         <p class="vdate">gdBasket v3.22 · 28 ก.ย. 2026</p>
         <p class="lead">ชุดจูนใหม่จากการเทสย้อนหลัง 2020–2026</p>
@@ -125,7 +156,7 @@
           <li><span class="plus">+</span><span><strong>โปรไฟล์ใหม่ VELOCE26</strong> — ช่อง Mode เหลือตัวเดียว หลังอัปตรวจให้ตรง</span></li>
           <li><span class="plus">+</span><span><strong>อัปทับได้เลย</strong> — ไม่ต้อง Reset input</span></li>
         </ul>
-        <a class="dl" href="https://intensivetrader.com/d/gdbasket" download>
+        <a class="dl ghost" href="https://intensivetrader.com/d/gdbasket-v322" download>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           ดาวน์โหลด v3.22
         </a>
