@@ -18,8 +18,8 @@ const XM_CODE = 'KWASATI';
 const VPS_AFF = 'https://bit.ly/MTCloudVPS';
 const COPYTRADE_URL = 'https://social.tp-redirect.com/s/0mYnzepR';
 
-// Myfxbook — ดึงทุกพอร์ต live จาก /api/myfxbook.json ตอน build + fallback ต่อบัญชีกันพัง
-// client script ท้ายไฟล์ refresh ค่าสดตอน runtime + clone การ์ดเพิ่มเองเมื่อ API คายพอร์ตใหม่ ไม่ต้องแก้ไฟล์นี้อีก
+// Myfxbook — ดึงทุกพอร์ต XS live จาก /api/myfxbook.json ตอน build + fallback ต่อบัญชีกันพัง
+// client script ท้ายไฟล์ refresh ค่าสดตอน runtime + clone การ์ดเพิ่มเองเมื่อ API คายพอร์ต XS ใหม่ ไม่ต้องแก้ไฟล์นี้อีก
 type MfbCard = {
   id: string; name: string; label: string; url: string | null; newNote: string | null;
   gain: string | null; absGain: string | null; monthly: string | null; drawdown: string | null; balance: string | null;
@@ -27,14 +27,15 @@ type MfbCard = {
 const mfbSlug = (s: string) => (s || 'account').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const mfbFallback: MfbCard[] = [
   { id: '12090186', name: 'gdbasket-xs', label: 'พอร์ต 1', url: 'https://www.myfxbook.com/members/kwasati/gdbasket-xs/12090186', newNote: null, gain: '53.40', absGain: '53.45', monthly: '53.40', drawdown: '18.16', balance: '460.36' },
-  { id: '12105756', name: 'gdbasket lx', label: 'พอร์ต 2', url: 'https://www.myfxbook.com/members/kwasati/gdbasket-lx/12105756', newNote: 'พอร์ตใหม่ เริ่ม 2026-07', gain: null, absGain: null, monthly: null, drawdown: null, balance: null },
 ];
 let mfbCards: MfbCard[] = mfbFallback;
 try {
   const raw = await fetch('https://www.intensivetrader.com/api/myfxbook.json').then((r) => r.json());
   // API รุ่นเก่าคาย object พอร์ตเดียว (ไม่มี id/name) — แปลงเป็น array โดยถือเป็นพอร์ต 1; รุ่นใหม่คาย array ทุกพอร์ต live
   const accounts = Array.isArray(raw) ? raw : (raw && raw.gain != null ? [{ id: mfbFallback[0].id, name: mfbFallback[0].name, ...raw }] : []);
-  if (accounts.length > 0) {
+  const isXs = (a: any) => String(a.id) === mfbFallback[0].id || (a.name || '').toLowerCase().includes('xs');
+  const xsAccounts = accounts.filter(isXs); // keep only XS accounts — LX / any other gdBasket* port gets no card
+  if (xsAccounts.length > 0) {
     const f = (n: unknown) => (n == null ? null : Number(n).toFixed(2));
     const toCard = (acc: any, base: MfbCard): MfbCard => ({
       ...base,
@@ -46,13 +47,13 @@ try {
     });
     const used = new Set<string>();
     mfbCards = mfbFallback.map((fb) => {
-      const acc = accounts.find((a: any) => String(a.id) === fb.id || (a.name || '').toLowerCase() === fb.name.toLowerCase());
+      const acc = xsAccounts.find((a: any) => String(a.id) === fb.id || (a.name || '').toLowerCase() === fb.name.toLowerCase());
       if (!acc) return fb; // fallback ต่อบัญชี — API ยังไม่คืนพอร์ตนี้
       used.add(String(acc.id));
       return toCard(acc, fb);
     });
-    // พอร์ตใหม่ที่ยังไม่รู้จัก — ต่อท้ายเป็นการ์ดเพิ่ม
-    for (const acc of accounts) {
+    // XS port that is not known yet — append as an extra card
+    for (const acc of xsAccounts) {
       if (!used.has(String(acc.id))) mfbCards.push(toCard(acc, { id: '', name: '', label: `พอร์ต ${mfbCards.length + 1}`, url: null, newNote: null, gain: null, absGain: null, monthly: null, drawdown: null, balance: null }));
     }
   }
@@ -1009,7 +1010,7 @@ const installSteps = [
       })
       .catch(() => {});
   }
-  // Myfxbook — API คาย array ทุกพอร์ต live; การ์ด SSR (มี 2 ใบตอน build) reuse ตามลำดับ พอร์ตเกินจากนั้น clone เพิ่มเอง
+  // Myfxbook — API คาย array ทุกพอร์ต live; การ์ด SSR (มี 1 ใบตอน build) reuse ตามลำดับ พอร์ตเกินจากนั้น clone เพิ่มเอง
   fetch('https://www.intensivetrader.com/api/myfxbook.json')
     .then((r) => r.json())
     .then((raw) => {
@@ -1024,6 +1025,8 @@ const installSteps = [
         const lbl = template.querySelector('.mfb-label');
         accounts = [{ id: template.getAttribute('data-mfb-id'), name: lbl ? (lbl.textContent || '').split(' · ')[0] : '', ...accounts }];
       }
+      // keep only XS accounts — LX / any other gdBasket* port gets no card
+      accounts = accounts.filter((a) => String(a.id) === '12090186' || (a.name || '').toLowerCase().includes('xs'));
       if (accounts.length === 0) return;
       const slugify = (s) => (s || 'account').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       accounts.forEach((acc, i) => {
