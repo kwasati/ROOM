@@ -5,7 +5,7 @@ export const eaItems = [
     kind: 'ea' as const,
     id: 'gdbasket',
     title: 'gdBasket',
-    description: 'Adaptive Buy Grid Behavior EA บน GOLD M15 — Mode AGILE เลือกชุดค่าเองตามความร้อนของตลาด ผลย้อนหลัง 8 ปี 34 รอบสำเร็จ / 5 SO พร้อมแผงจัดการสดบนจอ',
+    description: 'Adaptive Buy Grid Behavior EA บน GOLD M15 — Mode AGILE เลือกชุดค่าเองตามความร้อนของตลาด ผลย้อนหลัง 8 ปี 34 รอบสำเร็จ / 6 SO พร้อมแผงจัดการสดบนจอ',
     version: 'v4.00',
     live: true,
     href: '/ea/gdbasket',
