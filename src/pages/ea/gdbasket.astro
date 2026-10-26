@@ -4,7 +4,8 @@ import Layout from '../../layouts/Layout.astro';
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
-const DL_LATEST = '#'; // MOCKUP v4.00: placeholder link (real value = `${MAIN}/d/gdbasket` at release)
+const DL_LATEST = `${MAIN}/d/gdbasket`; // main button - redirect to the latest file v4.00 (publish/releases/v4.00/gdBasket_v4.00.ex5)
+const DL_SET = `${MAIN}/d/gdbasket-veloce26-set`;
 const DL_V322 = `${MAIN}/d/gdbasket-v322`;
 const DL_V311 = `${MAIN}/d/gdbasket-v311`;
 const DL_V310 = `${MAIN}/d/gdbasket-v310`;
@@ -82,7 +83,7 @@ const howSteps = [
 ];
 
 const releases = [
-  { version: 'v4.00', dateLabel: '__ 2026 [ต้องยืนยัน]', latest: true, url: DL_LATEST },
+  { version: 'v4.00', dateLabel: '26 ต.ค. 2026', latest: true, url: DL_LATEST },
   { version: 'v3.22', dateLabel: '28 ก.ย. 2026', latest: false, url: DL_V322 },
   { version: 'v3.11', dateLabel: '10 ก.ย. 2026', latest: false, url: DL_V311 },
   { version: 'v3.10', dateLabel: '22 ส.ค. 2026', latest: false, url: DL_V310 },
@@ -103,12 +104,12 @@ const fileRows = [
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
   { icon: 'clock', name: 'Releases', note: 'v4.00 · v3.22 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '10 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
-  { icon: 'dl', name: 'gdBasket v4.00 (mockup)', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
+  { icon: 'dl', name: 'gdBasket v4.00', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
-  'ดาวน์โหลดไฟล์ <strong>gdBasket v4.00 (mockup)</strong> จากปุ่มด้านบน',
+  'ดาวน์โหลดไฟล์ <strong>gdBasket v4.00</strong> จากปุ่มด้านบน',
   'เปิด <strong>MetaTrader 5</strong> → <strong>File → Open Data Folder</strong>',
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
@@ -180,7 +181,7 @@ const installSteps = [
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            ดาวน์โหลดฟรี <span>v4.00 (mockup)</span>
+            ดาวน์โหลดฟรี <span>v4.00</span>
           </a>
           <p>ไฟล์รุ่น <strong>v4.00</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
         </div>
@@ -191,7 +192,7 @@ const installSteps = [
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
             <p>v4.00 — AGILE เลือกชุดค่าเองตามความร้อนของตลาด — ผลย้อนหลัง 8 ปี 34 รอบสำเร็จ / 6 SO</p>
-            <time>อัปเดตไฟล์ __ 2026 <span class="tbc">[ต้องยืนยัน]</span></time>
+            <time>อัปเดตไฟล์ 26 ต.ค. 2026</time>
           </div>
           <div class="file-list">
             {fileRows.map((row) => (
@@ -292,7 +293,7 @@ const installSteps = [
             <strong>README</strong>
           </div>
           <div class="readme-body">
-            <img class="readme-chart" src="/gdbasket-chart-v302.png" alt="gdBasket VELOCE26 รันจริงบนกราฟ GOLD M15 — เห็นแผง Live Management ใหม่" /><p class="fine-print"><span class="tbc">[ต้องยืนยัน]</span> gdbasket-chart-v302.png</p>
+            <img class="readme-chart" src="/gdbasket-chart-v302.png" alt="gdBasket VELOCE26 รันจริงบนกราฟ GOLD M15 — เห็นแผง Live Management ใหม่" />
             <h1 class="pixel">gdBasket</h1>
             <p class="readme-subtitle">Adaptive Buy Grid Behavior EA</p>
             <p>EA เทรดทองคำด้วยระบบ <strong>Adaptive Grid Behavior</strong> ปรับพฤติกรรมการวาง Grid ตามสภาวะความผันผวนของตลาดแบบอัตโนมัติ และเสริมความแกร่งในการทำกำไรด้วยระบบ <strong>Peak Profit Trail System</strong> เก็บกำไรเก่ง เติมไม้ทำกำไรในช่วงตลาดพุ่ง — ใช้ระบบ Safety แบบ <strong>Common-TP/SL</strong> ที่วางจริงไว้ที่โบรก — ถึงเป้าปิดให้เองแม้คุณไม่ได้เปิดเครื่อง</p>
@@ -407,7 +408,7 @@ const installSteps = [
               </section>
               <section>
                 <b>VELOCE26 .set</b>
-                <p>ชุด VELOCE26 แจกเป็นไฟล์ .set — โหลดในหน้า Inputs แล้ว EA ทำงานแบบ VELOCE26 บน Mode CUSTOM</p>
+                <p>ชุด VELOCE26 แจกเป็นไฟล์ <a href={DL_SET} download class="text-primary hover:underline">.set (โหลดที่นี่)</a> — โหลดในหน้า Inputs แล้ว EA ทำงานแบบ VELOCE26 บน Mode CUSTOM</p>
               </section>
             </div>
 
@@ -755,7 +756,6 @@ const installSteps = [
 </div>
 
 <style>
-  .tbc { color: var(--color-secondary); font-weight: 700; }
   .install-path {
     display: inline-block;
     background: var(--color-dark);
@@ -1029,7 +1029,7 @@ const installSteps = [
         if (label && acc.name) label.textContent = `${acc.name} · พอร์ต ${i + 1}`;
         // มีตัวเลขจริงแล้ว — เอา note "พอร์ตใหม่ รอผูก" ออก
         if (acc.gain != null) { const note = card.querySelector('.mfb-new-note'); if (note) note.remove(); }
-        // การ์ด SSR ที่มีลิงก์จริงอยู่แล้วคงเดิม — การ์ด clone/การ์ด fallback (href="#") คำนวณลิงก์เอง
+        // การ์ด SSR ที่มีลิงก์จริงอยู่แล้วคงเดิม — การ์ด clone/การ์ด fallback (placeholder href) คำนวณลิงก์เอง
         const link = card.querySelector('.mfb-link');
         if (link && (isNew || link.getAttribute('href') === '#')) link.href = `https://www.myfxbook.com/members/kwasati/${slugify(acc.name)}/${acc.id}`;
       });
