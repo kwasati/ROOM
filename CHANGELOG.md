@@ -4,6 +4,10 @@
 
 ---
 
+## 2026-10-25
+
+- [x] **Myfxbook เหลือพอร์ต XS ใบเดียว** - ถอดการ์ด gdBasket LX ออกจากหน้า gdBasket ทั้ง fallback ตอน build และตอน client ดึง API (กรองเฉพาะ XS) · API ฝั่ง mainweb ไม่แตะ
+
 ## 2026-07-31
 
 - [x] **การ์ดโบรก / VPS / Copytrade หน้า gdBasket** - ยกการ์ด affiliate XM เป็นชุด 3 ใบ IB/VPS/Copy โซนบน (IB แดง เต็มกว้าง + VPS ทอง/Copy เขียว คู่ล่าง สูงเท่ากัน + แถบคำเตือน copytrade เต็มกว้างใต้คู่), และชุด minimal 3 การ์ดเดียวกันซ้ำโซนล่างท้าย install + คำเตือน copytrade — สีต่อการ์ดผูก hue variable, ปุ่ม CTA แยกสี (IB "เปิดบัญชี XM ได้ที่นี่"), มือถือ stack, build ผ่าน
