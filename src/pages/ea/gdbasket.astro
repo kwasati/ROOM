@@ -26,6 +26,14 @@ type MfbCard = {
   gain: string | null; absGain: string | null; monthly: string | null; drawdown: string | null; balance: string | null;
 };
 const mfbSlug = (s: string) => (s || 'account').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+// gain/absGain: > 0 -> '+' prefix + class positive; < 0 -> no extra sign (number already has '-') + class negative; == 0 -> no sign, no color class
+const mfbSign = (v: string | null): { text: string; cls: string } => {
+  if (v == null) return { text: '—', cls: '' };
+  const n = Number(v);
+  if (n > 0) return { text: `+${v}%`, cls: 'positive' };
+  if (n < 0) return { text: `${v}%`, cls: 'negative' };
+  return { text: `${v}%`, cls: '' };
+};
 const mfbFallback: MfbCard[] = [
   { id: '12090186', name: 'gdbasket-xs', label: 'พอร์ต 1', url: 'https://www.myfxbook.com/members/kwasati/gdbasket-xs/12090186', newNote: null, gain: '53.40', absGain: '53.45', monthly: '53.40', drawdown: '18.16', balance: '460.36' },
 ];
@@ -565,8 +573,8 @@ const installSteps = [
                   <span>{c.gain != null ? 'LIVE' : 'ใหม่'}</span>
                 </div>
                 <dl>
-                  <div><dt>Gain</dt><dd class={`mfb-gain ${c.gain != null ? 'positive' : ''}`}>{c.gain != null ? `+${c.gain}%` : '—'}</dd></div>
-                  <div><dt>กำไรรวม</dt><dd class={`mfb-absgain ${c.absGain != null ? 'positive' : ''}`}>{c.absGain != null ? `+${c.absGain}%` : '—'}</dd></div>
+                  <div><dt>Gain</dt><dd class={`mfb-gain ${mfbSign(c.gain).cls}`}>{mfbSign(c.gain).text}</dd></div>
+                  <div><dt>กำไรรวม</dt><dd class={`mfb-absgain ${mfbSign(c.absGain).cls}`}>{mfbSign(c.absGain).text}</dd></div>
                   <div><dt>ต่อเดือน</dt><dd class="mfb-monthly">{c.monthly != null ? `${c.monthly}%` : '—'}</dd></div>
                   <div><dt>ติดลบสูงสุด</dt><dd class="mfb-dd">{c.drawdown != null ? `${c.drawdown}%` : '—'}</dd></div>
                   <div><dt>ยอดเงิน</dt><dd class="mfb-balance">{c.balance != null ? `$${c.balance}` : '—'}</dd></div>
@@ -1002,15 +1010,22 @@ const installSteps = [
         }
         card.setAttribute('data-mfb-id', String(acc.id));
         const set = (sel, v, pre, suf) => { const el = card.querySelector(sel); if (el && v != null) el.textContent = (pre || '') + v + (suf || ''); };
-        set('.mfb-gain', acc.gain, '+', '%');
-        set('.mfb-absgain', acc.absGain, '+', '%');
+        const sign = (v, suf) => {
+          if (v == null) return { text: '—', cls: '' };
+          const n = Number(v);
+          if (n > 0) return { text: '+' + v + suf, cls: 'positive' };
+          if (n < 0) return { text: v + suf, cls: 'negative' };
+          return { text: v + suf, cls: '' };
+        };
+        const applySign = (sel, r) => {
+          const el = card.querySelector(sel);
+          if (el) { el.textContent = r.text; el.classList.remove('positive', 'negative'); if (r.cls) el.classList.add(r.cls); }
+        };
+        applySign('.mfb-gain', sign(acc.gain, '%'));
+        applySign('.mfb-absgain', sign(acc.absGain, '%'));
         set('.mfb-monthly', acc.monthly, '', '%');
         set('.mfb-dd', acc.drawdown, '', '%');
         set('.mfb-balance', acc.balance, '$', '');
-        const gainEl = card.querySelector('.mfb-gain');
-        if (gainEl && acc.gain != null) gainEl.classList.add('positive');
-        const absGainEl = card.querySelector('.mfb-absgain');
-        if (absGainEl && acc.absGain != null) absGainEl.classList.add('positive');
         const label = card.querySelector('.mfb-label');
         if (label && acc.name) label.textContent = `${acc.name} · พอร์ต ${i + 1}`;
         // มีตัวเลขจริงแล้ว — เอา note "พอร์ตใหม่ รอผูก" ออก
