@@ -4,6 +4,7 @@
 
 ## Commands
 - dev `npm run dev` / build `npm run build` / preview `npm run preview`
+- build บนเครื่อง Windows: Node 24 ปิดตัวพัง exit 127 หลัง "Complete!" (บั๊ก Node ไม่ใช่โค้ด) → `npx -y -p node@22 node node_modules\astro\bin\astro.mjs build`
 - test `npm run test:links` · `npm run test:links:built`
 - test planner `node --test tests\rolling-sim.test.mjs`
 
