@@ -543,7 +543,7 @@ const installSteps = [
         <!-- Trading Journal -->
         <section>
           <h2>Trading Journal <small>· ผลเทรดจริง</small></h2>
-          <!-- toggle รวม/ต่อพอร์ต — ปุ่มสร้างจาก account_login จริงใน client script (label จาก accounts.display_name, fallback เลขบัญชี); ซ่อนไว้จนมีมากกว่า 1 พอร์ต -->
+          <!-- toggle รวม/ต่อพอร์ต — buttons built from real account_login in client script (label from accounts.display_name, fallback login number); hidden until more than 1 real login. Baskets are fetched page-by-page (order=id.asc + Range <from>-<from+999>, stop when a page returns < 1000 rows). Every basket row whose account is retired (accounts.retired=true) is dropped before anything is computed, so a retired account (e.g. LX) gets no tab and is excluded from the combined total. -->
           <div id="tj-toggle" class="hidden gap-1 mb-3 bg-dark border border-dark-border rounded-lg p-1 text-[11px] font-semibold"></div>
           <div class="journal-box">
             <div><span>กำไรสะสม</span><strong id="tj-pnl">—</strong></div>
@@ -904,12 +904,32 @@ const installSteps = [
   const KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   if (SUPA && KEY) {
     const headers = { apikey: KEY, Authorization: `Bearer ${KEY}` };
+    // baskets — Supabase returns at most 1000 rows per request: page with order=id.asc + Range <from>-<from+999>, stop when a page returns fewer than 1000 rows (same idea as journal fetchAllBasketPages)
+    const fetchAllBaskets = async () => {
+      const all = [];
+      let from = 0;
+      for (;;) {
+        const res = await fetch(
+          `${SUPA}/rest/v1/baskets?select=pnl_usd,account_login&order=id.asc`,
+          { headers: { ...headers, Range: `${from}-${from + 999}` } }
+        );
+        const page = await res.json();
+        all.push(...page);
+        if (page.length < 1000) return all;
+        from += 1000;
+      }
+    };
     Promise.all([
-      fetch(`${SUPA}/rest/v1/baskets?select=pnl_usd,account_login&limit=100000`, { headers }).then((r) => r.json()),
-      fetch(`${SUPA}/rest/v1/accounts?select=login,display_name`, { headers }).then((r) => r.json()).catch(() => []),
+      fetchAllBaskets(),
+      fetch(`${SUPA}/rest/v1/accounts?select=login,display_name,retired`, { headers }).then((r) => r.json()).catch(() => []),
     ])
       .then(([rows, accs]) => {
         if (!Array.isArray(rows) || rows.length === 0) return;
+        // retired account (accounts.retired=true) → drop every basket row of that login (LX removed from this widget entirely)
+        const retired = new Set();
+        if (Array.isArray(accs)) for (const a of accs) if (a.retired) retired.add(String(a.login));
+        rows = rows.filter((b) => !(b.account_login != null && retired.has(String(b.account_login))));
+        if (rows.length === 0) return;
         const names = {};
         if (Array.isArray(accs)) for (const a of accs) names[String(a.login)] = a.display_name || String(a.login);
         const money = (n) => (n >= 0 ? '+$' : '-$') + Math.abs(Math.round(n)).toLocaleString();
