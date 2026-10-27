@@ -18,7 +18,6 @@ const DL_V118 = `${MAIN}/d/gdbasket-v118`;
 const XM_AFF = 'https://affs.click/jih0m';
 const XM_CODE = 'KWASATI';
 const VPS_AFF = 'https://bit.ly/MTCloudVPS';
-const COPYTRADE_URL = 'https://social.tp-redirect.com/s/0mYnzepR';
 
 // Myfxbook — ดึงทุกพอร์ต XS live จาก /api/myfxbook.json ตอน build + fallback ต่อบัญชีกันพัง
 // client script ท้ายไฟล์ refresh ค่าสดตอน runtime + clone การ์ดเพิ่มเองเมื่อ API คายพอร์ต XS ใหม่ ไม่ต้องแก้ไฟล์นี้อีก
@@ -62,20 +61,20 @@ try {
 } catch (e) { /* ใช้ fallback */ }
 
 const features = [
-  { title: 'อ่านตลาด 3 ชั้น', desc: 'ก่อนเปิดตะกร้า ระบบวัด 3 อย่างจากแท่งที่ปิดล่าสุด: ตลาดผันผวนแค่ไหน (Gear) · ร้อนกว่าปกติแค่ไหน (V-Lane) · ราคาอยู่โซนไหน (House)', tag: 'Gear · V-Lane · House' },
+  { title: 'อ่านตลาด 3 ชั้น', desc: 'ก่อนเปิดตะกร้า ระบบวัด 3 อย่างจากแท่งที่ปิดล่าสุด: ตลาดผันผวนแค่ไหน (Gear) · ร้อนกว่าปกติแค่ไหน (Market Temp) · ราคาอยู่โซนไหน (House)', tag: 'Gear · Market Temp · House' },
   { title: '28 ชุดค่า ล็อกต่อตะกร้า', desc: '2 เกียร์ × 7 ช่วงความร้อน × 2 บ้าน = 28 ชุดค่า (ขนาดไม้ · ระยะกริด · TP) ตะกร้าเปิดด้วยชุดไหน ใช้ชุดนั้นจนปิด ไม่เปลี่ยนกลางทาง', tag: 'ล็อกชุดค่าตั้งแต่ไม้แรก' },
-  { title: 'ข้ามตลาดที่ไม่คุ้ม', desc: 'ตลาดร้อนเกิน (ความร้อน ≥ 1.20) หรือราคาอยู่โซนกลางระหว่างเส้นบ้าน — ระบบไม่เปิดตะกร้า รอจังหวะถัดไป', tag: 'ไม่เปิดเมื่อไม่คุ้ม' },
+  { title: 'ข้ามตลาดที่ไม่คุ้ม', desc: 'ตลาดร้อนเกิน หรือราคาอยู่โซนกลางระหว่างเส้นบ้าน — ระบบไม่เปิดตะกร้า รอจังหวะถัดไป', tag: 'ไม่เปิดเมื่อไม่คุ้ม' },
 ];
 
 const engineSteps = [
   { label: 'Gear', title: 'ความผันผวน', desc: 'วัด ATR14 (M15) เป็นจุด · ต่ำกว่า 300 จุด = เกียร์ต่ำ (ตลาดเงียบ ใช้ชุดที่จูนจากยุคตลาดนิ่ง) · ตั้งแต่ 300 จุด = เกียร์สูง (ตลาดวิ่งแรง ใช้ชุดที่จูนจากยุคทองผันผวน)' },
-  { label: 'V-Lane', title: 'ความร้อนของตลาด', desc: 'เทียบ ATR ตอนนี้กับค่าเฉลี่ย 5 วัน แบ่ง 7 ช่วง (ต่ำกว่า 0.60 ไปจนถึง 1.10–1.20) · ร้อนเกิน 1.20 = ข้าม' },
+  { label: 'Market Temp', title: 'ความร้อนของตลาด', desc: 'เทียบ ATR ตอนนี้กับค่าเฉลี่ย 5 วัน แบ่ง 7 ช่วงความร้อน · ร้อนเกิน = ข้าม' },
   { label: 'House', title: 'โซนราคา', desc: 'ราคาเหนือเส้นบ้านบน = บ้านบน (ซื้อตามเทรนด์) · ต่ำกว่าเส้นบ้านล่าง = บ้านล่าง (ซื้อตอนย่อ) · อยู่ระหว่างเส้น = ข้าม' },
   { label: 'ชุดค่า', title: '', desc: 'ได้ 1 ใน 28 ชุด แล้วล็อกกับตะกร้านั้น · ชุดค่าถูกเก็บไว้ในไม้แรกที่โบรก ปิด / เปิด MT5 กลางรอบก็ใช้ชุดเดิมต่อ' },
 ];
 
 const howSteps = [
-  '<strong class="text-gray-light">เช็กตลาด</strong> — ทุกต้นชั่วโมงระบบอ่าน Gear · V-Lane · House ถ้าเข้าเงื่อนไขข้าม = ยังไม่เปิด',
+  '<strong class="text-gray-light">เช็กตลาด</strong> — ทุกต้นชั่วโมงระบบอ่าน Gear · Market Temp · House ถ้าเข้าเงื่อนไขข้าม = ยังไม่เปิด',
   '<strong class="text-gray-light">เลือกชุดค่า</strong> — หยิบชุดที่ตรงกับตลาดตอนนั้น แล้วล็อกกับตะกร้า',
   '<strong class="text-gray-light">ราคาลง ระบบทยอยซื้อ</strong> — วางไม้ตามระยะกริดของชุดนั้น และจำกัดไม้ต่อแท่งไม่ให้รัวตอนราคาดิ่ง (Drip)',
   '<strong class="text-gray-light">ราคาขึ้น ระบบเติมกำไร</strong> — PPTS เติมไม้ตามทางพร้อมไล่ล็อกกำไร',
@@ -223,7 +222,7 @@ const installSteps = [
           <img src="/agile-wordmark.png" alt="gdBasket AGILE" width="2132" height="916" loading="lazy" style="width:100%;max-width:340px;height:auto;" />
         </div>
 
-        <!-- (f) AFFILIATE CARDS — IB / VPS / Copytrade (แบบ A: IB เต็มกว้าง + VPS/Copy คู่ล่าง) -->
+        <!-- (f) AFFILIATE CARDS — IB + VPS (each full width row) -->
         <div class="aff-card card-ib">
           <small>โบรกที่ผมเทรดเอง</small>
           <h2>gdBasket ทำมาเพื่อ XM โดยเฉพาะ</h2>
@@ -263,27 +262,6 @@ const installSteps = [
             <p class="disclosure">ลิงก์แนะนำ — ผมได้ค่าตอบแทนถ้าสมัครผ่านลิงก์นี้ · เลือกใช้ VPS เจ้าไหนก็ได้ตามสะดวก</p>
           </div>
 
-          <div class="aff-card card-copy">
-            <span class="card-icon">
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 100-8 4 4 0 000 8zm6 0a4 4 0 10-3-6.65"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 20v-1a5 5 0 0110 0v1"/></svg>
-            </span>
-            <small>ไม่อยากลง EA เอง</small>
-            <h2>Copy ไม้ VELOCE26 อัตโนมัติ</h2>
-            <p>ก็อปการเทรดจากพอร์ต gdBasket ของผมตรงๆ ผ่านระบบ Copy Trading ทางการของ XM</p>
-            <ul class="aff-list">
-              <li>ก็อปไม้อัตโนมัติ ไม่ต้องลง EA</li>
-              <li>ระบบทางการของ XM</li>
-              <li>เริ่มลงทุนขั้นต่ำ $50</li>
-              <li>ทำงานให้ 24 ชม.</li>
-            </ul>
-            <a href={COPYTRADE_URL} target="_blank" rel="noopener noreferrer sponsored" class="repo-download btn-green" style="display:inline-flex;">ดูรายละเอียด Copy Trade →</a>
-            <p class="disclosure">ระบบ Copy Trading ของ XM · ไม่ใช่คำแนะนำการลงทุน · การเทรดมีความเสี่ยง</p>
-          </div>
-        </div>
-
-        <div class="risk-note">
-          <span aria-hidden="true">⚠</span>
-          <p><strong>Risk Warning</strong> : การ Copytrade จะไม่ได้การันตีผลลัพธ์ว่าจะได้ผลตอบแทนตามที่ต้องการเสมอไปนะครับ นักลงทุนควรจัดการความเสี่ยงของตนเอง และยอมรับความเสี่ยงที่จะเกิดขึ้น หากสูญเสียเงินทั้งหมดในการลงทุนไป ผู้ลงทุนจะเป็นผู้รับผิดชอบเงินของตัวเอง Master ผู้นำเทรด ไม่ใช่ผู้รับผิดชอบเงินทุนที่สูญเสียไป ฉะนั้นโปรดอ่านและพิจารณาเงื่อนไขความเสี่ยงทั้งหมดเป็นอย่างดีก่อนที่จะตัดสินใจลงทุน</p>
         </div>
 
         <!-- (g) README -->
@@ -532,18 +510,6 @@ const installSteps = [
                 <a href={VPS_AFF} target="_blank" rel="noopener noreferrer sponsored" class="mini-cta">ดู VPS →</a>
               </div>
 
-              <div class="mini-card card-copy">
-                <span class="mini-icon">
-                  <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 100-8 4 4 0 000 8zm6 0a4 4 0 10-3-6.65"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 20v-1a5 5 0 0110 0v1"/></svg>
-                </span>
-                <h4>Copy เทรดอัตโนมัติ</h4>
-                <p>ไม่อยากลง EA เอง ก็อปไม้จาก VELOCE26 ได้เลย</p>
-                <a href={COPYTRADE_URL} target="_blank" rel="noopener noreferrer sponsored" class="mini-cta">ดูรายละเอียด →</a>
-              </div>
-            </div>
-            <div class="risk-note">
-              <span aria-hidden="true">⚠</span>
-              <p><strong>Risk Warning</strong> : การ Copytrade จะไม่ได้การันตีผลลัพธ์ว่าจะได้ผลตอบแทนตามที่ต้องการเสมอไปนะครับ นักลงทุนควรจัดการความเสี่ยงของตนเอง และยอมรับความเสี่ยงที่จะเกิดขึ้น หากสูญเสียเงินทั้งหมดในการลงทุนไป ผู้ลงทุนจะเป็นผู้รับผิดชอบเงินของตัวเอง Master ผู้นำเทรด ไม่ใช่ผู้รับผิดชอบเงินทุนที่สูญเสียไป ฉะนั้นโปรดอ่านและพิจารณาเงื่อนไขความเสี่ยงทั้งหมดเป็นอย่างดีก่อนที่จะตัดสินใจลงทุน</p>
             </div>
           </div>
         </article>

@@ -204,7 +204,7 @@
 .ref-code button { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; color: var(--color-gray-light); background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 5px; font-size: 10px; }
 .affiliate-note .disclosure { margin-top: 10px; color: var(--color-gray-dark); font-size: 9.5px; }
 
-/* ---- aff-card system (IB / VPS / Copytrade cards) — สูตรเดียวกันทุกใบ ผูก --hue-r/g/b ---- */
+/* ---- aff-card system (IB / VPS cards) — สูตรเดียวกันทุกใบ ผูก --hue-r/g/b ---- */
 .aff-card { --hue-r: 220; --hue-g: 38; --hue-b: 38; display: flex; flex-direction: column; margin-bottom: 20px; padding: 18px; border-radius: 9px; background: linear-gradient(155deg, rgba(var(--hue-r), var(--hue-g), var(--hue-b), .065), rgba(20,22,26,.7)); border: 1px solid rgba(var(--hue-r), var(--hue-g), var(--hue-b), .31); }
 .aff-card:last-child { margin-bottom: 0; }
 .aff-card small { display: block; color: rgb(var(--hue-r), var(--hue-g), var(--hue-b)); font-size: 10px; font-weight: 750; letter-spacing: .02em; }
@@ -216,7 +216,6 @@
 
 .card-ib   { --hue-r: 220; --hue-g: 38;  --hue-b: 38;  } /* IB   = แดง  #DC2626 */
 .card-vps  { --hue-r: 245; --hue-g: 158; --hue-b: 11;  } /* VPS  = ทอง  #F59E0B */
-.card-copy { --hue-r: 34;  --hue-g: 197; --hue-b: 94;  } /* Copy = เขียว #22C55E */
 
 .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 .pill { padding: 6px 12px; background: var(--color-dark); border: 1px solid var(--color-dark-border); border-radius: 8px; color: var(--color-gray-light); font-size: 11px; font-weight: 600; }
@@ -234,12 +233,12 @@
 .card-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-bottom: 4px; }
 .card-icon svg { width: 18px; height: 18px; color: rgb(var(--hue-r), var(--hue-g), var(--hue-b)); }
 
-.cards-2col { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 16px; margin-top: 20px; }
+.cards-2col { display: grid; grid-template-columns: 1fr; align-items: stretch; gap: 16px; margin-top: 20px; }
 .cards-2col > .aff-card { margin-bottom: 0; }
 .cards-2col .aff-card .repo-download { margin-top: auto; }
 
-/* ---- mini-card system (โซนล่าง install — minimal 3 การ์ด IB/VPS/Copy, เบากว่า aff-card) — reuse .card-ib/.card-vps/.card-copy สำหรับ --hue-r/g/b ---- */
-.mini-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+/* ---- mini-card system (โซนล่าง install — minimal 2 การ์ด IB/VPS, เบากว่า aff-card) — reuse .card-ib/.card-vps สำหรับ --hue-r/g/b ---- */
+.mini-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
 .mini-card { --hue-r: 220; --hue-g: 38; --hue-b: 38; display: flex; flex-direction: column; gap: 6px; padding: 13px 14px; border-radius: 8px; background: linear-gradient(155deg, rgba(var(--hue-r), var(--hue-g), var(--hue-b), .035), rgba(20,22,26,.55)); border: 1px solid rgba(var(--hue-r), var(--hue-g), var(--hue-b), .22); }
 .mini-card .mini-icon { display: inline-flex; width: 15px; height: 15px; color: rgba(var(--hue-r), var(--hue-g), var(--hue-b), .85); margin-bottom: 1px; }
 .mini-card .mini-icon svg { width: 100%; height: 100%; }
