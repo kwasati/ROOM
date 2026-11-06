@@ -6,7 +6,6 @@ const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
 const DL_LATEST = `${MAIN}/d/gdbasket`; // main button - redirect to the latest file v4.01 (publish/releases/v4.01/gdBasket_v4.01.ex5)
 const DL_SET = `${MAIN}/d/gdbasket-veloce26-set`;
-const DL_V400 = `${MAIN}/d/gdbasket-v400`;
 const DL_V322 = `${MAIN}/d/gdbasket-v322`;
 const DL_V311 = `${MAIN}/d/gdbasket-v311`;
 const DL_V310 = `${MAIN}/d/gdbasket-v310`;
@@ -92,7 +91,7 @@ const howSteps = [
 
 const releases = [
   { version: 'v4.01', dateLabel: '6 พ.ย. 2026', latest: true, url: DL_LATEST },
-  { version: 'v4.00', dateLabel: '26 ต.ค. 2026', latest: false, url: DL_V400 },
+  { version: 'v4.00', dateLabel: '26 ต.ค. 2026', latest: false },
   { version: 'v3.22', dateLabel: '28 ก.ย. 2026', latest: false, url: DL_V322 },
   { version: 'v3.11', dateLabel: '10 ก.ย. 2026', latest: false, url: DL_V311 },
   { version: 'v3.10', dateLabel: '22 ส.ค. 2026', latest: false, url: DL_V310 },
