@@ -16,7 +16,7 @@
 
 ## → ลูก
 - `src\pages\index.astro` — home hub (โซนปักหมุด + ทั้งหมด + filter)
-- `src\pages\ea\gdbasket.astro` — หน้า EA สไตล์ github-repo (hardcode 10 รุ่น publish: v4.00..v1.18, รุ่นล่าสุด v4.00)
+- `src\pages\ea\gdbasket.astro` — หน้า EA สไตล์ github-repo (hardcode 11 รุ่น publish: v4.01..v1.18, รุ่นล่าสุด v4.01)
 - `src\pages\ea\gdbasket\rolling-capital.astro` — Rolling Capital Planner (คิดสดในเบราว์เซอร์)
 - `src\data\ea.ts` — รายการ EA แบบ hardcoded array (ไม่ใช่ content collection)
 - `src\content\courses\` + `src\content\lessons\` — คอร์สเป็น MDX collection
