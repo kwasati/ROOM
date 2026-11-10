@@ -4,7 +4,9 @@ import Layout from '../../layouts/Layout.astro';
 // content port จาก intensivetrader.com/src/pages/ea/gdbasket.astro (เดิม)
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
-const DL_LATEST = `${MAIN}/d/gdbasket`; // main button - redirect to the latest file v4.01 (publish/releases/v4.01/gdBasket_v4.01.ex5)
+const DL_LATEST = `${MAIN}/d/gdbasket`; // main button - redirect to the latest file v4.10 (publish/releases/v4.10/gdBasket_v4.10.ex5)
+const DL_AGILE_SET = `${MAIN}/d/gdbasket-agile-set`;
+const DL_V401 = `${MAIN}/d/gdbasket-v401`;
 const DL_SET = `${MAIN}/d/gdbasket-veloce26-set`;
 const DL_V322 = `${MAIN}/d/gdbasket-v322`;
 const DL_V311 = `${MAIN}/d/gdbasket-v311`;
@@ -90,7 +92,8 @@ const howSteps = [
 ];
 
 const releases = [
-  { version: 'v4.01', dateLabel: '6 พ.ย. 2026', latest: true, url: DL_LATEST },
+  { version: 'v4.10', dateLabel: '10 พ.ย. 2026', latest: true, url: DL_LATEST },
+  { version: 'v4.01', dateLabel: '6 พ.ย. 2026', latest: false, url: DL_V401 },
   { version: 'v4.00', dateLabel: '26 ต.ค. 2026', latest: false },
   { version: 'v3.22', dateLabel: '28 ก.ย. 2026', latest: false, url: DL_V322 },
   { version: 'v3.11', dateLabel: '10 ก.ย. 2026', latest: false, url: DL_V311 },
@@ -110,14 +113,14 @@ const fileRows = [
   { icon: 'modes', name: 'Mode AGILE (ค่าตั้งต้น)', note: 'ล็อกชุดค่าให้ทุกตะกร้า ไม่ต้องตั้งเอง · Mode CUSTOM 28 ช่อง', meta: 'พร้อมใช้', href: '#modes', color: 'text-primary' },
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
-  { icon: 'clock', name: 'Releases', note: 'v4.01 · v4.00 · v3.22 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '11 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
+  { icon: 'clock', name: 'Releases', note: 'v4.10 · v4.01 · v4.00 · v3.22 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '12 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
-  { icon: 'dl', name: 'gdBasket v4.01', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
+  { icon: 'dl', name: 'gdBasket v4.10', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
-  'ดาวน์โหลดไฟล์ <strong>gdBasket v4.01</strong> จากปุ่มด้านบน',
+  'ดาวน์โหลดไฟล์ <strong>gdBasket v4.10</strong> จากปุ่มด้านบน',
   'เปิด <strong>MetaTrader 5</strong> → <strong>File → Open Data Folder</strong>',
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
@@ -127,7 +130,7 @@ const installSteps = [
 
 ---
 
-<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — Mode AGILE ผลย้อนหลัง 8 ปี 2018–2026 — โหลดฟรี v4.01" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
+<Layout title="gdBasket — Adaptive Buy Grid Behavior EA · GOLD M15 | Room" description="EA เทรดทองคำด้วยระบบ Adaptive Grid Behavior ปรับพฤติกรรมตามความผันผวนตลาดเองอัตโนมัติ เสริมด้วย Peak Profit Trail System เก็บกำไรเก่ง ใช้ Common-TP/SL วางจริงที่โบรก ถึงเป้าปิดให้เองแม้ไม่ได้เปิดเครื่อง — Mode AGILE ผลย้อนหลัง 8 ปี 2018–2026 — โหลดฟรี v4.10" ogImage="https://room.intensivetrader.com/gdbasket-og.png" ogImageWidth={1200} ogImageHeight={630}>
 <div id="main-content" class="repo-page">
   <div class="repo-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -149,7 +152,7 @@ const installSteps = [
           <p>Adaptive Buy Grid Behavior EA · GOLD M15</p>
         </div>
       </div>
-      <div class="repo-version"><span>เวอร์ชัน</span><strong>v4.01</strong></div>
+      <div class="repo-version"><span>เวอร์ชัน</span><strong>v4.10</strong></div>
     </header>
 
     <!-- (c) SUB-NAV TABS -->
@@ -181,7 +184,7 @@ const installSteps = [
         <div class="repo-toolbar">
           <div class="branch-pill">
             <svg class="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m0-10a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100 4 2 2 0 000-4zm8-6a2 2 0 100-4 2 2 0 000 4zm0 0v1a3 3 0 01-3 3H9"/></svg>
-            <strong>v4.01</strong>
+            <strong>v4.10</strong>
           </div>
           <span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/></svg>
@@ -189,9 +192,9 @@ const installSteps = [
           </span>
           <a href={DL_LATEST} download class="repo-download compact">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            ดาวน์โหลดฟรี <span>v4.01</span>
+            ดาวน์โหลดฟรี <span>v4.10</span>
           </a>
-          <p>ไฟล์รุ่น <strong>v4.01</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
+          <p>ไฟล์รุ่น <strong>v4.10</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
         </div>
 
         <!-- (e) FILE BROWSER -->
@@ -199,8 +202,8 @@ const installSteps = [
           <div class="commit-row">
             <img src={`${MAIN}/profile.jpg`} class="commit-avatar" alt="" />
             <strong>IntensiveTrader</strong>
-            <p>v4.01 — AGILE 4 Gear มาแล้ว! ผลย้อนหลัง 8 ปี 27 รอบสำเร็จ / 6 SO</p>
-            <time>อัปเดตไฟล์ 6 พ.ย. 2026</time>
+            <p>v4.10 — CUSTOM ปรับ AGILE Gear ได้เต็มระบบ</p>
+            <time>อัปเดตไฟล์ 10 พ.ย. 2026</time>
           </div>
           <div class="file-list">
             {fileRows.map((row) => (
@@ -396,6 +399,7 @@ const installSteps = [
               <section>
                 <b>VELOCE26 .set</b>
                 <p>ชุด VELOCE26 แจกเป็นไฟล์ <a href={DL_SET} download class="text-primary hover:underline">.set (โหลดที่นี่)</a> — โหลดในหน้า Inputs แล้ว EA ทำงานแบบ VELOCE26 บน Mode CUSTOM</p>
+                <p><a href={DL_AGILE_SET} download class="text-primary hover:underline">AGILE.set (ใช้กับ Mode CUSTOM)</a></p>
               </section>
             </div>
 
@@ -527,9 +531,9 @@ const installSteps = [
         <section id="changelog" class="release-card scroll-mt-20">
           <div>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <strong>v4.01 · AGILE 4 Gear มาแล้ว!</strong>
+            <strong>v4.10 · CUSTOM ปรับ AGILE Gear ได้เต็มระบบ</strong>
           </div>
-          <p><strong>เก่งปี 26 และทนต่อปีเก่า Real Tick 2026 สำเร็จ 9 รอบ แพ้แค่ 1</strong> · ระบบ Gear ละเอียด 4 เกียร์ จุดเด่นที่ทำให้ AGILE รับได้ทุกความผันผวน · ชุดค่าที่ปรับแต่งมาเพื่อสอดคล้องกับปัจจุบันและอนาคต</p>
+          <p>ตั้ง Market Temp 8 ช่วง · Gear Lines · ชุดค่า 4 เกียร์ ได้เองทุกช่อง · แจก AGILE.set โหลดแล้วได้ค่าเท่า Mode AGILE ใช้เป็นจุดเริ่มปรับต่อ · Mode AGILE ค่าเดิมของ v4.01 ไม่เปลี่ยน</p>
           <a href="/ea/gdbasket/changelog" class="text-primary text-sm font-semibold hover:underline px-4 pb-4 inline-block">ดูประวัติทุกเวอร์ชัน →</a>
         </section>
       </div>
