@@ -1,27 +1,23 @@
 # Room
 
-ฮับคอร์ส + EA ใต้แบรนด์ IntensiveTrader — `room.intensivetrader.com` (ภาษาไทย)
+ฮับรวม บทเรียน / EA / Signal / เครื่องมือ ใต้แบรนด์ IntensiveTrader — `room.intensivetrader.com` (ภาษาไทย)
 
 ## Commands
 - dev `npm run dev` / build `npm run build` / preview `npm run preview`
 - build บนเครื่อง Windows: Node 24 ปิดตัวพัง exit 127 หลัง "Complete!" (บั๊ก Node ไม่ใช่โค้ด) → `npx -y -p node@22 node node_modules\astro\bin\astro.mjs build`
 - test `npm run test:links` · `npm run test:links:built`
-- test planner `node --test tests\rolling-sim.test.mjs`
 
 ## Rules
 - คอร์สว่าง -> build warning "collection empty" เป็นปกติ ไม่ใช่ error
 - ปุ่มโหลดใช้ค่า `DL_LATEST` ร่วมกับหน้าแม่เสมอ **ห้าม hardcode เวอร์ชัน**
-- refresh data ของ planner แล้วต้องรัน `node --test tests\rolling-sim.test.mjs` ใหม่ และอัปเดตเฉลยในเทสตาม baseline ใหม่
 - หน้า public พูดถึงเครื่องยนต์ VELOCE ตัวเดียว
 
 ## → ลูก
 - `src\pages\index.astro` — home hub — grid เดียว 4 หมวด บทเรียน / EA / Signal / เครื่องมือ + filter (`?filter=ea|tool`) · ปักหมุดจาก admin เรียงใน grid
 - `src\pages\ea\gdbasket.astro` — หน้า EA สไตล์ github-repo (hardcode 12 รุ่น publish: v4.10..v1.18, รุ่นล่าสุด v4.10)
-- `src\pages\ea\gdbasket\rolling-capital.astro` — Rolling Capital Planner (คิดสดในเบราว์เซอร์)
 - `src\data\ea.ts` — รายการ EA แบบ hardcoded array (ไม่ใช่ content collection)
 - `src\content\courses\` + `src\content\lessons\` — คอร์สเป็น MDX collection
-- `src\lib\rolling-sim.mjs` + `rolling-chart.mjs` — engine ของ planner
-- `src\data\gdbasket-rolling-cycles.json` — data ของ planner (export จาก EAfactory)
+- `src\data\tools.ts` — รายการเครื่องมือ (AGENTQ ลิงก์ออก agentq.intensivetrader.com)
 - `src\pages\ea\gdbasket\changelog.astro` — changelog route ของ gdBasket (hardcode · แก้ทุก release)
 - `src\pages\items.json.ts` — list item ทั้งหมดของ room ให้ admin เว็บหลักทำ pin manager
 - `CHANGELOG.md`
