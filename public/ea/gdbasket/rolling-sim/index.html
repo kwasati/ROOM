@@ -6,7 +6,7 @@
 /* intensivetrader room theme: dark only · tokens = room src/styles/global.css @theme */
 :root{color-scheme:dark;--surface:#0F0F0F;--card:#1A1A1A;--ink:#E5E7EB;--ink2:#9CA3AF;--muted:#6B7280;--grid:#2A2A2A;--axis:#3a3a3a;
 --primary:#DC2626;--primary-light:#EF4444;--secondary:#F59E0B;
---s1:#3987e5;--s2:#d95926;--s3:#199e70;--bad:#EF4444;--good:#22C55E}
+--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--bad:#EF4444;--good:#22C55E}
 *{box-sizing:border-box}body{margin:0;background:var(--surface);color:var(--ink);font:14px/1.5 'Noto Sans Thai','Inter',sans-serif;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1240px;margin:0 auto;padding:27px 16px 80px}
 .crumb{color:var(--muted);font-size:12px;margin-bottom:14px}.crumb b{color:var(--ink)}
@@ -20,8 +20,11 @@ select:focus,input:focus{outline:none;border-color:var(--primary)}
 input[type=checkbox]{accent-color:var(--primary)}
 input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 input[data-num]{width:110px}
-.scen{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.scen .card{margin:0;border-top:3px solid var(--c)}
+.scen{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.scen .card{margin:0;border-top:3px solid var(--c);min-width:0}
+.scen .grid2 > *{min-width:0}.scen select,.scen input[data-num]{width:100%}
+.steps{display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--ink2)}.steps b{color:var(--ink)}
+.tile{min-width:0}
 .scen h3{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
 .scen .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .sw{width:12px;height:12px;border-radius:3px;background:var(--c);display:inline-block}
@@ -30,7 +33,7 @@ table{border-collapse:collapse;width:100%;font-size:12.5px}
 th,td{padding:7px 9px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap}
 th:first-child,td:first-child{text-align:left}th{color:var(--ink2);font-weight:600;background:var(--card);position:sticky;top:0}
 tr:hover td{background:rgba(255,255,255,.025)}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
 .tile{background:var(--card);border:1px solid var(--grid);border-radius:12px;padding:12px 16px;border-left:3px solid var(--c)}
 .tile .big{font-size:26px;font-weight:700;color:#fff;font-family:'Inter','Noto Sans Thai',sans-serif}.tile .k{color:var(--ink2);font-size:12px}
 .tile .line{display:flex;justify-content:space-between;font-size:13px;padding:1px 0}.tile .line b{color:#fff;font-weight:600}
@@ -47,7 +50,7 @@ svg{width:100%;height:auto;display:block}
 .bad{color:var(--bad)!important}.good{color:var(--good)}
 .scroll{max-height:460px;overflow:auto}
 .card>b{color:var(--ink);font-size:14px}
-@media(max-width:900px){.scen,.tiles{grid-template-columns:1fr}}
+@media(max-width:1100px){.scen,.tiles{grid-template-columns:1fr 1fr}}@media(max-width:640px){.scen,.tiles{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <div class="crumb">room / gdBasket / <b>Rolling Simulator</b></div>
 <h1>AGILE <span>Rolling</span> + ถอนเงิน</h1>
@@ -96,7 +99,10 @@ function monthKey(t) { const d = tDate(t); return d.getUTCFullYear() * 12 + d.ge
 
 function simulate(D, o) {
   const { T, P, M, S } = D;
-  const roll = o.roll, wd = o.wd, floor = o.capInit;
+  // o.phases (optional): [{roll, wd, until}, ...] - switch to the next phase at a round end once balance >= until
+  const phases = o.phases || null; let ph = 0;
+  let roll = phases ? phases[0].roll : o.roll, wd = phases ? phases[0].wd : o.wd;
+  const floor = o.capInit;
   // start at the first basket closing on/after the chosen date; rounds are re-cut from there:
   // success = round P/L in $ reaches the current cap (EA target: effective balance = 2 x cap; a mid-round
   // cap change keeps the round P/L in $, same as the EA withdraw cut) · SO = the basket that hit SO in the backtest
@@ -105,7 +111,7 @@ function simulate(D, o) {
   let bal = o.startBal, cap = o.capInit, peak = bal, maxDD = 0, ddAt = 0, ddPeak = 0, ddLow = 0, worstDip = 0, dipAt = 0, dipCapPct = 0, dipCapAt = 0, dipBalPct = 0, dipBalAt = 0;
   let wdTotal = 0, pending = 0, short = 0, so = 0, ok = 0, succSinceRoll = 0;
   let lastRollBal = bal, monthProfit = 0, roundProfit = 0, hitCeil = null, stuck = null;
-  const wdYear = {}, pts = [], events = [], rounds2 = [];
+  const wdYear = {}, pts = [], events = [], rounds2 = [], phaseAt = [];
   const t0 = T[i0];
   const ceil = () => { if (cap >= o.maxCap && hitCeil === null) hitCeil = tNow; };
   let tNow = t0;
@@ -177,35 +183,40 @@ function simulate(D, o) {
       ev.push(bal, cap);
       rr.wd = rWd; rr.bal1 = bal; rr.capNext = cap; rounds2.push(rr);
       rStart = t; rBal0 = bal; rCap = cap; rWd = 0; rFloat = 0;
+      while (phases && ph < phases.length - 1 && bal >= phases[ph].until) {
+        ph++; roll = phases[ph].roll; wd = phases[ph].wd; succSinceRoll = 0;
+        phaseAt.push(t); events.push([t, 'P', ph + 1, bal, cap]);
+      }
     }
   }
   if (tNow > rStart) rounds2.push({ start: rStart, end: tNow, out: 0, cap: rCap, bal0: rBal0, pnl: roundProfit, balTrade: bal, float: rFloat, wd: rWd, bal1: bal, capNext: cap });
   pts.push([tNow, bal, wdTotal, cap]);
-  return { rounds2, bal, wdTotal, total: bal + wdTotal, maxDD, ddAt, ddPeak, ddLow, worstDip, dipAt, dipCapPct, dipCapAt, dipBalPct, dipBalAt, so, ok, short, hitCeil, stuck, wdYear, pts, events, t0, tEnd: tNow, cap };
+  return { phaseAt, rounds2, bal, wdTotal, total: bal + wdTotal, maxDD, ddAt, ddPeak, ddLow, worstDip, dipAt, dipCapPct, dipCapAt, dipBalPct, dipBalAt, so, ok, short, hitCeil, stuck, wdYear, pts, events, t0, tEnd: tNow, cap };
 }
 if (typeof module !== 'undefined') module.exports = { simulate, tDate };
 
-const COLORS=['var(--s1)','var(--s2)','var(--s3)'];
-const HEX=['#3987e5','#d95926','#199e70'];
+const COLORS=['var(--s1)','var(--s2)','var(--s3)','var(--s4)'];
+const HEX=['#3987e5','#d95926','#199e70','#c98500'];
 const ROLL=[['round','ทุกรอบที่สำเร็จ'],['none','ไม่ทบ (cap คงที่)'],['day','ทุกวัน'],['week','ทุกวีค'],['month','ทุกเดือน'],['pct','เมื่อบัญชีโตครบ X%']];
 const WD=[['none','ไม่ถอน'],['goal','โตถึงเป้าแล้วถอนส่วนเกินทุกรอบ'],['fixed','ถอนเดือนละ $ คงที่'],['pctMonth','ถอน % ของกำไรเดือนนั้น'],['pctRound','ถอน % ของกำไรทุกรอบสำเร็จ'],['target','บัญชีถึง $X ถอนให้เหลือ $Y']];
 const DEF=[
  {on:true,roll:'round',n:1,pct:20,wd:'none',amount:500,wpct:50,hi:20000,lo:10000,goal:500000,timing:'now'},
  {on:true,roll:'pct',n:1,pct:10,wd:'pctRound',amount:500,wpct:25,hi:20000,lo:10000,goal:500000,timing:'now'},
- {on:true,roll:'round',n:1,pct:20,wd:'goal',amount:500,wpct:50,hi:20000,lo:10000,goal:1000,timing:'now'}];
+ {on:true,roll:'round',n:1,pct:20,wd:'goal',amount:500,wpct:50,hi:20000,lo:10000,goal:1000,timing:'now'},
+ {on:true,kind:'phase',x:10000,y:100000}];
 const S=JSON.parse(JSON.stringify(DEF));
 const $=id=>document.getElementById(id);
 const fm=v=>{const a=Math.abs(v);return (v<0?'-':'')+'$'+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e4?(a/1e3).toFixed(1)+'k':a.toFixed(0))};
 const pc=v=>(v*100).toFixed(1)+'%';
 const fd=t=>{const d=tDate(t);return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0')};
 const yrs=(a,b)=>((b-a)/525960);
-const names=['A','B','C'];
+const names=['A','B','C','D'];
 // start options = round starts
 const num=el=>{const v=parseFloat(String(el.value).replace(/[,\s$]/g,''));return isFinite(v)?v:0};
 const startT=()=>{const m=String($('start').value).match(/(\d{4})\D?(\d{1,2})?\D?(\d{1,2})?/);const y=m?+m[1]:2018,mo=m&&m[2]?+m[2]:1,d=m&&m[3]?+m[3]:1;return Math.max(0,(Date.UTC(y,mo-1,d)-EPOCH_MS)/60000)};
 function opt(list,v){return list.map(([k,l])=>`<option value="${k}"${k===v?' selected':''}>${l}</option>`).join('')}
 function scenUI(){
- $('scen').innerHTML=S.map((s,i)=>`<div class="card ${s.on?'':'off'}" style="--c:${COLORS[i]}"><h3><span class="sw"></span>แบบ ${names[i]}<label style="flex-direction:row;margin-left:auto;align-items:center"><input type="checkbox" data-i="${i}" data-k="on" ${s.on?'checked':''}>แสดง</label></h3>
+ $('scen').innerHTML=S.map((s,i)=>s.kind==='phase'?phaseUI(s,i):`<div class="card ${s.on?'':'off'}" style="--c:${COLORS[i]}"><h3><span class="sw"></span>แบบ ${names[i]}<label style="flex-direction:row;margin-left:auto;align-items:center"><input type="checkbox" data-i="${i}" data-k="on" ${s.on?'checked':''}>แสดง</label></h3>
  <div class="grid2"><label>ทบ (ขยับ cap)<select data-i="${i}" data-k="roll">${opt(ROLL,s.roll)}</select></label>
  ${s.roll==='round'?`<label>ทุกกี่รอบสำเร็จ<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="n" value="${s.n}"></label>`:s.roll==='pct'?`<label>โตครบกี่ %<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="pct" value="${s.pct}"></label>`:'<span></span>'}
  <label>ถอน<select data-i="${i}" data-k="wd">${opt(WD,s.wd)}</select></label>
@@ -215,9 +226,15 @@ function scenUI(){
  </div></div>`).join('');
  $('scen').querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',e=>{const i=+el.dataset.i,k=el.dataset.k;S[i][k]=el.type==='checkbox'?el.checked:el.dataset.num?num(el):el.value;scenUI();run()}));
 }
-function optsOf(s,start){return{startT:start??startT(),startBal:num($('bal0')),capInit:num($('cap0')),ratio:+$('ratio').value,maxCap:num($('maxcap')),
+function phaseUI(s,i){return `<div class="card ${s.on?'':'off'}" style="--c:${COLORS[i]}"><h3><span class="sw"></span>แบบ ${names[i]} · ทีละขั้น<label style="flex-direction:row;margin-left:auto;align-items:center"><input type="checkbox" data-i="${i}" data-k="on" ${s.on?'checked':''}>แสดง</label></h3>
+ <div class="steps"><div><b>ตอน 1</b> ใช้ค่าของ <b>A</b></div>
+ <label>บัญชีถึง $ เปลี่ยนเป็นตอน 2 (ค่าของ B)<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="x" value="${s.x}"></label>
+ <label>บัญชีถึง $ เปลี่ยนเป็นตอน 3 (ค่าของ C)<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="y" value="${s.y}"></label>
+ </div><p class="k" style="margin:8px 0 0">เปลี่ยนตอนตอนจบรอบ · ถ้า C ถอนส่วนเกินเป้า ตอน 3 จะใช้เป้า = ยอดที่ตั้งเปลี่ยนเป็นตอน 3</p></div>`}
+function phase3(s){const c={...S[2]};if(c.wd==='goal')c.goal=Math.max(c.goal,s.y);return c}
+function optsOf(s,start){if(s.kind==='phase'){const o=k=>optsOf(k,start);const a=o(S[0]),b=o(S[1]),c=o(phase3(s));return{...a,phases:[{roll:a.roll,wd:a.wd,until:s.x},{roll:b.roll,wd:b.wd,until:s.y},{roll:c.roll,wd:c.wd}]}}return{startT:start??startT(),startBal:num($('bal0')),capInit:num($('cap0')),ratio:+$('ratio').value,maxCap:num($('maxcap')),
  roll:{type:s.roll,n:s.n,pct:s.pct},wd:{type:s.wd,goal:s.goal,amount:s.amount,pct:s.wpct,hi:s.hi,lo:s.lo,timing:s.wd==='pctRound'?'roundEnd':s.timing}}}
-let RES=[],tab='cmp',RSC=0;const VIS={0:true,1:true,2:true,m:true};
+let RES=[],tab='cmp',RSC=0;const VIS={0:true,1:true,2:true,3:true,m:true};
 function run(){
  RES=S.map(s=>s.on?simulate(DATA,optsOf(s)):null);
  tiles();chart1();chart2();tabs();
@@ -235,6 +252,7 @@ function tiles(){
  <div class="line" title="ลอยของตะกร้าเทียบเงินในบัญชีตอนนั้น"><span>ลอยหนักสุด % ของบัญชี</span><b>${pc(r.dipBalPct)}</b></div>
  <div class="line" title="ลอยเป็นเงินก้อนใหญ่สุด (มักเกิดตอน cap ใหญ่สุด)"><span>ลอยหนักสุดเป็นเงิน</span><b>${fm(r.worstDip)}</b></div>
  <div class="line"><span>รอบสำเร็จ / SO</span><b>${r.ok} / ${r.so}</b></div>
+ ${(S[i]||{}).kind==='phase'?`<div class="line"><span>เข้าตอน 2 / ตอน 3</span><span class="k">${[0,1].map(k=>r.phaseAt[k]!==undefined?fd(r.phaseAt[k]):'ยังไม่ถึง').join(' / ')}</span></div>`:''}
  <div class="line"><span>cap ตอนจบ</span><b>${fm(r.cap)}${r.hitCeil!==null?` <span class="k">ชนเพดาน ${fd(r.hitCeil)}</span>`:''}</b></div>
  ${r.short?`<div class="line"><span title="ครั้งที่ขอถอนเกินกว่าที่ถอนได้ — ถอนได้แค่ให้บัญชีเหลือ 2 × cap แรก">ถอนไม่ได้เต็ม</span><b class="bad">${r.short} ครั้ง</b></div>`:''}
  ${r.stuck!==null?`<div class="line bad"><span>⛔ บัญชีต่ำกว่า cap หยุดเปิดตะกร้า</span><b>${fd(r.stuck)}</b></div>`:''}
@@ -250,7 +268,7 @@ function niceStep(r){const p=10**Math.floor(Math.log10(r||1));const f=r/p;return
 function lineChart(svg,lg,key,H,log,withMt5){
  const PB=26;const all=RES.map((r,i)=>[r,i]).filter(([r])=>r);const live=all.filter(([r,i])=>VIS[i]);
  const mtOk=withMt5&&startT()<=DATA.T[0]&&num($('bal0'))===2000&&num($('cap0'))===1000;
- $(lg).innerHTML=all.map(([r,i])=>`<label class="tg"><input type="checkbox" data-v="${i}" ${VIS[i]?'checked':''}><i class="sw" style="--c:${COLORS[i]}"></i>แบบ ${names[i]}: ${label(S[i])}</label>`).join('')+(mtOk?`<label class="tg"><input type="checkbox" data-v="m" ${VIS.m?'checked':''}><i class="sw" style="--c:#9CA3AF;border-radius:50%"></i>MT5 จริง (rolling ทุกรอบ)</label>`:'')+(key===1?`<span>○ = รอบที่โดน SO</span>`:'');
+ $(lg).innerHTML=all.map(([r,i])=>`<label class="tg"><input type="checkbox" data-v="${i}" ${VIS[i]?'checked':''}><i class="sw" style="--c:${COLORS[i]}"></i>แบบ ${names[i]}: ${label(S[i])}</label>`).join('')+(mtOk?`<label class="tg"><input type="checkbox" data-v="m" ${VIS.m?'checked':''}><i class="sw" style="--c:#9CA3AF;border-radius:50%"></i>MT5 จริง (rolling ทุกรอบ)</label>`:'')+(key===1?`<span>○ = รอบที่โดน SO · ■2 ■3 = แบบ D เข้าตอน 2 / 3</span>`:'');
  $(lg).querySelectorAll('[data-v]').forEach(c=>c.onchange=()=>{VIS[c.dataset.v]=c.checked;chart1();chart2()});
  if(!live.length&&!(mtOk&&VIS.m)){$(svg).innerHTML='';return}
  const src=live.length?live:all;const t0=Math.min(...src.map(([r])=>r.t0)),t1=Math.max(...src.map(([r])=>r.tEnd));
@@ -261,6 +279,7 @@ function lineChart(svg,lg,key,H,log,withMt5){
  yTicks(lo,hi,log).forEach(v=>{const yy=Y(v);s+=`<line x1="${PL}" x2="${W-PR}" y1="${yy}" y2="${yy}" stroke="var(--grid)"/><text x="${PL-8}" y="${yy+4}" font-size="12" fill="var(--muted)" text-anchor="end">${fm(v)}</text>`});
  s+=`<line x1="${PL}" x2="${W-PR}" y1="${H-PB}" y2="${H-PB}" stroke="var(--axis)"/>`;
  live.forEach(([r,i])=>{const d=r.pts.map((p,k)=>(k?'L':'M')+x(p[0]).toFixed(1)+','+Y(p[key]).toFixed(1)).join('');s+=`<path d="${d}" fill="none" stroke="${HEX[i]}" stroke-width="2" stroke-linejoin="round"/>`;
+  if(key===1)r.events.filter(e=>e[1]==='P').forEach(e=>{const X=x(e[0]),Yv=Y(e[3]);s+=`<rect x="${X-7}" y="${Yv-7}" width="14" height="14" rx="3" fill="${HEX[i]}"/><text x="${X}" y="${Yv+4}" font-size="10" font-weight="700" fill="#0F0F0F" text-anchor="middle">${e[2]}</text>`});
   if(key===1)r.events.filter(e=>e[1]==='X').forEach(e=>{const p=near(r.pts,e[0]);s+=`<circle cx="${x(e[0])}" cy="${Y(p[1])}" r="4" fill="#0F0F0F" stroke="${HEX[i]}" stroke-width="2"/>`})});
  mt.forEach(m=>{s+=`<circle cx="${x(m[0])}" cy="${Y(m[1])}" r="4.5" fill="#9CA3AF" stroke="#1A1A1A" stroke-width="2"/>`});
  s+=`<line id="${svg}x" y1="${PT}" y2="${H-PB}" stroke="var(--ink2)" stroke-dasharray="3 3" visibility="hidden"/><rect x="${PL}" y="${PT}" width="${W-PL-PR}" height="${H-PB-PT}" fill="transparent" id="${svg}hit"/>`;
@@ -273,7 +292,7 @@ function lineChart(svg,lg,key,H,log,withMt5){
  hit.onmouseleave=()=>{tip.style.display='none';cx.setAttribute('visibility','hidden')};
 }
 function near(pts,t){let a=0,b=pts.length-1;while(a<b){const m=(a+b+1)>>1;if(pts[m][0]<=t)a=m;else b=m-1}return pts[a]}
-function label(s){const r=ROLL.find(x=>x[0]===s.roll)[1].replace('X%',s.pct+'%')+(s.roll==='round'&&s.n>1?` (ทุก ${s.n} รอบ)`:'');const w=WD.find(x=>x[0]===s.wd)[1].replace('$X','$'+s.hi).replace('$Y','$'+s.lo).replace('$ คงที่','$'+s.amount).replace('โตถึงเป้า','โตถึงเป้า '+fm(s.goal||0)).replace('%','%').replace(/^ถอน %/,'ถอน '+s.wpct+'%');return 'ทบ'+r+' · '+w}
+function label(s){if(s.kind==='phase')return `ทีละขั้น: A → ถึง ${fm(s.x)} → B → ถึง ${fm(s.y)} → C`;const r=ROLL.find(x=>x[0]===s.roll)[1].replace('X%',s.pct+'%')+(s.roll==='round'&&s.n>1?` (ทุก ${s.n} รอบ)`:'');const w=WD.find(x=>x[0]===s.wd)[1].replace('$X','$'+s.hi).replace('$Y','$'+s.lo).replace('$ คงที่','$'+s.amount).replace('โตถึงเป้า','โตถึงเป้า '+fm(s.goal||0)).replace('%','%').replace(/^ถอน %/,'ถอน '+s.wpct+'%');return 'ทบ'+r+' · '+w}
 function chart1(){lineChart('ch1','lg1',1,380,$('scale').value==='log',true)}
 function chart2(){lineChart('ch2','lg2',2,240,false,false)}
 // ---------- tables ----------
