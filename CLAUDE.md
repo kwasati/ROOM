@@ -15,7 +15,7 @@
 - หน้า public พูดถึงเครื่องยนต์ VELOCE ตัวเดียว
 
 ## → ลูก
-- `src\pages\index.astro` — home hub (โซนปักหมุด + ทั้งหมด + filter)
+- `src\pages\index.astro` — home hub — grid เดียว 4 หมวด บทเรียน / EA / Signal / เครื่องมือ + filter (`?filter=ea|tool`) · ปักหมุดจาก admin เรียงใน grid
 - `src\pages\ea\gdbasket.astro` — หน้า EA สไตล์ github-repo (hardcode 12 รุ่น publish: v4.10..v1.18, รุ่นล่าสุด v4.10)
 - `src\pages\ea\gdbasket\rolling-capital.astro` — Rolling Capital Planner (คิดสดในเบราว์เซอร์)
 - `src\data\ea.ts` — รายการ EA แบบ hardcoded array (ไม่ใช่ content collection)
