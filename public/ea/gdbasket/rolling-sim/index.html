@@ -20,7 +20,8 @@ select:focus,input:focus{outline:none;border-color:var(--primary)}
 input[type=checkbox]{accent-color:var(--primary)}
 input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8)}
 input[data-num]{width:110px}
-.scen{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.scen{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dcard{grid-column:1/-1}.dsteps{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:start}.dstep{min-width:0;border:1px solid var(--grid);border-radius:10px;padding:10px}.dhead{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-bottom:8px;min-height:52px}.dhead b{color:var(--ink);font-size:13px}.dfrom{max-width:60%}.darrow{align-self:center;color:var(--muted);font-size:18px}.warn{margin:8px 0 0;color:var(--secondary);font-size:12px}
 .scen .card{margin:0;border-top:3px solid var(--c);min-width:0}
 .scen .grid2 > *{min-width:0}.scen select,.scen input[data-num]{width:100%}
 .steps{display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--ink2)}.steps b{color:var(--ink)}
@@ -50,7 +51,7 @@ svg{width:100%;height:auto;display:block}
 .bad{color:var(--bad)!important}.good{color:var(--good)}
 .scroll{max-height:460px;overflow:auto}
 .card>b{color:var(--ink);font-size:14px}
-@media(max-width:1100px){.scen,.tiles{grid-template-columns:1fr 1fr}}@media(max-width:640px){.scen,.tiles{grid-template-columns:1fr}}
+@media(max-width:1100px){.scen,.tiles{grid-template-columns:1fr 1fr}.dsteps{grid-template-columns:1fr}.darrow{display:none}}@media(max-width:640px){.scen,.tiles{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <div class="crumb">room / gdBasket / <b>Rolling Simulator</b></div>
 <h1>AGILE <span>Rolling</span> + ถอนเงิน</h1>
@@ -173,7 +174,7 @@ function simulate(D, o) {
         if (wd.type === 'pctRound') request(Math.max(0, roundProfit) * wd.pct / 100);
       } else so++;
       const ev = [t, out === 1 ? 'S' : 'X', roundProfit]; events.push(ev);
-      const rr = { start: rStart, end: t, out, cap: rCap, bal0: rBal0, pnl: roundProfit, balTrade: bal, float: rFloat };
+      const rr = { start: rStart, end: t, out, cap: rCap, bal0: rBal0, pnl: roundProfit, balTrade: bal, float: rFloat, ph: ph + 1 };
       roundProfit = 0;
       if (pending > 0) { doWithdraw(pending); pending = 0; }
       if (wd.type === 'target' && wd.timing !== 'now' && bal >= wd.hi) doWithdraw(bal - wd.lo);
@@ -189,7 +190,7 @@ function simulate(D, o) {
       }
     }
   }
-  if (tNow > rStart) rounds2.push({ start: rStart, end: tNow, out: 0, cap: rCap, bal0: rBal0, pnl: roundProfit, balTrade: bal, float: rFloat, wd: rWd, bal1: bal, capNext: cap });
+  if (tNow > rStart) rounds2.push({ ph: ph + 1, start: rStart, end: tNow, out: 0, cap: rCap, bal0: rBal0, pnl: roundProfit, balTrade: bal, float: rFloat, wd: rWd, bal1: bal, capNext: cap });
   pts.push([tNow, bal, wdTotal, cap]);
   return { phaseAt, rounds2, bal, wdTotal, total: bal + wdTotal, maxDD, ddAt, ddPeak, ddLow, worstDip, dipAt, dipCapPct, dipCapAt, dipBalPct, dipBalAt, so, ok, short, hitCeil, stuck, wdYear, pts, events, t0, tEnd: tNow, cap };
 }
@@ -203,7 +204,10 @@ const DEF=[
  {on:true,roll:'round',n:1,pct:20,wd:'none',amount:500,wpct:50,hi:20000,lo:10000,goal:500000,timing:'now'},
  {on:true,roll:'pct',n:1,pct:10,wd:'pctRound',amount:500,wpct:25,hi:20000,lo:10000,goal:500000,timing:'now'},
  {on:true,roll:'round',n:1,pct:20,wd:'goal',amount:500,wpct:50,hi:20000,lo:10000,goal:1000,timing:'now'},
- {on:true,kind:'phase',x:10000,y:100000}];
+ {on:true,kind:'phase',steps:[
+  {roll:'round',n:1,pct:10,wd:'none',amount:500,wpct:25,hi:20000,lo:10000,goal:100000,timing:'roundEnd'},
+  {from:10000,roll:'pct',n:1,pct:10,wd:'pctRound',amount:500,wpct:25,hi:20000,lo:10000,goal:100000,timing:'roundEnd'},
+  {from:100000,roll:'round',n:1,pct:10,wd:'goal',amount:500,wpct:25,hi:20000,lo:10000,goal:100000,timing:'roundEnd'}]}];
 const S=JSON.parse(JSON.stringify(DEF));
 const $=id=>document.getElementById(id);
 const fm=v=>{const a=Math.abs(v);return (v<0?'-':'')+'$'+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e4?(a/1e3).toFixed(1)+'k':a.toFixed(0))};
@@ -215,25 +219,33 @@ const names=['A','B','C','D'];
 const num=el=>{const v=parseFloat(String(el.value).replace(/[,\s$]/g,''));return isFinite(v)?v:0};
 const startT=()=>{const m=String($('start').value).match(/(\d{4})\D?(\d{1,2})?\D?(\d{1,2})?/);const y=m?+m[1]:2018,mo=m&&m[2]?+m[2]:1,d=m&&m[3]?+m[3]:1;return Math.max(0,(Date.UTC(y,mo-1,d)-EPOCH_MS)/60000)};
 function opt(list,v){return list.map(([k,l])=>`<option value="${k}"${k===v?' selected':''}>${l}</option>`).join('')}
+const NUM=(i,p,k,v)=>`<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-p="${p}" data-k="${k}" value="${v}">`;
+function fields(s,i,p){return `<div class="grid2"><label>ทบ (ขยับ cap)<select data-i="${i}" data-p="${p}" data-k="roll">${opt(ROLL,s.roll)}</select></label>
+ ${s.roll==='round'?`<label>ทุกกี่รอบสำเร็จ${NUM(i,p,'n',s.n)}</label>`:s.roll==='pct'?`<label>โตครบกี่ %${NUM(i,p,'pct',s.pct)}</label>`:'<span></span>'}
+ <label>ถอน<select data-i="${i}" data-p="${p}" data-k="wd">${opt(WD,s.wd)}</select></label>
+ ${s.wd==='goal'?`<label>เป้า $${NUM(i,p,'goal',s.goal)}</label>`:s.wd==='fixed'?`<label>เดือนละ $${NUM(i,p,'amount',s.amount)}</label>`:s.wd==='pctMonth'||s.wd==='pctRound'?`<label>กี่ %${NUM(i,p,'wpct',s.wpct)}</label>`:s.wd==='target'?`<label>ถึง $X${NUM(i,p,'hi',s.hi)}</label>`:'<span></span>'}
+ ${s.wd==='target'?`<label>ให้เหลือ $Y${NUM(i,p,'lo',s.lo)}</label>`:''}
+ ${s.wd!=='none'&&s.wd!=='pctRound'&&s.wd!=='goal'?`<label>ถอนตอนไหน<select data-i="${i}" data-p="${p}" data-k="timing">${opt([['now','ทันที (กลางรอบได้)'],['roundEnd','รอจบรอบ']],s.timing)}</select></label>`:''}
+ </div>`}
+function head(s,i,extra){return `<h3><span class="sw"></span>แบบ ${names[i]}${extra||''}<label style="flex-direction:row;margin-left:auto;align-items:center"><input type="checkbox" data-i="${i}" data-p="" data-k="on" ${s.on?'checked':''}>แสดง</label></h3>`}
+// warnings a step can trip on (shown under the step, never block the run)
+function stepWarn(s,k){const st=s.steps[k],w=[];
+ if(k===2&&st.from<=s.steps[1].from)w.push('ยอดเข้าตอน 3 ต้องมากกว่ายอดเข้าตอน 2 ไม่งั้นข้ามตอน 2 ไปเลย');
+ if(k>0&&st.wd==='goal'&&st.goal<st.from)w.push(`เป้าถอน ${fm(st.goal)} ต่ำกว่ายอดที่เข้าตอนนี้ ${fm(st.from)} — เข้าตอนแล้วถอนลงเหลือ ${fm(st.goal)} ทันที`);
+ if(k===0&&st.wd==='goal'&&st.goal<s.steps[1].from)w.push(`เป้าถอน ${fm(st.goal)} ต่ำกว่ายอดเข้าตอน 2 — บัญชีไม่มีทางถึงตอน 2`);
+ if(k===1&&st.wd==='goal'&&st.goal<s.steps[2].from)w.push(`เป้าถอน ${fm(st.goal)} ต่ำกว่ายอดเข้าตอน 3 — บัญชีไม่มีทางถึงตอน 3`);
+ return w.map(x=>`<p class="warn">⚠ ${x}</p>`).join('')}
+function phaseUI(s,i){return `<div class="card dcard ${s.on?'':'off'}" style="--c:${COLORS[i]}">${head(s,i,' · ทีละขั้น (ตั้งเองได้ทุกตอน · เปลี่ยนตอนตอนจบรอบ)')}
+ <div class="dsteps">${s.steps.map((st,k)=>`<div class="dstep"><div class="dhead"><b>ตอน ${k+1}</b>${k===0?'<span class="k">เริ่มเทรด</span>':`<label class="dfrom">เริ่มเมื่อบัญชีถึง $${NUM(i,k,'from',st.from)}</label>`}</div>${fields(st,i,k)}${stepWarn(s,k)}</div>`).join('<div class="darrow">→</div>')}</div></div>`}
 function scenUI(){
- $('scen').innerHTML=S.map((s,i)=>s.kind==='phase'?phaseUI(s,i):`<div class="card ${s.on?'':'off'}" style="--c:${COLORS[i]}"><h3><span class="sw"></span>แบบ ${names[i]}<label style="flex-direction:row;margin-left:auto;align-items:center"><input type="checkbox" data-i="${i}" data-k="on" ${s.on?'checked':''}>แสดง</label></h3>
- <div class="grid2"><label>ทบ (ขยับ cap)<select data-i="${i}" data-k="roll">${opt(ROLL,s.roll)}</select></label>
- ${s.roll==='round'?`<label>ทุกกี่รอบสำเร็จ<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="n" value="${s.n}"></label>`:s.roll==='pct'?`<label>โตครบกี่ %<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="pct" value="${s.pct}"></label>`:'<span></span>'}
- <label>ถอน<select data-i="${i}" data-k="wd">${opt(WD,s.wd)}</select></label>
- ${s.wd==='goal'?`<label>เป้า $<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="goal" value="${s.goal}"></label>`:s.wd==='fixed'?`<label>เดือนละ $<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="amount" value="${s.amount}"></label>`:s.wd==='pctMonth'||s.wd==='pctRound'?`<label>กี่ %<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="wpct" value="${s.wpct}"></label>`:s.wd==='target'?`<label>ถึง $X<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="hi" value="${s.hi}"></label>`:'<span></span>'}
- ${s.wd==='target'?`<label>ให้เหลือ $Y<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="lo" value="${s.lo}"></label>`:''}
- ${s.wd!=='none'&&s.wd!=='pctRound'&&s.wd!=='goal'?`<label>ถอนตอนไหน<select data-i="${i}" data-k="timing">${opt([['now','ทันที (กลางรอบได้)'],['roundEnd','รอจบรอบ']],s.timing)}</select></label>`:''}
- </div></div>`).join('');
- $('scen').querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',e=>{const i=+el.dataset.i,k=el.dataset.k;S[i][k]=el.type==='checkbox'?el.checked:el.dataset.num?num(el):el.value;scenUI();run()}));
+ $('scen').innerHTML=S.map((s,i)=>s.kind==='phase'?phaseUI(s,i):`<div class="card ${s.on?'':'off'}" style="--c:${COLORS[i]}">${head(s,i)}${fields(s,i,'')}</div>`).join('');
+ $('scen').querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',()=>{const i=+el.dataset.i,p=el.dataset.p,k=el.dataset.k;const o=p===''?S[i]:S[i].steps[+p];o[k]=el.type==='checkbox'?el.checked:el.dataset.num?num(el):el.value;scenUI();run()}));
 }
-function phaseUI(s,i){return `<div class="card ${s.on?'':'off'}" style="--c:${COLORS[i]}"><h3><span class="sw"></span>แบบ ${names[i]} · ทีละขั้น<label style="flex-direction:row;margin-left:auto;align-items:center"><input type="checkbox" data-i="${i}" data-k="on" ${s.on?'checked':''}>แสดง</label></h3>
- <div class="steps"><div><b>ตอน 1</b> ใช้ค่าของ <b>A</b></div>
- <label>บัญชีถึง $ เปลี่ยนเป็นตอน 2 (ค่าของ B)<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="x" value="${s.x}"></label>
- <label>บัญชีถึง $ เปลี่ยนเป็นตอน 3 (ค่าของ C)<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="y" value="${s.y}"></label>
- </div><p class="k" style="margin:8px 0 0">เปลี่ยนตอนตอนจบรอบ · ถ้า C ถอนส่วนเกินเป้า ตอน 3 จะใช้เป้า = ยอดที่ตั้งเปลี่ยนเป็นตอน 3</p></div>`}
-function phase3(s){const c={...S[2]};if(c.wd==='goal')c.goal=Math.max(c.goal,s.y);return c}
-function optsOf(s,start){if(s.kind==='phase'){const o=k=>optsOf(k,start);const a=o(S[0]),b=o(S[1]),c=o(phase3(s));return{...a,phases:[{roll:a.roll,wd:a.wd,until:s.x},{roll:b.roll,wd:b.wd,until:s.y},{roll:c.roll,wd:c.wd}]}}return{startT:start??startT(),startBal:num($('bal0')),capInit:num($('cap0')),ratio:+$('ratio').value,maxCap:num($('maxcap')),
- roll:{type:s.roll,n:s.n,pct:s.pct},wd:{type:s.wd,goal:s.goal,amount:s.amount,pct:s.wpct,hi:s.hi,lo:s.lo,timing:s.wd==='pctRound'?'roundEnd':s.timing}}}
+function optsOf(s,start){
+ const base={startT:start??startT(),startBal:num($('bal0')),capInit:num($('cap0')),ratio:+$('ratio').value,maxCap:num($('maxcap'))};
+ const rw=x=>({roll:{type:x.roll,n:x.n,pct:x.pct},wd:{type:x.wd,goal:x.goal,amount:x.amount,pct:x.wpct,hi:x.hi,lo:x.lo,timing:x.wd==='pctRound'?'roundEnd':x.timing}});
+ if(s.kind==='phase'){const ph=s.steps.map((x,k)=>({...rw(x),until:s.steps[k+1]?s.steps[k+1].from:Infinity}));return{...base,...ph[0],phases:ph}}
+ return{...base,...rw(s)}}
 let RES=[],tab='cmp',RSC=0;const VIS={0:true,1:true,2:true,3:true,m:true};
 function run(){
  RES=S.map(s=>s.on?simulate(DATA,optsOf(s)):null);
@@ -292,7 +304,7 @@ function lineChart(svg,lg,key,H,log,withMt5){
  hit.onmouseleave=()=>{tip.style.display='none';cx.setAttribute('visibility','hidden')};
 }
 function near(pts,t){let a=0,b=pts.length-1;while(a<b){const m=(a+b+1)>>1;if(pts[m][0]<=t)a=m;else b=m-1}return pts[a]}
-function label(s){if(s.kind==='phase')return `ทีละขั้น: A → ถึง ${fm(s.x)} → B → ถึง ${fm(s.y)} → C`;const r=ROLL.find(x=>x[0]===s.roll)[1].replace('X%',s.pct+'%')+(s.roll==='round'&&s.n>1?` (ทุก ${s.n} รอบ)`:'');const w=WD.find(x=>x[0]===s.wd)[1].replace('$X','$'+s.hi).replace('$Y','$'+s.lo).replace('$ คงที่','$'+s.amount).replace('โตถึงเป้า','โตถึงเป้า '+fm(s.goal||0)).replace('%','%').replace(/^ถอน %/,'ถอน '+s.wpct+'%');return 'ทบ'+r+' · '+w}
+function label(s){if(s.kind==='phase')return 'ทีละขั้น: '+s.steps.map((x,k)=>(k?`ถึง ${fm(x.from)} → `:'')+label(x)).join(' → ');const r=ROLL.find(x=>x[0]===s.roll)[1].replace('X%',s.pct+'%')+(s.roll==='round'&&s.n>1?` (ทุก ${s.n} รอบ)`:'');const w=WD.find(x=>x[0]===s.wd)[1].replace('$X','$'+s.hi).replace('$Y','$'+s.lo).replace('$ คงที่','$'+s.amount).replace('โตถึงเป้า','โตถึงเป้า '+fm(s.goal||0)).replace('%','%').replace(/^ถอน %/,'ถอน '+s.wpct+'%');return 'ทบ'+r+' · '+w}
 function chart1(){lineChart('ch1','lg1',1,380,$('scale').value==='log',true)}
 function chart2(){lineChart('ch2','lg2',2,240,false,false)}
 // ---------- tables ----------
@@ -309,9 +321,9 @@ function tYear(){const live=RES.map((r,i)=>[r,i]).filter(([r])=>r);const ys=[...
 function tRounds(){const live=RES.map((r,i)=>[r,i]).filter(([r])=>r);if(!live.length)return '';if(!RES[RSC])RSC=live[0][1];const r=RES[RSC];
  let h=`<div class="row" style="margin-bottom:8px;align-items:center"><label style="flex-direction:row;align-items:center;gap:6px">ดูแบบ<select id="rsc">${live.map(([x,i])=>`<option value="${i}"${i===RSC?' selected':''}>แบบ ${names[i]}: ${label(S[i])}</option>`).join('')}</select></label></div>
  <p class="note" style="margin:0 0 8px">อ่านทีละแถว: เริ่มรอบด้วยเงินในบัญชีเท่านี้ → ใช้ทุนรอบ (cap) เท่านี้คิดขนาดไม้ → ระหว่างรอบตะกร้าลอยหนักสุดกี่ % ของ cap → จบรอบได้/เสียเท่าไหร่ → ถอนออกไปเท่าไหร่ → เหลือในบัญชีเท่าไหร่ → รอบถัดไปใช้ทุนเท่าไหร่ · รอบสำเร็จ = ได้กำไรเท่ากับทุนรอบ (+100% ของ cap)</p>
- <table><tr><th>รอบ</th><th style="text-align:left">ช่วงเวลา</th><th style="text-align:left">ผล</th><th>เงินในบัญชีตอนเริ่ม</th><th>ทุนรอบนี้ (cap)</th><th>ลอยหนักสุดในรอบ</th><th>ได้ / เสียในรอบ</th><th>ถอนออก</th><th>เงินในบัญชีตอนจบ</th><th>ทุนรอบถัดไป</th></tr>`;
+ <table><tr><th>รอบ</th>${S[RSC].kind==='phase'?'<th>ตอน</th>':''}<th style="text-align:left">ช่วงเวลา</th><th style="text-align:left">ผล</th><th>เงินในบัญชีตอนเริ่ม</th><th>ทุนรอบนี้ (cap)</th><th>ลอยหนักสุดในรอบ</th><th>ได้ / เสียในรอบ</th><th>ถอนออก</th><th>เงินในบัญชีตอนจบ</th><th>ทุนรอบถัดไป</th></tr>`;
  r.rounds2.forEach((x,k)=>{const days=Math.round((x.end-x.start)/1440);const res=x.out===1?'✅ สำเร็จ':x.out===2?'❌ SO':'⏳ ยังไม่จบ';
-  h+=`<tr><td>${k+1}</td><td style="text-align:left">${fd(x.start)} → ${fd(x.end)} <span class="k">${days} วัน</span></td><td style="text-align:left">${res}</td><td>${fm(x.bal0)}</td><td>${fm(x.cap)}</td><td class="${x.float>0.9?'bad':''}">${pc(x.float)} <span class="k">ของ cap</span></td><td class="${x.pnl<0?'bad':'good'}">${x.pnl>=0?'+':''}${fm(x.pnl)} <span class="k">${x.pnl>=0?'+':''}${pc(x.pnl/x.bal0)} ของบัญชี</span></td><td>${x.wd?fm(x.wd):'-'}</td><td><b>${fm(x.bal1)}</b></td><td>${fm(x.capNext)}${x.capNext>x.cap?' <span class="good">▲</span>':x.capNext<x.cap?' <span class="bad">▼</span>':''}</td></tr>`});
+  h+=`<tr><td>${k+1}</td>${S[RSC].kind==='phase'?`<td>${x.ph}</td>`:''}<td style="text-align:left">${fd(x.start)} → ${fd(x.end)} <span class="k">${days} วัน</span></td><td style="text-align:left">${res}</td><td>${fm(x.bal0)}</td><td>${fm(x.cap)}</td><td class="${x.float>0.9?'bad':''}">${pc(x.float)} <span class="k">ของ cap</span></td><td class="${x.pnl<0?'bad':'good'}">${x.pnl>=0?'+':''}${fm(x.pnl)} <span class="k">${x.pnl>=0?'+':''}${pc(x.pnl/x.bal0)} ของบัญชี</span></td><td>${x.wd?fm(x.wd):'-'}</td><td><b>${fm(x.bal1)}</b></td><td>${fm(x.capNext)}${x.capNext>x.cap?' <span class="good">▲</span>':x.capNext<x.cap?' <span class="bad">▼</span>':''}</td></tr>`});
  return h+'</table>'}
 function bindRsc(){const s=$('rsc');if(s)s.onchange=()=>{RSC=+s.value;tabs()}}
 ['start','bal0','cap0','ratio','maxcap','scale'].forEach(id=>$(id).addEventListener('change',run));
