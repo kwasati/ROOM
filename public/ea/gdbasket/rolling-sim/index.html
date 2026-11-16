@@ -19,7 +19,7 @@ select,input{font:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--
 select:focus,input:focus{outline:none;border-color:var(--primary)}
 input[type=checkbox]{accent-color:var(--primary)}
 input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8)}
-input[type=number]{width:110px}
+input[data-num]{width:110px}
 .scen{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .scen .card{margin:0;border-top:3px solid var(--c)}
 .scen h3{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
@@ -51,14 +51,14 @@ svg{width:100%;height:auto;display:block}
 </style></head><body><div class="wrap">
 <div class="crumb">room / gdBasket / <b>Rolling Simulator</b></div>
 <h1>AGILE <span>Rolling</span> + ถอนเงิน</h1>
-<p class="sub">ข้อมูลจริง: ทุกตะกร้าของ AGILE M15 2018-01 → 2026-11-13 (2018–2025 = GOLD#.xm · 2026 = GOLD# · รันที่ cap 1000 คงที่) เอามาคิดใหม่ตามขนาด cap ของแต่ละแบบ · จุดเทา = รัน MT5 จริงที่เปิด rolling (dev 0.19)</p>
+<p class="sub">ข้อมูลจริง: ทุกตะกร้าของ AGILE M15 2018-01 → 2026-11-13 (2018–2025 = GOLD#.xm · 2026 = GOLD# · รันที่ cap 1000 คงที่) เอามาคิดใหม่ตามขนาด cap ของแต่ละแบบ · จุดเทา = รัน MT5 จริงที่เปิด rolling (dev 0.19 · โชว์เมื่อตั้งเริ่ม 2018 ทุน 2000 cap 1000)</p>
 
 <div class="card"><div class="row">
-<label>เริ่มเทรดวันที่<input id="start" type="date" value="2018-01-03" min="2018-01-03" max="2026-11-01"></label>
-<label>เงินฝากเริ่ม ($)<input id="bal0" type="number" value="2000" step="100"></label>
-<label>cap แรก = ขั้นต่ำ ($)<input id="cap0" type="number" value="1000" step="100"></label>
+<label>เริ่มเทรดวันที่<input id="start" type="text" inputmode="numeric" value="2018-01-03" placeholder="ปปปป-ดด-วว" style="width:120px"></label>
+<label>เงินฝากเริ่ม ($)<input id="bal0" type="text" inputmode="decimal" data-num="1" value="200"></label>
+<label>cap แรก = ขั้นต่ำ ($)<input id="cap0" type="text" inputmode="decimal" data-num="1" value="100"></label>
 <label>cap = บัญชี ×<select id="ratio"><option value="0.5">1/2 (รอดเท่า 2 เท่า)</option><option value="0.3333333">1/3</option><option value="0.25">1/4</option></select></label>
-<label>เพดาน cap ($)<input id="maxcap" type="number" value="5000000" step="100000"></label>
+<label>เพดาน cap ($)<input id="maxcap" type="text" inputmode="decimal" data-num="1" value="5000000" step="100000"></label>
 <label>แกนเงิน<select id="scale"><option value="log">log (เห็นช่วงต้น)</option><option value="lin">ปกติ</option></select></label>
 </div></div>
 
@@ -98,10 +98,10 @@ function simulate(D, o) {
   const { T, P, M, S } = D;
   const roll = o.roll, wd = o.wd, floor = o.capInit;
   // start at the first basket closing on/after the chosen date; rounds are re-cut from there:
-  // success = progress reaches +1 cap (EA round target) · SO = the basket that hit SO in the backtest
+  // success = round P/L in $ reaches the current cap (EA target: effective balance = 2 x cap; a mid-round
+  // cap change keeps the round P/L in $, same as the EA withdraw cut) · SO = the basket that hit SO in the backtest
   let i0 = T.findIndex(t => t >= o.startT); if (i0 < 0) i0 = T.length - 1;
   const soEnd = k => S[k] === 1;
-  let prog = 0;
   let bal = o.startBal, cap = o.capInit, peak = bal, maxDD = 0, ddAt = 0, ddPeak = 0, ddLow = 0, worstDip = 0, dipAt = 0, dipCapPct = 0, dipCapAt = 0, dipBalPct = 0, dipBalAt = 0;
   let wdTotal = 0, pending = 0, short = 0, so = 0, ok = 0, succSinceRoll = 0;
   let lastRollBal = bal, monthProfit = 0, roundProfit = 0, hitCeil = null, stuck = null;
@@ -156,13 +156,12 @@ function simulate(D, o) {
     if (-M[i] / 100000 > rFloat) rFloat = -M[i] / 100000;
     if (dip / bal > dipBalPct) { dipBalPct = dip / bal; dipBalAt = t; }
     const pnl = (P[i] / 100) * k;
-    bal += pnl; monthProfit += pnl; roundProfit += pnl; prog += P[i] / 100000;
+    bal += pnl; monthProfit += pnl; roundProfit += pnl;
     if (bal > peak) peak = bal;
-    if (roll.type === 'pct' && bal >= lastRollBal * (1 + roll.pct / 100)) recap();
+    if (roll.type === 'pct' && calc() >= cap * (1 + roll.pct / 100)) recap(); // EA design: raise when the new cap is X% above the current one
     if (wd.type === 'target' && wd.timing === 'now' && bal >= wd.hi) doWithdraw(bal - wd.lo);
-    const out = soEnd(i) ? 2 : prog >= 0.9999 ? 1 : 0;
+    const out = soEnd(i) ? 2 : roundProfit >= cap * 0.9999 ? 1 : 0;
     if (out !== 0) {
-      prog = 0;
       if (out === 1) {
         ok++; succSinceRoll++;
         if (wd.type === 'pctRound') request(Math.max(0, roundProfit) * wd.pct / 100);
@@ -192,7 +191,7 @@ const ROLL=[['round','ทุกรอบที่สำเร็จ'],['none','�
 const WD=[['none','ไม่ถอน'],['goal','โตถึงเป้าแล้วถอนส่วนเกินทุกรอบ'],['fixed','ถอนเดือนละ $ คงที่'],['pctMonth','ถอน % ของกำไรเดือนนั้น'],['pctRound','ถอน % ของกำไรทุกรอบสำเร็จ'],['target','บัญชีถึง $X ถอนให้เหลือ $Y']];
 const DEF=[
  {on:true,roll:'round',n:1,pct:20,wd:'none',amount:500,wpct:50,hi:20000,lo:10000,goal:500000,timing:'now'},
- {on:true,roll:'round',n:1,pct:20,wd:'pctRound',amount:500,wpct:50,hi:20000,lo:10000,goal:500000,timing:'now'},
+ {on:true,roll:'pct',n:1,pct:10,wd:'goal',amount:500,wpct:50,hi:20000,lo:10000,goal:500000,timing:'now'},
  {on:true,roll:'round',n:1,pct:20,wd:'goal',amount:500,wpct:50,hi:20000,lo:10000,goal:500000,timing:'now'}];
 const S=JSON.parse(JSON.stringify(DEF));
 const $=id=>document.getElementById(id);
@@ -202,20 +201,21 @@ const fd=t=>{const d=tDate(t);return d.getUTCFullYear()+'-'+String(d.getUTCMonth
 const yrs=(a,b)=>((b-a)/525960);
 const names=['A','B','C'];
 // start options = round starts
-const startT=()=>{const v=$('start').value||'2018-01-03';const [y,m,d]=v.split('-').map(Number);return (Date.UTC(y,m-1,d)-EPOCH_MS)/60000};
+const num=el=>{const v=parseFloat(String(el.value).replace(/[,\s$]/g,''));return isFinite(v)?v:0};
+const startT=()=>{const m=String($('start').value).match(/(\d{4})\D?(\d{1,2})?\D?(\d{1,2})?/);const y=m?+m[1]:2018,mo=m&&m[2]?+m[2]:1,d=m&&m[3]?+m[3]:1;return Math.max(0,(Date.UTC(y,mo-1,d)-EPOCH_MS)/60000)};
 function opt(list,v){return list.map(([k,l])=>`<option value="${k}"${k===v?' selected':''}>${l}</option>`).join('')}
 function scenUI(){
  $('scen').innerHTML=S.map((s,i)=>`<div class="card ${s.on?'':'off'}" style="--c:${COLORS[i]}"><h3><span class="sw"></span>แบบ ${names[i]}<label style="flex-direction:row;margin-left:auto;align-items:center"><input type="checkbox" data-i="${i}" data-k="on" ${s.on?'checked':''}>แสดง</label></h3>
  <div class="grid2"><label>ทบ (ขยับ cap)<select data-i="${i}" data-k="roll">${opt(ROLL,s.roll)}</select></label>
- ${s.roll==='round'?`<label>ทุกกี่รอบสำเร็จ<input type="number" min="1" data-i="${i}" data-k="n" value="${s.n}"></label>`:s.roll==='pct'?`<label>โตครบกี่ %<input type="number" min="1" data-i="${i}" data-k="pct" value="${s.pct}"></label>`:'<span></span>'}
+ ${s.roll==='round'?`<label>ทุกกี่รอบสำเร็จ<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="n" value="${s.n}"></label>`:s.roll==='pct'?`<label>โตครบกี่ %<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="pct" value="${s.pct}"></label>`:'<span></span>'}
  <label>ถอน<select data-i="${i}" data-k="wd">${opt(WD,s.wd)}</select></label>
- ${s.wd==='goal'?`<label>เป้า $<input type="number" step="10000" data-i="${i}" data-k="goal" value="${s.goal}"></label>`:s.wd==='fixed'?`<label>เดือนละ $<input type="number" data-i="${i}" data-k="amount" value="${s.amount}"></label>`:s.wd==='pctMonth'||s.wd==='pctRound'?`<label>กี่ %<input type="number" data-i="${i}" data-k="wpct" value="${s.wpct}"></label>`:s.wd==='target'?`<label>ถึง $X<input type="number" data-i="${i}" data-k="hi" value="${s.hi}"></label>`:'<span></span>'}
- ${s.wd==='target'?`<label>ให้เหลือ $Y<input type="number" data-i="${i}" data-k="lo" value="${s.lo}"></label>`:''}
+ ${s.wd==='goal'?`<label>เป้า $<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="goal" value="${s.goal}"></label>`:s.wd==='fixed'?`<label>เดือนละ $<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="amount" value="${s.amount}"></label>`:s.wd==='pctMonth'||s.wd==='pctRound'?`<label>กี่ %<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="wpct" value="${s.wpct}"></label>`:s.wd==='target'?`<label>ถึง $X<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="hi" value="${s.hi}"></label>`:'<span></span>'}
+ ${s.wd==='target'?`<label>ให้เหลือ $Y<input type="text" inputmode="decimal" data-num="1" data-i="${i}" data-k="lo" value="${s.lo}"></label>`:''}
  ${s.wd!=='none'&&s.wd!=='pctRound'&&s.wd!=='goal'?`<label>ถอนตอนไหน<select data-i="${i}" data-k="timing">${opt([['now','ทันที (กลางรอบได้)'],['roundEnd','รอจบรอบ']],s.timing)}</select></label>`:''}
  </div></div>`).join('');
- $('scen').querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',e=>{const i=+el.dataset.i,k=el.dataset.k;S[i][k]=el.type==='checkbox'?el.checked:el.type==='number'?+el.value:el.value;scenUI();run()}));
+ $('scen').querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',e=>{const i=+el.dataset.i,k=el.dataset.k;S[i][k]=el.type==='checkbox'?el.checked:el.dataset.num?num(el):el.value;scenUI();run()}));
 }
-function optsOf(s,start){return{startT:start??startT(),startBal:+$('bal0').value,capInit:+$('cap0').value,ratio:+$('ratio').value,maxCap:+$('maxcap').value,
+function optsOf(s,start){return{startT:start??startT(),startBal:num($('bal0')),capInit:num($('cap0')),ratio:+$('ratio').value,maxCap:num($('maxcap')),
  roll:{type:s.roll,n:s.n,pct:s.pct},wd:{type:s.wd,goal:s.goal,amount:s.amount,pct:s.wpct,hi:s.hi,lo:s.lo,timing:s.wd==='pctRound'?'roundEnd':s.timing}}}
 let RES=[],tab='cmp',RSC=0;const VIS={0:true,1:true,2:true,m:true};
 function run(){
@@ -249,7 +249,7 @@ function yTicks(lo,hi,log){const out=[];if(log){for(let e=Math.floor(Math.log10(
 function niceStep(r){const p=10**Math.floor(Math.log10(r||1));const f=r/p;return (f<1.5?1:f<3?2:f<7?5:10)*p}
 function lineChart(svg,lg,key,H,log,withMt5){
  const PB=26;const all=RES.map((r,i)=>[r,i]).filter(([r])=>r);const live=all.filter(([r,i])=>VIS[i]);
- const mtOk=withMt5&&startT()<=DATA.T[0];
+ const mtOk=withMt5&&startT()<=DATA.T[0]&&num($('bal0'))===2000&&num($('cap0'))===1000;
  $(lg).innerHTML=all.map(([r,i])=>`<label class="tg"><input type="checkbox" data-v="${i}" ${VIS[i]?'checked':''}><i class="sw" style="--c:${COLORS[i]}"></i>แบบ ${names[i]}: ${label(S[i])}</label>`).join('')+(mtOk?`<label class="tg"><input type="checkbox" data-v="m" ${VIS.m?'checked':''}><i class="sw" style="--c:#9CA3AF;border-radius:50%"></i>MT5 จริง (rolling ทุกรอบ)</label>`:'')+(key===1?`<span>○ = รอบที่โดน SO</span>`:'');
  $(lg).querySelectorAll('[data-v]').forEach(c=>c.onchange=()=>{VIS[c.dataset.v]=c.checked;chart1();chart2()});
  if(!live.length&&!(mtOk&&VIS.m)){$(svg).innerHTML='';return}
