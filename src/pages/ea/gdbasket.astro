@@ -114,7 +114,6 @@ const fileRows = [
   { icon: 'star', name: 'จุดเด่น', note: 'Adaptive Grid / Market Temperature / PPTS / Common-TP', meta: 'อ่าน', href: '#features', color: 'text-primary' },
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
   { icon: 'clock', name: 'Releases', note: 'v4.10 · v4.01 · v4.00 · v3.22 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '12 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
-  { icon: 'calc', name: 'วางแผนเงิน Rolling Capital', note: 'เครื่องคิดเลขถอน/ทบจากผลจริงย้อนหลัง', meta: 'ลองเลย', href: '/ea/gdbasket/rolling-capital', color: 'text-secondary' },
   { icon: 'dl', name: 'gdBasket v4.10', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
@@ -352,24 +351,13 @@ const installSteps = [
               </section>
             </div>
 
-            <h2 id="capital">Capital และ Rolling Capital</h2>
+            <h2 id="capital">Capital ต่อรอบ</h2>
             <div class="gdb-capital-grid">
               <div>
                 <h3>Capital ต่อรอบ</h3>
                 <div class="gdb-formula">$1,000 → เป้ากำไร $1,000</div>
                 <p>Capital คือเงินที่มึงยอมเสี่ยงต่อหนึ่งรอบ ไม่ใช่ยอดเงินทั้งหมดในบัญชี ระบบใช้ตัวเลขนี้เป็นฐานคำนวณขนาดไม้ เป้ากำไร และเพดานของรอบ</p>
                 <p class="fine-print">ราคา Gap หรือ Slippage อาจทำให้ผลจริงเกินจุดที่ตั้งใจ จึงไม่ใช่ยอดขาดทุนสูงสุดแบบรับประกัน</p>
-              </div>
-              <div>
-                <h3>Rolling Capital</h3>
-                <p>เลือกถอนกำไรบางส่วนและนำที่เหลือกลับไปเพิ่มทุนได้ ระบบแยกเงินแต่ละหน้าที่ออกจากกัน และลดขนาดไม้หรือหยุดเปิดรอบใหม่เมื่อเงินจริงไม่พอ</p>
-                <div class="gdb-wallets">
-                  <div><b>ทุนต่อรอบ</b>ฐานความเสี่ยง</div>
-                  <div><b>เงินรอทบ</b>กำไรที่รอเพิ่มทุน</div>
-                  <div><b>เงินทำงาน</b>ยอดจริงในบัญชี</div>
-                  <div><b>เงินถอนสะสม</b>เงินที่นำออกแล้ว</div>
-                </div>
-                <a href="/ea/gdbasket/rolling-capital" class="repo-download rolling-cta mt-4" style="display:inline-flex;min-height:40px;padding:0 16px;gap:8px;background:var(--color-secondary);border-color:var(--color-secondary-dark);">ลองวางแผนถอน/ทบทุนจากผลจริงย้อนหลัง →</a>
               </div>
             </div>
 
@@ -479,7 +467,6 @@ const installSteps = [
                 <div><b>ไม่มี Stop Loss แยกรายไม้</b><p>ทุกไม้ถูกดูแลเป็นกองเดียว และใช้จุดหยุดรวมของทั้งรอบ</p></div>
                 <div><b>หนึ่งรอบอาจเสียใกล้เคียง Capital</b><p>Gap, Slippage หรือสภาพคล่องบางช่วง อาจทำให้ผลจริงเกินระดับที่ตั้งใจ</p></div>
                 <div><b>ผลย้อนหลังไม่รับประกันอนาคต</b><p>Spread, Swap, Slippage และตลาดจริงอาจทำให้ผลต่างจากการทดสอบ</p></div>
-                <div><b>Rolling Capital ทำให้เงินเสี่ยงโตตามทุน</b><p>เมื่อ Capital โต ขนาด Lot และจำนวนเงินที่ยอมเสี่ยงต่อรอบจะโตด้วย</p></div>
                 <div><b>ใช้เฉพาะ XM GOLD M15</b><p>ค่าของระบบออกแบบกับสัญญา XM ไม่ควรนำไปใช้กับโบรกหรือสินทรัพย์อื่น</p></div>
                 <div><b>EA ต้องทำงานต่อเนื่องเพื่อจัดการไม้ใหม่</b><p>TP/SL ที่โบรกยังอยู่ แต่การเปิดและปรับแผนใหม่ต้องให้ EA ทำงาน</p></div>
               </div>
@@ -640,10 +627,6 @@ const installSteps = [
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               Releases
             </a>
-            <a href="/ea/gdbasket/rolling-capital">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h.01M12 11h.01M15 11h.01M9 15h.01M12 15h.01M15 15h.01M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
-              วางแผนเงิน Rolling Capital
-            </a>
           </nav>
         </section>
 
@@ -773,15 +756,11 @@ const installSteps = [
   .gdb-mode-tiles dt { margin-top: 4px; color: var(--color-gray-dark); font-size: 9px; line-height: 1.4; }
   .gdb-mode-tiles dd { margin: 0; color: var(--color-green); font-size: 15px; font-weight: 800; }
   .gdb-mode-tiles dd.danger { color: var(--color-primary-light); }
-  .gdb-capital-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: hidden; margin: 14px 0 28px; border: 1px solid var(--color-dark-border); border-radius: 8px; }
+  .gdb-capital-grid { display: grid; grid-template-columns: minmax(0, 1fr); overflow: hidden; margin: 14px 0 28px; border: 1px solid var(--color-dark-border); border-radius: 8px; }
   .gdb-capital-grid > div { padding: 19px; background: var(--color-dark-card); }
-  .gdb-capital-grid > div + div { border-left: 1px solid var(--color-dark-border); background: rgba(255,255,255,.012); }
   .gdb-capital-grid h3 { margin: 0; color: var(--color-gray-light); font-size: 14px; }
   .gdb-capital-grid p { margin: 9px 0 0; color: var(--color-gray); font-size: 11px; line-height: 1.7; }
   .gdb-formula { margin: 12px 0; color: var(--color-secondary); font-size: 18px; font-weight: 800; }
-  .gdb-wallets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 12px; }
-  .gdb-wallets > div { padding: 8px; border: 1px solid var(--color-dark-border); border-radius: 6px; color: var(--color-gray-dark); font-size: 9px; }
-  .gdb-wallets b { display: block; margin-bottom: 3px; color: var(--color-gray-light); font-size: 10px; }
 
   .gdb-support-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 14px 0 28px; }
   .gdb-support-grid section { padding: 13px; }
@@ -819,8 +798,6 @@ const installSteps = [
     .gdb-core-features, .gdb-safety-grid, .gdb-support-grid, .veloce-behavior, .gdb-risk-list { grid-template-columns: 1fr; }
     .gdb-engine-steps { grid-template-columns: 1fr; gap: 24px; }
     .gdb-engine-steps section + section::before { content: "↓"; left: 50%; top: -19px; transform: translateX(-50%); }
-    .gdb-capital-grid { grid-template-columns: 1fr; }
-    .gdb-capital-grid > div + div { border-top: 1px solid var(--color-dark-border); border-left: 0; }
   }
 
   /* popup "ดูสถิติเต็ม" — overlay ใหม่ (backdrop-blur เดียวกับ .glass-dark) + กล่องเนื้อหายืมค่าจาก .readme-card/.course-preview */
@@ -848,8 +825,6 @@ const installSteps = [
     .stats-modal { max-width: 100%; max-height: 100vh; height: 100vh; border-radius: 0; }
     .stats-modal-head { gap: 10px; padding: 14px 16px; }
     .stats-modal-close { width: 48px; height: 48px; border-radius: 9px; }
-    .readme-callout .rolling-cta { display: flex !important; width: 100%; min-height: 48px; justify-content: center; padding: 11px 16px !important; line-height: 1.45; text-align: center; white-space: normal; }
-    .rolling-cta svg { flex: 0 0 auto; }
   }
 </style>
 

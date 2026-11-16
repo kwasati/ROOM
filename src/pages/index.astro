@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import BrokerCTA from '../components/BrokerCTA.astro';
 import { getCollection, render } from 'astro:content';
 import { eaItems } from '../data/ea';
+import { toolItems } from '../data/tools';
 
 const courses = (await getCollection('courses')).sort((a, b) => a.data.order - b.data.order);
 const allLessons = (await getCollection('lessons')).sort((a, b) => a.data.order - b.data.order);
@@ -11,7 +12,6 @@ const lessonCounts = new Map<string, number>();
 for (const lesson of allLessons) {
   lessonCounts.set(lesson.data.course, (lessonCounts.get(lesson.data.course) || 0) + 1);
 }
-const totalLessons = allLessons.length;
 
 // Pre-render lesson content (inline toggle for courses)
 const renderedLessons = new Map<string, { id: string; title: string; duration?: string; order: number; course: string; Content: any }[]>();
@@ -42,162 +42,94 @@ const courseItems = courses.map(c => ({
   pinOrder: c.data.pinOrder,
 }));
 
-type Item = (typeof eaItems)[number] | (typeof courseItems)[number];
-const allItems: Item[] = [...eaItems, ...courseItems];
+type Item = (typeof eaItems)[number] | (typeof toolItems)[number] | (typeof courseItems)[number];
+const allItems: Item[] = [...eaItems, ...toolItems, ...courseItems];
 
+// single grid: pinned first (pin order), then the rest in list order
 const pinnedItems = allItems
   .filter(i => i.pinned)
   .sort((a, b) => (a.pinOrder ?? 999) - (b.pinOrder ?? 999));
-const restItems = allItems.filter(i => !i.pinned);
+const gridItems = [...pinnedItems, ...allItems.filter(i => !i.pinned)];
 
+const itemKey = (i: Item) => `${i.kind}:${i.id}`;
+
+// filter pills — a category with 0 items renders dimmed ("เร็ว ๆ นี้")
 const learnCount = allItems.filter(i => i.cardType === 'learn' || i.cardType === 'learn-tool').length;
 const eaCount = allItems.filter(i => i.cardType === 'ea').length;
+const toolCount = allItems.filter(i => i.cardType === 'tool').length;
+const signalCount = 0; // no Signal items yet
+const pills = [
+  { filter: 'all', label: 'ทั้งหมด', count: allItems.length },
+  { filter: 'learn', label: 'บทเรียน', count: learnCount },
+  { filter: 'ea', label: 'EA', count: eaCount },
+  { filter: 'signal', label: 'Signal', count: signalCount },
+  { filter: 'tool', label: 'เครื่องมือ', count: toolCount },
+];
 ---
 
 <Layout title="Room — เรียน+เทรดฟรี | IntensiveTrader">
   <div id="main-content" class="room-index">
 
-    <!-- INTRO -->
-    <section class="room-intro">
-      <div class="max-w-[1100px] mx-auto px-5 room-intro-grid">
-        <div>
-          <h1 class="text-[30px] max-md:text-[24px] font-bold text-gray-light leading-tight mb-2">
-            เรียน<span class="text-primary">+</span>เทรด<br><span class="text-secondary">ฟรีทั้งหมด</span>
-          </h1>
-          <p class="text-[15px] text-gray max-w-[520px] leading-relaxed">
-            คอร์สมือใหม่ + เครื่องมือเทรด (EA) สำหรับ MT5 — โหลดใช้ได้เลย ไม่มีค่าใช้จ่าย ไม่มีเงื่อนไข
-          </p>
-        </div>
-        <div class="room-intro-rail">
-          <div class="room-index-signature pixel" aria-hidden="true"><span>ROOM</span><strong>/TRADER</strong><small>OPEN CLASSROOM</small></div>
-          <dl class="room-stats" aria-label="จำนวนเนื้อหา">
-            <div><dt>คอร์ส</dt><dd>{courses.length}</dd></div>
-            <div><dt>EA</dt><dd>{eaItems.length}</dd></div>
-            <div><dt>บทเรียน</dt><dd>{totalLessons}</dd></div>
-          </dl>
+    <!-- HEADER -->
+    <section class="hub-hero">
+      <div class="hub-orb hub-orb-a" aria-hidden="true"></div>
+      <div class="hub-orb hub-orb-b" aria-hidden="true"></div>
+      <div class="max-w-[1100px] mx-auto px-5 relative">
+        <h1 class="pixel text-[22px] max-md:text-[18px] text-gray-light leading-normal mb-3">ROOM</h1>
+        <p class="text-[15px] text-gray max-w-[600px] leading-relaxed">
+          แหล่งรวมของที่ผมทำขึ้นมาใช้เอง — บทเรียน · EA · Signal · เครื่องมือ · ใช้ล็อกอินเดียวกับ intensivetrader.com
+        </p>
+        <div class="filter-pills hub-pills" id="course-filter" role="group" aria-label="กรองรายการ">
+          {pills.map(p => (
+            <button data-filter={p.filter} class={`filter-btn${p.filter === 'all' ? ' active' : ''}${p.count === 0 ? ' dim' : ''}`} aria-pressed={p.filter === 'all' ? 'true' : 'false'}>
+              {p.label}<span>{p.count === 0 ? 'เร็ว ๆ นี้' : p.count}</span>
+            </button>
+          ))}
         </div>
       </div>
     </section>
 
     <!-- CATALOG -->
-    <section class="room-catalog max-w-[1100px] mx-auto px-5" aria-label="รายการเนื้อหาใน Room">
-      <div class="catalog-toolbar">
-        <div class="filter-pills" id="course-filter" role="group" aria-label="กรองรายการ">
-          <button data-filter="all" class="filter-btn active" aria-pressed="true">ทั้งหมด<span>{allItems.length}</span></button>
-          <button data-filter="learn" class="filter-btn" aria-pressed="false">คอร์สเรียน<span>{learnCount}</span></button>
-          <button data-filter="ea" class="filter-btn" aria-pressed="false">EA<span>{eaCount}</span></button>
-        </div>
+    <section class="room-catalog max-w-[1100px] mx-auto px-5 pt-8 pb-4" aria-label="รายการเนื้อหาใน Room">
+      <div id="item-grid" class="hub-grid">
+        {gridItems.map((item, idx) => (
+          <div data-course-type={item.cardType} data-item-key={itemKey(item)} data-idx={idx}>
+            {item.kind === 'ea' ? (
+              <a href={item.href} class="hub-card">
+                <div class="hub-tags">
+                  <span class="hub-tag ea">EA · MT5</span>
+                  {item.live && <span class="hub-tag live">● LIVE{item.version ? ` ${item.version}` : ''}</span>}
+                  <span class="hub-tag">ฟรี</span>
+                </div>
+                <h3 class="pixel">{item.title}</h3>
+                <p>{item.description}</p>
+                <div class="hub-foot"><span>room / ea / {item.id}</span><span class="go">ดู + โหลด →</span></div>
+              </a>
+            ) : item.kind === 'tool' ? (
+              <a href={item.href} class="hub-card" target="_blank" rel="noopener">
+                <div class="hub-tags">
+                  {item.badges.map((b, i) => <span class={`hub-tag${i === 0 ? ' tool' : ''}`}>{b}</span>)}
+                </div>
+                <h3 class="pixel">{item.title}</h3>
+                <p>{item.description}</p>
+                <div class="hub-foot"><span>{item.footerText}</span><span class="go">{item.actionText}</span></div>
+              </a>
+            ) : (
+              <button type="button" data-course-id={item.id} class="hub-card" aria-expanded="false">
+                <div class="hub-tags">
+                  <span class="hub-tag learn">บทเรียน</span>
+                  <span class="hub-tag">ฟรี</span>
+                </div>
+                <h3 class="pixel">{item.title}</h3>
+                <p>{item.description}</p>
+                <div class="hub-foot"><span>{item.count} บท</span><span class="go">ดูบทเรียน</span></div>
+              </button>
+            )}
+          </div>
+        ))}
       </div>
 
-      <!-- PINNED -->
-      <div id="pinned-section" class={`catalog-group pinned-group${pinnedItems.length > 0 ? '' : ' hidden'}`}>
-        <div class="catalog-label">
-          <span>
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 3l5 5-1.5 1.5-1-.5-3.5 3.5.5 3.5-2 2-3.5-3.5L3 24l-1-1 6.5-8.5L5 11l2-2 3.5.5L14 6l-.5-1z"/></svg>
-            ปักหมุด
-          </span>
-          <small>ดูสถานะและ README ก่อนใช้</small>
-        </div>
-        <div id="pinned-grid" class="resource-grid">
-          {pinnedItems.map(item => (
-            <div data-course-type={item.cardType} data-item-key={item.kind === 'ea' ? `ea:${item.id}` : `course:${item.id}`}>
-              {item.kind === 'ea' ? (
-                <a href={item.href} class="resource-card">
-                  <div class="resource-card-visual ea">
-                    <img src="/gdbasket-mark.png" alt="gdBasket" class="w-9 h-9 object-contain" />
-                    <span>FREE</span>
-                  </div>
-                  <div class="resource-card-body">
-                    <div class="resource-card-badges">
-                      <span class="resource-type ea">EA</span>
-                      {item.live && <span class="resource-live"><i></i> LIVE</span>}
-                      {item.version && <span class="resource-version">{item.version}</span>}
-                    </div>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                    <div class="resource-card-meta"><span></span><span>เปิด README</span></div>
-                  </div>
-                  <div class="resource-card-action" aria-hidden="true">
-                    <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7" /></svg>
-                  </div>
-                </a>
-              ) : (
-                <button type="button" data-course-id={item.id} class="resource-card" aria-expanded="false">
-                  <div class="resource-card-visual">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    <span>FREE</span>
-                  </div>
-                  <div class="resource-card-body">
-                    <div class="resource-card-badges">
-                      <span class="resource-type">คอร์สเรียน</span>
-                    </div>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                    <div class="resource-card-meta"><span>{item.count} บท</span><span>ดูบทเรียน</span></div>
-                  </div>
-                  <div class="resource-card-action" aria-hidden="true">
-                    <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9l6 6 6-6" /></svg>
-                  </div>
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <!-- REST -->
-      <div id="rest-section" class={`catalog-group${restItems.length > 0 ? '' : ' hidden'}`}>
-        <div class="catalog-label">
-          <span>ทั้งหมด</span>
-        </div>
-        <div id="rest-grid" class="resource-grid">
-          {restItems.map(item => (
-            <div data-course-type={item.cardType} data-item-key={item.kind === 'ea' ? `ea:${item.id}` : `course:${item.id}`}>
-              {item.kind === 'ea' ? (
-                <a href={item.href} class="resource-card">
-                  <div class="resource-card-visual ea">
-                    <img src="/gdbasket-mark.png" alt="gdBasket" class="w-9 h-9 object-contain" />
-                    <span>FREE</span>
-                  </div>
-                  <div class="resource-card-body">
-                    <div class="resource-card-badges">
-                      <span class="resource-type ea">EA</span>
-                      {item.live && <span class="resource-live"><i></i> LIVE</span>}
-                      {item.version && <span class="resource-version">{item.version}</span>}
-                    </div>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                    <div class="resource-card-meta"><span></span><span>เปิด README</span></div>
-                  </div>
-                  <div class="resource-card-action" aria-hidden="true">
-                    <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7" /></svg>
-                  </div>
-                </a>
-              ) : (
-                <button type="button" data-course-id={item.id} class="resource-card" aria-expanded="false">
-                  <div class="resource-card-visual">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    <span>FREE</span>
-                  </div>
-                  <div class="resource-card-body">
-                    <div class="resource-card-badges">
-                      <span class="resource-type">คอร์สเรียน</span>
-                    </div>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                    <div class="resource-card-meta"><span>{item.count} บท</span><span>ดูบทเรียน</span></div>
-                  </div>
-                  <div class="resource-card-action" aria-hidden="true">
-                    <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9l6 6 6-6" /></svg>
-                  </div>
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <!-- Inline course content (toggle on resource-card click) -->
+      <!-- Inline course content (toggle on hub-card click) -->
       {courses.map(course => {
         const courseLessons = renderedLessons.get(course.id) || [];
         const isMultiLesson = courseLessons.length > 1;
@@ -245,27 +177,56 @@ const eaCount = allItems.filter(i => i.cardType === 'ea').length;
         );
       })}
 
-      <div id="catalog-empty" class="catalog-empty hidden">ยังไม่มีรายการในหมวดนี้</div>
+      <div id="catalog-empty" class="catalog-empty hidden">ยังไม่มีในหมวดนี้ — กำลังทำอยู่</div>
 
     </section>
 
   </div>
 </Layout>
 
+<style>
+  .hub-hero { position: relative; overflow: hidden; padding: 64px 0 28px; background: var(--color-dark); border-bottom: 1px solid var(--color-dark-border); }
+  .hub-hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .18; background-image: radial-gradient(var(--color-primary) 1px, transparent 1px); background-size: 20px 20px; }
+  .hub-orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(70px); background: rgba(220, 38, 38, .18); }
+  .hub-orb-a { width: 380px; height: 380px; top: -60px; left: 15%; }
+  .hub-orb-b { width: 300px; height: 300px; bottom: -120px; right: 10%; background: rgba(220, 38, 38, .1); }
+  .hub-pills { margin-top: 28px; }
+  .filter-pills button.dim { opacity: .45; }
+  .filter-pills button.dim.active { opacity: 1; }
+  .filter-pills button span { white-space: nowrap; }
+  .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+  .hub-grid > div { display: flex; }
+  .hub-card { width: 100%; display: flex; flex-direction: column; gap: 12px; padding: 22px; text-align: left; color: var(--color-gray-light); background: var(--color-dark-card); border: 1px solid var(--color-dark-border); border-radius: 12px; cursor: pointer; transition: transform 160ms ease-out, border-color 160ms ease-out; }
+  .hub-card:hover { transform: translateY(-2px); border-color: var(--color-primary); }
+  .hub-card.expanded { border-color: var(--color-primary); }
+  .hub-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .hub-tag { padding: 2px 8px; color: var(--color-gray); background: #262626; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .hub-tag.ea { color: #f87171; background: #2a1010; }
+  .hub-tag.live { color: var(--color-green); background: #0f2a18; }
+  .hub-tag.tool { color: var(--color-secondary); background: #2a2005; }
+  .hub-tag.learn { color: var(--color-primary-light); background: rgba(220, 38, 38, .1); }
+  .hub-card h3 { margin: 0; color: var(--color-gray-light); font-size: 14px; line-height: 1.6; }
+  .hub-card p { flex: 1; margin: 0; color: var(--color-gray); font-size: 14px; line-height: 1.6; }
+  .hub-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; color: var(--color-gray-dark); font-size: 13px; }
+  .hub-foot .go { color: var(--color-primary); font-weight: 600; white-space: nowrap; }
+  @media (max-width: 767px) {
+    .hub-hero { padding: 46px 0 22px; }
+    .hub-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
 <script>
-  // Course card toggle (course cards only — EA cards are <a> links)
-  const courseCards = document.querySelectorAll<HTMLButtonElement>('button.resource-card');
+  // Course card toggle (course cards only — EA / tool cards are <a> links)
+  const courseCards = document.querySelectorAll<HTMLButtonElement>('button.hub-card');
   const courseContents = document.querySelectorAll<HTMLElement>('.course-preview');
   let activeCourse: string | null = null;
 
   function setCardExpanded(courseId: string, expanded: boolean) {
-    document.querySelectorAll<HTMLButtonElement>(`button.resource-card[data-course-id="${courseId}"]`).forEach(card => {
+    document.querySelectorAll<HTMLButtonElement>(`button.hub-card[data-course-id="${courseId}"]`).forEach(card => {
       card.classList.toggle('expanded', expanded);
       card.setAttribute('aria-expanded', String(expanded));
-      const meta = card.querySelector('.resource-card-meta span:last-child');
+      const meta = card.querySelector('.hub-foot span:last-child');
       if (meta) meta.textContent = expanded ? 'กำลังเปิด' : 'ดูบทเรียน';
-      const chevron = card.querySelector('.resource-card-action svg');
-      chevron?.classList.toggle('rotate', expanded);
     });
   }
 
@@ -341,30 +302,24 @@ const eaCount = allItems.filter(i => i.cardType === 'ea').length;
 
   filterBtns.forEach(btn => btn.addEventListener('click', () => applyFilter(btn.getAttribute('data-filter') || 'all')));
 
-  // ?filter=ea -> auto-activate EA filter (nav "EA" link)
+  // ?filter=ea / ?filter=tool -> auto-activate that filter (nav links)
   const urlFilter = new URLSearchParams(window.location.search).get('filter');
-  if (urlFilter === 'ea' || urlFilter === 'learn') applyFilter(urlFilter);
+  if (urlFilter === 'ea' || urlFilter === 'learn' || urlFilter === 'tool') applyFilter(urlFilter);
 
-  // ── ปักหมุดจาก admin: ดึง content_pins (site_settings) มาจัดโซนใหม่ ──
-  // fetch fail / ไม่มี pins = คง frontmatter เดิม (SSR default)
+  // ── ปักหมุดจาก admin: ดึง content_pins (site_settings) มาเรียงใหม่ใน grid เดียว ──
+  // pinned มาก่อน (ตามลำดับ pin) แล้วที่เหลือตามลำดับเดิม · fetch fail / ไม่มี pins = คงลำดับ SSR
   function applyPins(pins: { key: string; order?: number }[]) {
-    const pinnedGrid = document.getElementById('pinned-grid');
-    const restGrid = document.getElementById('rest-grid');
-    const pinnedSection = document.getElementById('pinned-section');
-    const restSection = document.getElementById('rest-section');
-    if (!pinnedGrid || !restGrid || !pinnedSection || !restSection) return;
-
+    const grid = document.getElementById('item-grid');
+    if (!grid) return;
     const orderMap = new Map(pins.map(p => [p.key, p.order ?? 999]));
-    const wrappers = [...document.querySelectorAll<HTMLElement>('[data-item-key]')];
+    const wrappers = [...grid.querySelectorAll<HTMLElement>('[data-item-key]')];
     const pinned = wrappers
       .filter(w => orderMap.has(w.dataset.itemKey!))
       .sort((a, b) => orderMap.get(a.dataset.itemKey!)! - orderMap.get(b.dataset.itemKey!)!);
-    const rest = wrappers.filter(w => !orderMap.has(w.dataset.itemKey!));
-
-    pinned.forEach(w => pinnedGrid.appendChild(w));
-    rest.forEach(w => restGrid.appendChild(w));
-    pinnedSection.classList.toggle('hidden', pinned.length === 0);
-    restSection.classList.toggle('hidden', rest.length === 0);
+    const rest = wrappers
+      .filter(w => !orderMap.has(w.dataset.itemKey!))
+      .sort((a, b) => Number(a.dataset.idx) - Number(b.dataset.idx));
+    [...pinned, ...rest].forEach(w => grid.appendChild(w));
   }
 
   const SUPA_URL = import.meta.env.PUBLIC_SUPABASE_URL;

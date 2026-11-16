@@ -12,6 +12,11 @@
       "source": "/gdbasket-changelog.html",
       "destination": "/ea/gdbasket/changelog",
       "permanent": true
+    },
+    {
+      "source": "/ea/gdbasket/rolling-capital",
+      "destination": "/ea/gdbasket",
+      "permanent": true
     }
   ]
 }
