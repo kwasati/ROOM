@@ -18,6 +18,7 @@
 - `src\data\ea.ts` — รายการ EA แบบ hardcoded array (ไม่ใช่ content collection)
 - `src\content\courses\` + `src\content\lessons\` — คอร์สเป็น MDX collection
 - `src\data\tools.ts` — รายการเครื่องมือ (AGENTQ ลิงก์ออก agentq.intensivetrader.com)
+- `public\ea\gdbasket\rolling-sim\index.html` — หน้า Rolling Simulator (static · noindex · ไม่มีลิงก์) ห้ามแก้ไฟล์นี้ตรง: สร้างจาก `C:\WORKSPACE\projects\2-EAfactory\ea\gdBasket\research\scripts\rolling-sim\` · ใบ `C:\WORKSPACE\projects\1-intensivetrader.com\roadmap\queue-rolling-sim-page.md`
 - `src\pages\ea\gdbasket\changelog.astro` — changelog route ของ gdBasket (hardcode · แก้ทุก release)
 - `src\pages\items.json.ts` — list item ทั้งหมดของ room ให้ admin เว็บหลักทำ pin manager
 - `CHANGELOG.md`
