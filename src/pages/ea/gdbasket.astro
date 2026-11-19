@@ -5,6 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 const MAIN = 'https://intensivetrader.com';
 const JOURNAL = 'https://journal.intensivetrader.com/';
 const DL_LATEST = `${MAIN}/d/gdbasket`; // main button - redirect to the latest file v4.10 (publish/releases/v4.10/gdBasket_v4.10.ex5)
+const DL_MT5 = `${MAIN}/d/gdbasket-mt5`; // MT5 (XM) portable zip + gdBasket v4.10 - GitHub release kwasati/gdbasket-releases
 const DL_AGILE_SET = `${MAIN}/d/gdbasket-agile-set`;
 const DL_V401 = `${MAIN}/d/gdbasket-v401`;
 const DL_SET = `${MAIN}/d/gdbasket-veloce26-set`;
@@ -115,12 +116,13 @@ const fileRows = [
   { icon: 'risk', name: 'ความเสี่ยงที่ต้องรู้', note: 'Buy Grid · Capital · เงินค้ำ · ข้อจำกัดก่อนใช้', meta: 'สำคัญ', href: '#risk', color: 'text-secondary' },
   { icon: 'clock', name: 'Releases', note: 'v4.10 · v4.01 · v4.00 · v3.22 · v3.11 · v3.10 · v3.092 · v2.02 · v2.01 · v2.00 · v1.37 · v1.18', meta: '12 rel', href: '/ea/gdbasket/changelog', color: 'text-gray' },
   { icon: 'dl', name: 'gdBasket v4.10', note: 'พร้อมใช้ · โหลดฟรี', meta: 'ดาวน์โหลด', href: DL_LATEST, color: 'text-green', download: true },
+  { icon: 'mt5', name: 'gdBasket MT5 (Windows)', note: 'MT5 ของ XM + gdBasket พร้อมใช้ · แตก zip แล้วกด Create Desktop Shortcut', meta: 'โหลด zip', href: DL_MT5, color: 'text-green', download: true },
   { icon: 'journal', name: 'Trading Journal', note: 'ผลเทรดจริงรายวัน · กำไร/ขาดทุนต่อรอบ', meta: 'ดูประวัติ', href: JOURNAL, color: 'text-primary', accent: true },
 ];
 
 const installSteps = [
   'ดาวน์โหลดไฟล์ <strong>gdBasket v4.10</strong> จากปุ่มด้านบน',
-  'เปิด <strong>MetaTrader 5</strong> → <strong>File → Open Data Folder</strong>',
+  'เปิด <strong>MetaTrader 5</strong> (ยังไม่มี? <a href="https://intensivetrader.com/d/gdbasket-mt5" class="text-primary hover:underline">โหลด MT5 พร้อม gdBasket</a>) → <strong>File → Open Data Folder</strong>',
   'วางไฟล์ในโฟลเดอร์ <code class="install-path">MQL5 → Experts</code>',
   'ปิดเปิด MT5 ใหม่ หรือกด <strong>Refresh</strong> ใน Navigator',
   'ลาก <strong>gdBasket</strong> ใส่กราฟ <strong>GOLD M15</strong> → ติ๊กอนุญาตเทรดอัตโนมัติ → กดปุ่ม <strong>Algo Trading</strong> ให้ขึ้น<strong class="text-green">สีเขียว</strong>',
@@ -193,6 +195,10 @@ const installSteps = [
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             ดาวน์โหลดฟรี <span>v4.10</span>
           </a>
+          <a href={DL_MT5} download class="repo-download outline">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            ดาวน์โหลด MT5
+          </a>
           <p>ไฟล์รุ่น <strong>v4.10</strong> — ใช้ได้เฉพาะบัญชี <strong>XM</strong> (ทองคำ ไทม์เฟรม M15) ล็อกไว้ในตัว EA</p>
         </div>
 
@@ -218,6 +224,7 @@ const installSteps = [
                 {row.icon === 'risk' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.82 14A2 2 0 003.18 21h17.64a2 2 0 001.71-3.14l-8.82-14a2 2 0 00-3.42 0z"/></svg>}
                 {row.icon === 'clock' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
                 {row.icon === 'dl' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>}
+                {row.icon === 'mt5' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>}
                 {row.icon === 'journal' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>}
                 {row.icon === 'calc' && <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h.01M12 11h.01M15 11h.01M9 15h.01M12 15h.01M15 15h.01M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>}
                 <strong>{row.name}</strong>

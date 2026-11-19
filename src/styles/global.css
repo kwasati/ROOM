@@ -117,6 +117,9 @@
 .repo-download:active { transform: scale(.97); }
 .repo-download span { color: rgba(255,255,255,.72); font-size: 9px; }
 .repo-download.compact { margin-left: auto; }
+.repo-download.outline { color: var(--color-gray-light); background: transparent; border: 1px solid currentColor; box-shadow: none; }
+.repo-download.outline:hover { background: rgba(255,255,255,.06); }
+.repo-download.compact + .repo-download { margin-left: 8px; }
 .file-browser { overflow: hidden; margin-bottom: 28px; border: 1px solid var(--color-dark-border); border-radius: 9px; }
 .commit-row { min-height: 43px; display: grid; grid-template-columns: auto auto minmax(80px, 1fr) auto; align-items: center; gap: 8px; padding: 6px 13px; color: var(--color-gray); background: var(--color-dark-card); border-bottom: 1px solid var(--color-dark-border); font-size: 11px; }
 .commit-avatar { width: 23px; height: 23px; display: grid; place-items: center; color: #fff; background: var(--color-dark-border); border-radius: 50%; object-fit: cover; font-size: 7px; }
