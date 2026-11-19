@@ -14,7 +14,7 @@
 
 ## → ลูก
 - `src\pages\index.astro` — home hub — grid เดียว 3 หมวด บทเรียน / EA / เครื่องมือ + filter (`?filter=ea|tool`) · ปักหมุดจาก admin เรียงใน grid
-- `src\pages\ea\gdbasket.astro` — หน้า EA สไตล์ github-repo (hardcode 12 รุ่น publish: v4.10..v1.18, รุ่นล่าสุด v4.10)
+- `src\pages\ea\gdbasket.astro` — หน้า EA สไตล์ github-repo (hardcode 12 รุ่น publish: v4.10..v1.18, รุ่นล่าสุด v4.10) · ปุ่มโหลด MT5 3 จุดใช้ `DL_MT5` = `/d/gdbasket-mt5` (zip บน GitHub Release · ขั้นทำ zip = RELEASE-RUNBOOK STEP A ข้อ 7)
 - `src\data\ea.ts` — รายการ EA แบบ hardcoded array (ไม่ใช่ content collection)
 - `src\content\courses\` + `src\content\lessons\` — คอร์สเป็น MDX collection
 - `src\data\tools.ts` — รายการเครื่องมือ (AGENTQ ลิงก์ออก agentq.intensivetrader.com)
