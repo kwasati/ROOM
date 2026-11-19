@@ -1,9 +1,9 @@
 # Room
 
-room.intensivetrader.com (ภาษาไทย) — แหล่งรวม บทเรียน / EA / Signal / เครื่องมือ ของแบรนด์ IntensiveTrader · repo `kwasati/ROOM` · branch `master` = production
+room.intensivetrader.com (ภาษาไทย) — แหล่งรวม บทเรียน / EA / เครื่องมือ ของแบรนด์ IntensiveTrader · repo `kwasati/ROOM` · branch `master` = production
 
 ## WHY
-- แหล่งรวม 4 หมวด บทเรียน / EA / Signal / เครื่องมือ: การ์ดใน home hub (`src\data\ea.ts` · `src\data\tools.ts`) ชี้ไปหน้ารายละเอียด หรือลิงก์ออก (AGENTQ)
+- แหล่งรวม 3 หมวด บทเรียน / EA / เครื่องมือ: การ์ดใน home hub (`src\data\ea.ts` · `src\data\tools.ts`) ชี้ไปหน้ารายละเอียด หรือลิงก์ออก (AGENTQ)
 - ตัวหลักตอนนี้คือ gdBasket: หน้า landing สไตล์ github-repo + changelog + รายการ releases + ปุ่มโหลด
 - มีโครงคอร์ส/บทเรียน (MDX) รองรับ แต่ตอนนี้ `src\content\courses\` และ `src\content\lessons\forex-basics\` ว่าง (build เตือน "collection empty" เป็นปกติ)
 

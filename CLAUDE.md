@@ -1,6 +1,6 @@
 # Room
 
-ฮับรวม บทเรียน / EA / Signal / เครื่องมือ ใต้แบรนด์ IntensiveTrader — `room.intensivetrader.com` (ภาษาไทย)
+ฮับรวม บทเรียน / EA / เครื่องมือ ใต้แบรนด์ IntensiveTrader — `room.intensivetrader.com` (ภาษาไทย)
 
 ## Commands
 - dev `npm run dev` / build `npm run build` / preview `npm run preview`
@@ -13,7 +13,7 @@
 - หน้า public พูดถึงเครื่องยนต์ VELOCE ตัวเดียว
 
 ## → ลูก
-- `src\pages\index.astro` — home hub — grid เดียว 4 หมวด บทเรียน / EA / Signal / เครื่องมือ + filter (`?filter=ea|tool`) · ปักหมุดจาก admin เรียงใน grid
+- `src\pages\index.astro` — home hub — grid เดียว 3 หมวด บทเรียน / EA / เครื่องมือ + filter (`?filter=ea|tool`) · ปักหมุดจาก admin เรียงใน grid
 - `src\pages\ea\gdbasket.astro` — หน้า EA สไตล์ github-repo (hardcode 12 รุ่น publish: v4.10..v1.18, รุ่นล่าสุด v4.10)
 - `src\data\ea.ts` — รายการ EA แบบ hardcoded array (ไม่ใช่ content collection)
 - `src\content\courses\` + `src\content\lessons\` — คอร์สเป็น MDX collection
