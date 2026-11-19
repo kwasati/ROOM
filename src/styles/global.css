@@ -325,6 +325,9 @@
   .repo-toolbar > span { display: none; }
   .repo-toolbar > p { text-align: left; }
   .repo-download.compact { margin-left: auto; }
+  .repo-toolbar > .repo-download { flex: 1 1 0; min-width: 0; padding: 0 8px; white-space: nowrap; }
+  .repo-toolbar > .repo-download span { display: none; }
+  .repo-toolbar > .repo-download.compact + .repo-download { margin-left: 0; }
   .commit-row { grid-template-columns: auto auto minmax(60px, 1fr); }
   .commit-row time { display: none; }
   .file-list > a { min-height: 44px; grid-template-columns: 18px minmax(0, 1fr) auto; }
